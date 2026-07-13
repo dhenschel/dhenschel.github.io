@@ -1,0 +1,183 @@
+---
+import { projects } from "../data/projects";
+---
+
+<div class="project-hub" data-project-hub>
+  <div class="project-hub__bar">
+    <div>
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>LIBRARY CONNECTED</span>
+    </div>
+    <div class="project-hub__progress" aria-live="polite">
+      <span data-project-progress>01</span>
+      <span aria-hidden="true">/</span>
+      <span>{projects.length.toString().padStart(2, "0")}</span>
+    </div>
+    <div class="project-hub__keys" aria-label="Tastatursteuerung">
+      <kbd>←</kbd><kbd>→</kbd><span>SELECT</span>
+    </div>
+  </div>
+
+  <ul class="project-library" aria-label="Projektbibliothek">
+    {
+      projects.map((project, index) => (
+        <li>
+          <a
+            class="project-card"
+            href={`#project-${project.slug}`}
+            data-project-control
+            data-project-index={index}
+            data-active={index === 0 ? "true" : "false"}
+            aria-current={index === 0 ? "true" : undefined}
+            aria-controls={`project-${project.slug}`}
+          >
+            <span
+              class={`project-card__art project-card__art--${project.tone}`}
+            >
+              <span class="project-card__grid" aria-hidden="true" />
+              <span class="project-card__orbit" aria-hidden="true" />
+              <span class="project-card__mark">{project.mark}</span>
+              <span class="project-card__number">{project.index}</span>
+            </span>
+            <span class="project-card__copy">
+              <span>{project.eyebrow}</span>
+              <strong>{project.title}</strong>
+              <small>{project.status}</small>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="project-hub__controls" aria-label="Projekt wechseln">
+    <button type="button" data-project-previous aria-label="Vorheriges Projekt">
+      <span aria-hidden="true">←</span>
+    </button>
+    <button type="button" data-project-next aria-label="Nächstes Projekt">
+      <span aria-hidden="true">→</span>
+    </button>
+  </div>
+
+  <div class="project-inspector" aria-label="Ausgewähltes Projekt">
+    {
+      projects.map((project, index) => (
+        <article
+          class="project-panel"
+          id={`project-${project.slug}`}
+          data-project-panel
+          data-active={index === 0 ? "true" : "false"}
+        >
+          <div class="project-panel__index" aria-hidden="true">
+            {project.index}
+          </div>
+          <div class="project-panel__main">
+            <p class="eyebrow">{project.eyebrow}</p>
+            <h3>{project.title}</h3>
+            <p class="project-panel__description">{project.description}</p>
+            {project.href ? (
+              <a class="text-link" href={project.href}>
+                Case Study öffnen <span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <span class="text-link text-link--muted">
+                Wird mit echtem Projekt belegt
+              </span>
+            )}
+          </div>
+          <dl class="project-panel__meta">
+            <div>
+              <dt>Rolle</dt>
+              <dd>{project.role}</dd>
+            </div>
+            <div>
+              <dt>Stack / Fokus</dt>
+              <dd>{project.stack.join(" · ")}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>
+                <span class="status-dot" aria-hidden="true" />
+                {project.status}
+              </dd>
+            </div>
+          </dl>
+        </article>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const hub = document.querySelector<HTMLElement>("[data-project-hub]");
+
+  if (hub) {
+    document.documentElement.classList.add("js");
+
+    const controls = Array.from(
+      hub.querySelectorAll<HTMLAnchorElement>("[data-project-control]"),
+    );
+    const panels = Array.from(
+      hub.querySelectorAll<HTMLElement>("[data-project-panel]"),
+    );
+    const progress = hub.querySelector<HTMLElement>("[data-project-progress]");
+    const previous = hub.querySelector<HTMLButtonElement>(
+      "[data-project-previous]",
+    );
+    const next = hub.querySelector<HTMLButtonElement>("[data-project-next]");
+    let activeIndex = 0;
+
+    const activate = (index: number, moveFocus = false) => {
+      activeIndex = (index + controls.length) % controls.length;
+
+      controls.forEach((control, controlIndex) => {
+        const isActive = controlIndex === activeIndex;
+        control.dataset.active = String(isActive);
+        control.toggleAttribute("aria-current", isActive);
+      });
+
+      panels.forEach((panel, panelIndex) => {
+        const isActive = panelIndex === activeIndex;
+        panel.dataset.active = String(isActive);
+        panel.hidden = !isActive;
+      });
+
+      if (progress) {
+        progress.textContent = String(activeIndex + 1).padStart(2, "0");
+      }
+
+      if (moveFocus) controls[activeIndex]?.focus();
+    };
+
+    controls.forEach((control, index) => {
+      control.addEventListener("click", (event) => {
+        event.preventDefault();
+        activate(index);
+      });
+    });
+
+    previous?.addEventListener("click", () => activate(activeIndex - 1, true));
+    next?.addEventListener("click", () => activate(activeIndex + 1, true));
+
+    hub.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        activate(activeIndex - 1, true);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        activate(activeIndex + 1, true);
+      }
+      if (event.key === "Home") {
+        event.preventDefault();
+        activate(0, true);
+      }
+      if (event.key === "End") {
+        event.preventDefault();
+        activate(controls.length - 1, true);
+      }
+    });
+
+    activate(0);
+  }
+</script>

@@ -1,0 +1,30 @@
+---
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<header class:list={["site-header", { "site-header--compact": compact }]}>
+  <a class="brand" href="/" aria-label="D. Henschel – Startseite">
+    <span class="brand__mark">DH</span>
+    <span class="brand__signal" aria-hidden="true"></span>
+  </a>
+
+  <nav class="site-nav" aria-label="Hauptnavigation">
+    <a href="/#projekte">Projekte</a>
+    <a href="/#profil">Profil</a>
+    <a href="/#kontakt">Kontakt</a>
+  </nav>
+
+  <a
+    class="header-link"
+    href="https://github.com/dhenschel"
+    target="_blank"
+    rel="noreferrer"
+  >
+    GitHub
+    <span aria-hidden="true">↗</span>
+  </a>
+</header>

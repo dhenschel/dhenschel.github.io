@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#141820"/>
+      <stop offset="1" stop-color="#080a0d"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0v48" fill="none" stroke="#f1f0ea" stroke-opacity=".06"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="1050" cy="110" r="12" fill="#65f6d2"/>
+  <path d="M920 128h142M991 57v142" stroke="#65f6d2" stroke-width="2" stroke-opacity=".5"/>
+  <text x="72" y="88" fill="#65f6d2" font-family="monospace" font-size="20" letter-spacing="4">PORTFOLIO / SYSTEM READY</text>
+  <text x="70" y="320" fill="#f1f0ea" font-family="Arial, sans-serif" font-size="118" font-weight="700" letter-spacing="-7">D. HENSCHEL</text>
+  <text x="76" y="394" fill="#9aa3ae" font-family="Arial, sans-serif" font-size="34">Digitale Produkte mit System und Charakter.</text>
+  <rect x="74" y="512" width="190" height="2" fill="#65f6d2"/>
+  <text x="290" y="520" fill="#f1f0ea" font-family="monospace" font-size="19" letter-spacing="2">SOFTWARE DEVELOPER</text>
+</svg>

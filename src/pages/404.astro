@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+---
+
+<BaseLayout title="404 — Signal verloren" noindex>
+  <SiteHeader compact />
+  <main id="main-content" class="not-found shell">
+    <p class="eyebrow">
+      <span class="status-dot status-dot--error"></span> ERROR / 404
+    </p>
+    <strong aria-hidden="true">404</strong>
+    <h1>Signal verloren.</h1>
+    <p>Diese Route gehört nicht zur aktuellen Mission.</p>
+    <a class="button button--primary" href="/">Zurück zum Hub →</a>
+  </main>
+  <SiteFooter />
+</BaseLayout>

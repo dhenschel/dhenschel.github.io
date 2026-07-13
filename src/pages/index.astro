@@ -1,0 +1,278 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import ProjectHub from "../components/ProjectHub.astro";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "D. Henschel",
+  url: "https://www.dhenschel.de",
+  sameAs: ["https://github.com/dhenschel"],
+  jobTitle: "Software Developer",
+};
+---
+
+<BaseLayout>
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(structuredData)}
+  />
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero__copy" data-reveal>
+        <p class="eyebrow hero__eyebrow">
+          <span class="status-dot" aria-hidden="true"></span>
+          PORTFOLIO SYSTEM / 00.1
+        </p>
+        <h1 id="hero-title">
+          <span>Digitale Produkte</span>
+          <span class="text-outline">mit System</span>
+          <span>und Charakter.</span>
+        </h1>
+        <p class="hero__intro">
+          Ich bin D. Henschel, Software Developer. Ich entwickle Websites und
+          Software, die technische Klarheit mit einer eigenständigen Oberfläche
+          verbinden.
+        </p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="#projekte">
+            Projekte entdecken <span aria-hidden="true">↓</span>
+          </a>
+          <a class="button button--ghost" href="https://github.com/dhenschel">
+            GitHub öffnen <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <div
+        class="hero-console"
+        data-reveal
+        aria-label="Portfolio-Statusanzeige"
+      >
+        <div class="hero-console__topline">
+          <span>PLAYER PROFILE</span>
+          <span class="hero-console__clock" data-clock>--:-- CET</span>
+        </div>
+        <div class="hero-console__screen">
+          <div class="signal-orb" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="hero-console__identity">
+            <span>ID / 001</span>
+            <strong>D. HENSCHEL</strong>
+            <small>SOFTWARE DEVELOPER</small>
+          </div>
+          <span class="hero-console__coordinate hero-console__coordinate--one"
+            >48.1 N</span
+          >
+          <span class="hero-console__coordinate hero-console__coordinate--two"
+            >BUILD / ACTIVE</span
+          >
+        </div>
+        <dl class="hero-console__stats">
+          <div>
+            <dt>Current quest</dt>
+            <dd>Portfolio launch</dd>
+          </div>
+          <div>
+            <dt>Mode</dt>
+            <dd>Design × Code</dd>
+          </div>
+          <div>
+            <dt>Signal</dt>
+            <dd><span class="status-dot" aria-hidden="true"></span> Online</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="hero__footnote" aria-hidden="true">
+        <span>SCROLL TO EXPLORE</span>
+        <span class="hero__line"></span>
+        <span>001—004</span>
+      </div>
+    </section>
+
+    <section
+      class="section projects-section shell"
+      id="projekte"
+      aria-labelledby="projects-title"
+    >
+      <div class="section-heading" data-reveal>
+        <div>
+          <p class="eyebrow">01 / SELECTED WORK</p>
+          <h2 id="projects-title">Project Library</h2>
+        </div>
+        <p>
+          Eine kuratierte Auswahl statt einer endlosen Liste. Weitere Websites
+          werden später als eigene Titel und Case Studies ergänzt.
+        </p>
+      </div>
+
+      <div data-reveal>
+        <ProjectHub />
+      </div>
+    </section>
+
+    <section
+      class="section profile-section shell"
+      id="profil"
+      aria-labelledby="profile-title"
+    >
+      <div class="section-heading section-heading--profile" data-reveal>
+        <div>
+          <p class="eyebrow">02 / PLAYER PROFILE</p>
+          <h2 id="profile-title">Gute Software fühlt sich einfach an.</h2>
+        </div>
+        <div class="profile-copy">
+          <p>
+            Hinter einer klaren Oberfläche stecken gute Entscheidungen: Was ist
+            wirklich wichtig? Was kann einfacher werden? Und welche technische
+            Grundlage hält auch nach dem Launch?
+          </p>
+          <p>
+            Genau an dieser Schnittstelle aus Produktdenken, Interface und
+            Engineering arbeite ich. Dieses Portfolio wächst dabei mit jedem
+            veröffentlichten Projekt weiter.
+          </p>
+        </div>
+      </div>
+
+      <div class="capability-grid" data-reveal>
+        <article class="capability-card">
+          <span class="capability-card__index">01</span>
+          <div class="capability-card__icon" aria-hidden="true">◎</div>
+          <h3>Discover</h3>
+          <p>
+            Problem, Zielgruppe und Erfolgsmaß verstehen, bevor Code entsteht.
+          </p>
+          <span class="capability-card__tag">PRODUCT THINKING</span>
+        </article>
+        <article class="capability-card">
+          <span class="capability-card__index">02</span>
+          <div class="capability-card__icon" aria-hidden="true">◇</div>
+          <h3>Shape</h3>
+          <p>
+            Information, Interaktion und visuelle Sprache zu einem System
+            formen.
+          </p>
+          <span class="capability-card__tag">INTERFACE DESIGN</span>
+        </article>
+        <article class="capability-card">
+          <span class="capability-card__index">03</span>
+          <div class="capability-card__icon" aria-hidden="true">⌘</div>
+          <h3>Build</h3>
+          <p>Performante, wartbare und barrierebewusste Software umsetzen.</p>
+          <span class="capability-card__tag">ENGINEERING</span>
+        </article>
+      </div>
+    </section>
+
+    <section
+      class="section process-section shell"
+      aria-labelledby="process-title"
+    >
+      <div class="process-panel" data-reveal>
+        <div class="process-panel__intro">
+          <p class="eyebrow">03 / DEFAULT WORKFLOW</p>
+          <h2 id="process-title">Von Signal zu System.</h2>
+        </div>
+        <ol class="process-list">
+          <li>
+            <span>01</span>
+            <strong>Explore</strong>
+            <small>Kontext und Ziel schärfen</small>
+          </li>
+          <li>
+            <span>02</span>
+            <strong>Prototype</strong>
+            <small>Richtung früh sichtbar machen</small>
+          </li>
+          <li>
+            <span>03</span>
+            <strong>Engineer</strong>
+            <small>Sauber und messbar umsetzen</small>
+          </li>
+          <li>
+            <span>04</span>
+            <strong>Refine</strong>
+            <small>Testen, lernen, verbessern</small>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section
+      class="contact-section shell"
+      id="kontakt"
+      aria-labelledby="contact-title"
+    >
+      <div class="contact-section__signal" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="contact-section__copy" data-reveal>
+        <p class="eyebrow">04 / START A CONVERSATION</p>
+        <h2 id="contact-title">Noch ein Slot frei.</h2>
+        <p>
+          Projekte, Ideen und Kontaktmöglichkeiten werden hier Schritt für
+          Schritt ergänzt. Bis dahin ist GitHub der direkte Kanal.
+        </p>
+        <a
+          class="button button--light"
+          href="https://github.com/dhenschel"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Auf GitHub verbinden <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="contact-section__number" aria-hidden="true">04</div>
+    </section>
+  </main>
+
+  <SiteFooter />
+
+  <script>
+    const clock = document.querySelector<HTMLElement>("[data-clock]");
+
+    const updateClock = () => {
+      if (!clock) return;
+      const time = new Intl.DateTimeFormat("de-DE", {
+        timeZone: "Europe/Berlin",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).format(new Date());
+      clock.textContent = `${time} CET`;
+    };
+
+    updateClock();
+    window.setInterval(updateClock, 60_000);
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const revealItems = document.querySelectorAll<HTMLElement>("[data-reveal]");
+
+    if (!reduceMotion && "IntersectionObserver" in window) {
+      document.documentElement.classList.add("reveal-ready");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -8%", threshold: 0.08 },
+      );
+      revealItems.forEach((item) => observer.observe(item));
+    }
+  </script>
+</BaseLayout>

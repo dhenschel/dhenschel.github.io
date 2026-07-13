@@ -1,0 +1,119 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+---
+
+<BaseLayout
+  title="dhenschel.de — Case Study"
+  description="Konzept und technische Entscheidungen hinter dem Portfolio-Hub von D. Henschel."
+>
+  <SiteHeader compact />
+  <main id="main-content" class="case-study">
+    <header class="case-hero shell">
+      <a class="back-link" href="/#projekte">← Zurück zur Library</a>
+      <p class="eyebrow"><span class="status-dot"></span> CASE FILE / 001</p>
+      <h1>Ein Portfolio, das sich wie ein Produkt anfühlt.</h1>
+      <p class="case-hero__lede">
+        dhenschel.de verbindet die schnelle Orientierung eines klassischen
+        Entwickler-Portfolios mit der Auswahl- und Statuslogik eines modernen
+        Console Hubs.
+      </p>
+      <dl class="case-hero__meta">
+        <div><dt>Jahr</dt><dd>2026</dd></div>
+        <div><dt>Rolle</dt><dd>Konzept · Design · Entwicklung</dd></div>
+        <div><dt>Stack</dt><dd>Astro · TypeScript · CSS</dd></div>
+        <div><dt>Status</dt><dd>In Entwicklung</dd></div>
+      </dl>
+    </header>
+
+    <div
+      class="case-visual shell"
+      aria-label="Abstrakte Darstellung des Portfolio-Hubs"
+    >
+      <div class="case-visual__screen">
+        <span class="case-visual__label">PROJECT LIBRARY / ONLINE</span>
+        <div class="case-visual__cards" aria-hidden="true">
+          <span class="is-active">DH</span><span>WP</span><span>TS</span><span
+            >EX</span
+          >
+        </div>
+        <div class="case-visual__readout">
+          <strong>DIGITALE PRODUKTE</strong>
+          <span>SYSTEM / CHARACTER / CLARITY</span>
+        </div>
+      </div>
+    </div>
+
+    <article class="case-body shell">
+      <section class="case-section">
+        <p class="eyebrow">01 / CHALLENGE</p>
+        <div>
+          <h2>Eigenständig wirken, ohne Orientierung zu opfern.</h2>
+          <p>
+            Viele Entwickler-Portfolios sind entweder sehr funktional und
+            austauschbar oder visuell eindrucksvoll, aber schwer zu bedienen.
+            Das Ziel ist eine dritte Option: ein wiedererkennbares Interface,
+            das die Projekte trotzdem in wenigen Sekunden verständlich macht.
+          </p>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <p class="eyebrow">02 / APPROACH</p>
+        <div>
+          <h2>Die Spielebibliothek als Navigationsmodell.</h2>
+          <p>
+            Projektcover, aktiver Status, Index und Inspector bilden gemeinsam
+            den Console Hub. Die Metapher bleibt bewusst leicht: Jeder Titel ist
+            ein normaler Link, alle Informationen sind semantisches HTML und auf
+            Mobilgeräten wird daraus ein übersichtlicher Kartenstapel.
+          </p>
+          <ul class="case-points">
+            <li>
+              <span>01</span> Tastatursteuerung zusätzlich zur direkten Auswahl
+            </li>
+            <li>
+              <span>02</span> Vollständiger Inhalt auch ohne Client-JavaScript
+            </li>
+            <li><span>03</span> Reduzierte Bewegung über Systemeinstellung</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <p class="eyebrow">03 / SYSTEM</p>
+        <div>
+          <h2>Statischer Kern, Interaktion nur dort, wo sie trägt.</h2>
+          <p>
+            Astro erzeugt alle Seiten als statisches HTML. Projektinhalte werden
+            strukturiert gepflegt und später automatisch für Hub, Archiv und
+            Case Studies wiederverwendet. JavaScript steuert nur die Auswahl im
+            Hub und kleine Interface-Details.
+          </p>
+          <div class="metric-grid">
+            <div><strong>0</strong><span>Tracking-Skripte</span></div>
+            <div><strong>100%</strong><span>statisch deploybar</span></div>
+            <div><strong>AA</strong><span>Accessibility-Ziel</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="case-section case-section--next">
+        <p class="eyebrow">04 / NEXT</p>
+        <div>
+          <h2>Jetzt kommen die echten Projekte.</h2>
+          <p>
+            Die technische und visuelle Bühne steht. Als Nächstes ersetzen echte
+            Projektinhalte die vorbereiteten Slots, ergänzt um Screenshots,
+            Ergebnisse und konkrete technische Entscheidungen.
+          </p>
+          <a class="button button--primary" href="/#projekte"
+            >Library ansehen →</a
+          >
+        </div>
+      </section>
+    </article>
+  </main>
+  <SiteFooter />
+</BaseLayout>
