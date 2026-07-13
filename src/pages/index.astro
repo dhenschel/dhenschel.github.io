@@ -1,278 +1,226 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
 import ProjectHub from "../components/ProjectHub.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import StartupScreen from "../components/StartupScreen.astro";
+import { projects } from "../data/projects";
+import "../styles/console.css";
 
 const structuredData = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: "D. Henschel",
-  url: "https://www.dhenschel.de",
-  sameAs: ["https://github.com/dhenschel"],
-  jobTitle: "Software Developer",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://www.dhenschel.de/#person",
+      name: "D. Henschel",
+      url: "https://www.dhenschel.de",
+      sameAs: ["https://github.com/dhenschel"],
+      jobTitle: "Software Developer",
+    },
+    {
+      "@type": "CollectionPage",
+      name: "D. Henschel — Website Console",
+      url: "https://www.dhenschel.de/",
+      about: { "@id": "https://www.dhenschel.de/#person" },
+      mainEntity: {
+        "@type": "ItemList",
+        itemListElement: projects
+          .filter((project) => project.url)
+          .map((project, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            item: {
+              "@type": "WebSite",
+              name: project.title,
+              url: project.url,
+              creator: { "@id": "https://www.dhenschel.de/#person" },
+            },
+          })),
+      },
+    },
+  ],
 };
 ---
 
-<BaseLayout>
+<BaseLayout
+  title="D. Henschel — Website Console"
+  description="Die persönliche Website-Konsole von D. Henschel mit ClipCollection, CozySite, Restaurant Lava und kommenden Projekten."
+>
   <script
     is:inline
     type="application/ld+json"
     set:html={JSON.stringify(structuredData)}
   />
-  <SiteHeader />
 
-  <main id="main-content">
-    <section class="hero shell" aria-labelledby="hero-title">
-      <div class="hero__copy" data-reveal>
-        <p class="eyebrow hero__eyebrow">
-          <span class="status-dot" aria-hidden="true"></span>
-          PORTFOLIO SYSTEM / 00.1
-        </p>
-        <h1 id="hero-title">
-          <span>Digitale Produkte</span>
-          <span class="text-outline">mit System</span>
-          <span>und Charakter.</span>
-        </h1>
-        <p class="hero__intro">
-          Ich bin D. Henschel, Software Developer. Ich entwickle Websites und
-          Software, die technische Klarheit mit einer eigenständigen Oberfläche
-          verbinden.
-        </p>
-        <div class="hero__actions">
-          <a class="button button--primary" href="#projekte">
-            Projekte entdecken <span aria-hidden="true">↓</span>
-          </a>
-          <a class="button button--ghost" href="https://github.com/dhenschel">
-            GitHub öffnen <span aria-hidden="true">↗</span>
-          </a>
+  <StartupScreen />
+
+  <main id="main-content" class="console-home">
+    <section class="console-stage" aria-label="Website-Konsole">
+      <header class="console-bar">
+        <a class="console-brand" href="/" aria-label="D. Henschel – Home">
+          <span>DH</span>
+          <strong>HOME</strong>
+        </a>
+
+        <div class="console-player">
+          <div class="player-avatar player-avatar--small" aria-hidden="true">
+            DH
+          </div>
+          <span><small>Player 01</small><strong>D. Henschel</strong></span>
         </div>
+
+        <nav class="console-nav" aria-label="Schnellzugriff">
+          <a href="#profil">Profil</a>
+          <a
+            href="https://github.com/dhenschel"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub ↗
+          </a>
+          <button type="button" data-replay-startup>Intro abspielen</button>
+        </nav>
+
+        <div class="console-time">
+          <time data-console-time>--:--</time>
+          <span data-console-date>--.--.----</span>
+        </div>
+      </header>
+
+      <div class="console-stage__intro">
+        <span class="console-stage__online"><i></i> System online</span>
+        <p>
+          Das ist meine kleine Website-Konsole. Jeder Kanal ist ein Projekt –
+          auswählen, ansehen und direkt starten.
+        </p>
       </div>
 
-      <div
-        class="hero-console"
-        data-reveal
-        aria-label="Portfolio-Statusanzeige"
-      >
-        <div class="hero-console__topline">
-          <span>PLAYER PROFILE</span>
-          <span class="hero-console__clock" data-clock>--:-- CET</span>
+      <ProjectHub />
+    </section>
+
+    <section class="player-profile" id="profil" aria-labelledby="profile-title">
+      <div class="player-profile__inner">
+        <div class="player-profile__aside">
+          <p>Player card / 01</p>
+          <div class="player-avatar player-avatar--profile" aria-hidden="true">
+            <span>DH</span>
+            <small>Portrait folgt</small>
+          </div>
+          <button type="button" data-replay-startup>Startup ansehen</button>
         </div>
-        <div class="hero-console__screen">
-          <div class="signal-orb" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
+
+        <div class="player-profile__copy">
+          <p class="player-profile__kicker">D. Henschel · Software Developer</p>
+          <h2 id="profile-title">
+            Meine Projekte bekommen ein gemeinsames Zuhause.
+          </h2>
+          <p>
+            Diese Konsole sammelt Websites, Experimente und kleine Produkte, die
+            ich entwickle. Manche sind praktisch, manche bewusst verspielt – und
+            mit jedem neuen Projekt kommt ein weiterer Titel in die Bibliothek.
+          </p>
+          <div class="player-profile__links">
+            <a href="#weitere-titel">Was als Nächstes kommt ↓</a>
+            <a
+              href="https://github.com/dhenschel"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub-Profil ↗
+            </a>
           </div>
-          <div class="hero-console__identity">
-            <span>ID / 001</span>
-            <strong>D. HENSCHEL</strong>
-            <small>SOFTWARE DEVELOPER</small>
-          </div>
-          <span class="hero-console__coordinate hero-console__coordinate--one"
-            >48.1 N</span
-          >
-          <span class="hero-console__coordinate hero-console__coordinate--two"
-            >BUILD / ACTIVE</span
-          >
         </div>
-        <dl class="hero-console__stats">
+
+        <dl class="player-stats">
           <div>
-            <dt>Current quest</dt>
-            <dd>Portfolio launch</dd>
+            <dt>Veröffentlicht</dt><dd>03</dd><span>Websites online</span>
           </div>
+          <div><dt>Bibliothek</dt><dd>∞</dd><span>bereit für mehr</span></div>
           <div>
-            <dt>Mode</dt>
-            <dd>Design × Code</dd>
-          </div>
-          <div>
-            <dt>Signal</dt>
-            <dd><span class="status-dot" aria-hidden="true"></span> Online</dd>
+            <dt>Aktueller Modus</dt><dd>BUILD</dd><span>Portfolio wächst</span>
           </div>
         </dl>
       </div>
-
-      <div class="hero__footnote" aria-hidden="true">
-        <span>SCROLL TO EXPLORE</span>
-        <span class="hero__line"></span>
-        <span>001—004</span>
-      </div>
     </section>
 
     <section
-      class="section projects-section shell"
-      id="projekte"
-      aria-labelledby="projects-title"
+      class="release-queue"
+      id="weitere-titel"
+      aria-labelledby="queue-title"
     >
-      <div class="section-heading" data-reveal>
-        <div>
-          <p class="eyebrow">01 / SELECTED WORK</p>
-          <h2 id="projects-title">Project Library</h2>
-        </div>
-        <p>
-          Eine kuratierte Auswahl statt einer endlosen Liste. Weitere Websites
-          werden später als eigene Titel und Case Studies ergänzt.
-        </p>
-      </div>
+      <div class="release-queue__inner">
+        <header>
+          <p>Download queue</p>
+          <h2 id="queue-title">Als Nächstes</h2>
+          <span>Die Konsole ist vorbereitet – die Inhalte wachsen mit.</span>
+        </header>
 
-      <div data-reveal>
-        <ProjectHub />
-      </div>
-    </section>
-
-    <section
-      class="section profile-section shell"
-      id="profil"
-      aria-labelledby="profile-title"
-    >
-      <div class="section-heading section-heading--profile" data-reveal>
-        <div>
-          <p class="eyebrow">02 / PLAYER PROFILE</p>
-          <h2 id="profile-title">Gute Software fühlt sich einfach an.</h2>
-        </div>
-        <div class="profile-copy">
-          <p>
-            Hinter einer klaren Oberfläche stecken gute Entscheidungen: Was ist
-            wirklich wichtig? Was kann einfacher werden? Und welche technische
-            Grundlage hält auch nach dem Launch?
-          </p>
-          <p>
-            Genau an dieser Schnittstelle aus Produktdenken, Interface und
-            Engineering arbeite ich. Dieses Portfolio wächst dabei mit jedem
-            veröffentlichten Projekt weiter.
-          </p>
-        </div>
-      </div>
-
-      <div class="capability-grid" data-reveal>
-        <article class="capability-card">
-          <span class="capability-card__index">01</span>
-          <div class="capability-card__icon" aria-hidden="true">◎</div>
-          <h3>Discover</h3>
-          <p>
-            Problem, Zielgruppe und Erfolgsmaß verstehen, bevor Code entsteht.
-          </p>
-          <span class="capability-card__tag">PRODUCT THINKING</span>
-        </article>
-        <article class="capability-card">
-          <span class="capability-card__index">02</span>
-          <div class="capability-card__icon" aria-hidden="true">◇</div>
-          <h3>Shape</h3>
-          <p>
-            Information, Interaktion und visuelle Sprache zu einem System
-            formen.
-          </p>
-          <span class="capability-card__tag">INTERFACE DESIGN</span>
-        </article>
-        <article class="capability-card">
-          <span class="capability-card__index">03</span>
-          <div class="capability-card__icon" aria-hidden="true">⌘</div>
-          <h3>Build</h3>
-          <p>Performante, wartbare und barrierebewusste Software umsetzen.</p>
-          <span class="capability-card__tag">ENGINEERING</span>
-        </article>
-      </div>
-    </section>
-
-    <section
-      class="section process-section shell"
-      aria-labelledby="process-title"
-    >
-      <div class="process-panel" data-reveal>
-        <div class="process-panel__intro">
-          <p class="eyebrow">03 / DEFAULT WORKFLOW</p>
-          <h2 id="process-title">Von Signal zu System.</h2>
-        </div>
-        <ol class="process-list">
+        <ol class="release-list">
           <li>
-            <span>01</span>
-            <strong>Explore</strong>
-            <small>Kontext und Ziel schärfen</small>
+            <span class="release-list__state">01</span>
+            <div>
+              <strong>Persönliches Portrait</strong><p>
+                Das ausgewählte Foto ersetzt später den DH-Platzhalter im Player
+                Login.
+              </p>
+            </div>
+            <small>ASSET FEHLT</small>
           </li>
           <li>
-            <span>02</span>
-            <strong>Prototype</strong>
-            <small>Richtung früh sichtbar machen</small>
+            <span class="release-list__state">02</span>
+            <div>
+              <strong>Weitere Websites</strong><p>
+                Jedes neue Projekt erhält Cover, Farbe, Beschreibung und einen
+                eigenen Start-Button.
+              </p>
+            </div>
+            <small>READY</small>
           </li>
           <li>
-            <span>03</span>
-            <strong>Engineer</strong>
-            <small>Sauber und messbar umsetzen</small>
-          </li>
-          <li>
-            <span>04</span>
-            <strong>Refine</strong>
-            <small>Testen, lernen, verbessern</small>
+            <span class="release-list__state">03</span>
+            <div>
+              <strong>Startup verfeinern</strong><p>
+                Animation, Timing und Sound können später mit deiner
+                persönlichen Bildwelt erweitert werden.
+              </p>
+            </div>
+            <small>PROTOTYPE</small>
           </li>
         </ol>
       </div>
-    </section>
-
-    <section
-      class="contact-section shell"
-      id="kontakt"
-      aria-labelledby="contact-title"
-    >
-      <div class="contact-section__signal" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </div>
-      <div class="contact-section__copy" data-reveal>
-        <p class="eyebrow">04 / START A CONVERSATION</p>
-        <h2 id="contact-title">Noch ein Slot frei.</h2>
-        <p>
-          Projekte, Ideen und Kontaktmöglichkeiten werden hier Schritt für
-          Schritt ergänzt. Bis dahin ist GitHub der direkte Kanal.
-        </p>
-        <a
-          class="button button--light"
-          href="https://github.com/dhenschel"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Auf GitHub verbinden <span aria-hidden="true">↗</span>
-        </a>
-      </div>
-      <div class="contact-section__number" aria-hidden="true">04</div>
     </section>
   </main>
 
   <SiteFooter />
 
   <script>
-    const clock = document.querySelector<HTMLElement>("[data-clock]");
+    const timeElements = document.querySelectorAll<HTMLElement>(
+      "[data-console-time]",
+    );
+    const dateElements = document.querySelectorAll<HTMLElement>(
+      "[data-console-date]",
+    );
 
-    const updateClock = () => {
-      if (!clock) return;
+    const updateConsoleTime = () => {
+      const now = new Date();
       const time = new Intl.DateTimeFormat("de-DE", {
         timeZone: "Europe/Berlin",
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
-      }).format(new Date());
-      clock.textContent = `${time} CET`;
+      }).format(now);
+      const date = new Intl.DateTimeFormat("de-DE", {
+        timeZone: "Europe/Berlin",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }).format(now);
+
+      timeElements.forEach((element) => (element.textContent = time));
+      dateElements.forEach((element) => (element.textContent = date));
     };
 
-    updateClock();
-    window.setInterval(updateClock, 60_000);
-
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const revealItems = document.querySelectorAll<HTMLElement>("[data-reveal]");
-
-    if (!reduceMotion && "IntersectionObserver" in window) {
-      document.documentElement.classList.add("reveal-ready");
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          });
-        },
-        { rootMargin: "0px 0px -8%", threshold: 0.08 },
-      );
-      revealItems.forEach((item) => observer.observe(item));
-    }
+    updateConsoleTime();
+    window.setInterval(updateConsoleTime, 60_000);
   </script>
 </BaseLayout>

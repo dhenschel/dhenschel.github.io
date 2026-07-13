@@ -1,73 +1,82 @@
 export interface Project {
   slug: string;
   index: string;
-  eyebrow: string;
   title: string;
+  subtitle: string;
+  category: string;
   description: string;
-  role: string;
-  stack: string[];
+  url?: string;
+  image?: string;
+  year: string;
   status: string;
-  mark: string;
-  tone: "mint" | "coral" | "violet" | "amber";
-  href?: string;
+  accent: string;
+  accentRgb: string;
+  tags: string[];
   placeholder?: boolean;
 }
 
 export const projects: Project[] = [
   {
-    slug: "dhenschel-de",
+    slug: "clipcollection",
     index: "01",
-    eyebrow: "Portfolio / 2026",
-    title: "dhenschel.de",
+    title: "ClipCollection",
+    subtitle: "Deine Clips. Eine Sammlung.",
+    category: "Video Gallery",
     description:
-      "Ein schneller, barrierebewusster Portfolio-Hub, der Projekte wie eine kuratierte Spielebibliothek inszeniert.",
-    role: "Konzept · Design · Entwicklung",
-    stack: ["Astro", "TypeScript", "GitHub Pages"],
-    status: "IN BUILD",
-    mark: "DH",
-    tone: "mint",
-    href: "/projekte/dhenschel-de/",
+      "Eine zentrale Galerie für kuratierte Video-Clips mit Kategorien, Filtern und direktem Zugriff auf die Sammlung.",
+    url: "https://clipcollection.de/",
+    image: "/projects/clipcollection.png",
+    year: "2026",
+    status: "ONLINE",
+    accent: "#f2f4f7",
+    accentRgb: "242 244 247",
+    tags: ["Gallery", "Video", "Web App"],
   },
   {
-    slug: "web-products",
+    slug: "cozysite",
     index: "02",
-    eyebrow: "Collection / Web",
-    title: "Web Products",
+    title: "CozySite",
+    subtitle: "Ein Playground für kleine Ideen.",
+    category: "Interactive Playground",
     description:
-      "Hier landen produktorientierte Websites und Anwendungen mit klarer UX und sauberer technischer Basis.",
-    role: "Reservierter Projekt-Slot",
-    stack: ["Frontend", "UX", "Performance"],
-    status: "SLOT READY",
-    mark: "WP",
-    tone: "coral",
-    placeholder: true,
+      "Ein verspieltes Web-Experiment mit konfigurierbarem Entenregen, überraschenden Events und viel Raum für neue Ideen.",
+    url: "https://www.cozysite.de/",
+    image: "/projects/cozysite.png",
+    year: "2026",
+    status: "ONLINE",
+    accent: "#bae9ff",
+    accentRgb: "186 233 255",
+    tags: ["Creative Code", "Interaction", "Playground"],
   },
   {
-    slug: "tools-systems",
+    slug: "lava-restaurant",
     index: "03",
-    eyebrow: "Collection / Systems",
-    title: "Tools & Systems",
+    title: "Restaurant Lava",
+    subtitle: "Digitale Heimat für ein Restaurant.",
+    category: "Business Website",
     description:
-      "Ein Platz für Werkzeuge, APIs und technische Systeme, die Abläufe einfacher oder zuverlässiger machen.",
-    role: "Reservierter Projekt-Slot",
-    stack: ["APIs", "Automation", "Architecture"],
-    status: "SLOT READY",
-    mark: "TS",
-    tone: "violet",
-    placeholder: true,
+      "Eine kompakte Restaurant-Website mit Speisekarte, Öffnungszeiten, Standort und direkter Kontaktmöglichkeit.",
+    url: "https://lava-restaurant.com/",
+    image: "/projects/lava-restaurant.png",
+    year: "2025–2026",
+    status: "ONLINE",
+    accent: "#d19a55",
+    accentRgb: "209 154 85",
+    tags: ["Restaurant", "Content", "Responsive"],
   },
   {
-    slug: "experiments",
+    slug: "next-project",
     index: "04",
-    eyebrow: "Collection / Lab",
-    title: "Experiments",
+    title: "Nächster Titel",
+    subtitle: "Dieser Slot wartet auf die nächste Idee.",
+    category: "Coming Soon",
     description:
-      "Kleine Prototypen und technische Versuche bekommen hier Raum für Ideen außerhalb des Hauptpfads.",
-    role: "Reservierter Projekt-Slot",
-    stack: ["Creative Code", "Prototypes", "Learning"],
-    status: "LAB OPEN",
-    mark: "EX",
-    tone: "amber",
+      "Die Bibliothek ist bewusst erweiterbar. Neue Websites erscheinen später wie neue Spiele direkt in diesem Menü.",
+    year: "SOON",
+    status: "EMPTY SLOT",
+    accent: "#d7c7ff",
+    accentRgb: "215 199 255",
+    tags: ["New Project", "In Progress"],
     placeholder: true,
   },
 ];

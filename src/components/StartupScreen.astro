@@ -1,0 +1,89 @@
+<script is:inline>
+  (() => {
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    let introSeen = false;
+
+    try {
+      introSeen = sessionStorage.getItem("dh-intro-seen") === "true";
+    } catch {
+      introSeen = true;
+    }
+
+    document.documentElement.dataset.boot =
+      reducedMotion || introSeen ? "skip" : "pending";
+  })();
+</script>
+
+<noscript
+  ><style>
+    .startup-screen {
+      display: none !important;
+    }
+  </style></noscript
+>
+
+<div class="startup-screen" data-startup-screen aria-hidden="true">
+  <button class="startup-screen__skip" type="button" data-skip-startup>
+    Überspringen
+  </button>
+
+  <div class="startup-screen__system">
+    <span>DH HOME</span>
+    <span>PORTFOLIO SYSTEM / 01</span>
+  </div>
+
+  <div class="startup-screen__profile">
+    <!-- Später kann der Initialen-Platzhalter durch das ausgewählte Portrait ersetzt werden. -->
+    <div class="player-avatar player-avatar--boot" aria-hidden="true">
+      <span>DH</span>
+    </div>
+    <p>Willkommen zurück</p>
+    <strong>D. Henschel</strong>
+    <small>Profil wird geladen</small>
+    <div class="startup-screen__progress" aria-hidden="true"><span></span></div>
+  </div>
+
+  <p class="startup-screen__hint">Deine Websites. Deine Konsole.</p>
+</div>
+
+<script>
+  const startupScreen = document.querySelector<HTMLElement>(
+    "[data-startup-screen]",
+  );
+  const skipStartup = document.querySelector<HTMLButtonElement>(
+    "[data-skip-startup]",
+  );
+  const replayStartupButtons = document.querySelectorAll<HTMLButtonElement>(
+    "[data-replay-startup]",
+  );
+  let startupTimer: number | undefined;
+
+  const finishStartup = () => {
+    window.clearTimeout(startupTimer);
+    document.documentElement.dataset.boot = "done";
+    startupScreen?.setAttribute("aria-hidden", "true");
+
+    try {
+      sessionStorage.setItem("dh-intro-seen", "true");
+    } catch {
+      // The animation remains optional when storage is unavailable.
+    }
+  };
+
+  const playStartup = () => {
+    document.documentElement.dataset.boot = "pending";
+    startupScreen?.setAttribute("aria-hidden", "false");
+    startupTimer = window.setTimeout(finishStartup, 2200);
+  };
+
+  if (document.documentElement.dataset.boot === "pending") {
+    playStartup();
+  }
+
+  skipStartup?.addEventListener("click", finishStartup);
+  replayStartupButtons.forEach((button) =>
+    button.addEventListener("click", playStartup),
+  );
+</script>

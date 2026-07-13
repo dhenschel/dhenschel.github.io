@@ -1,23 +1,24 @@
 # dhenschel.de
 
-Geplantes persönliches Softwareentwickler-Portfolio für
+Persönliches Softwareentwickler-Portfolio für
 [www.dhenschel.de](https://www.dhenschel.de), statisch gehostet über GitHub
 Pages.
 
 **Aktuelle Vorschau:** [dhenschel.github.io](https://dhenschel.github.io/)
 
-Die visuelle Leitidee ist ein hochwertiger **Developer Console Hub**: Projekte
-werden wie Titel in einer modernen Spielebibliothek präsentiert, bleiben aber
-als klassische Portfolio-Inhalte klar, schnell und barrierearm erreichbar.
+Die visuelle Leitidee ist eine persönliche **Website Console**: Projekte werden
+wie Spiele in einer horizontalen Konsolenbibliothek präsentiert, erhalten ein
+eigenes Cover und lassen sich direkt aus ihrer Detailansicht starten.
 
 ## Projektstatus
 
-**Phase 1 – funktionsfähiger visueller Prototyp**
+**Phase 2 – interaktive Konsolenbibliothek**
 
-Die Website ist als statisches Astro-Projekt umgesetzt. Der Console Hub, eine
-erste Case Study, responsive Layouts, reduzierte Bewegung, SEO-Grundlagen und
-das GitHub-Pages-Deployment sind vorhanden. Die vorbereiteten Projekt-Slots
-werden als Nächstes mit echten Inhalten belegt.
+Die Website ist als statisches Astro-Projekt umgesetzt. ClipCollection,
+CozySite und Restaurant Lava sind mit eigenen Covers und direkten Links
+eingebunden. Titelwechsel, Projekt-Details, mobile Navigation, ein persönliches
+Spielerprofil und ein überspringbarer Startup-Prototyp sind vorhanden. Ein
+Portrait kann später an den vorbereiteten Avatar-Stellen ergänzt werden.
 
 ## Dokumentation
 
@@ -31,8 +32,8 @@ werden als Nächstes mit echten Inhalten belegt.
 
 - Astro mit TypeScript für eine statische, schnelle Website
 - CSS Custom Properties und komponentennahes CSS für ein eigenes Designsystem
-- Astro Content Collections für Projekte und spätere Case Studies
-- kleine JavaScript-Inseln nur für Hub-Navigation, Filter und Animationen
+- ein strukturierter TypeScript-Datensatz für Projekte und spätere Titel
+- kleine JavaScript-Inseln nur für Hub-Navigation und Startup-Animation
 - GitHub Actions für Prüfung, Build und Deployment nach GitHub Pages
 
 Der Stack ist bewusst statisch und wartungsarm. Die Konsolenwirkung entsteht

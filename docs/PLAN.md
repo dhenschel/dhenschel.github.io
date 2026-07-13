@@ -8,10 +8,10 @@ Stand: 13. Juli 2026
 sondern bereits beim ersten Besuch zeigen, dass hier Softwareentwicklung und
 gestalterischer Anspruch zusammenkommen.
 
-Die Kernidee ist ein **Developer Console Hub**: Eine ruhige, hochwertige
-Oberfläche übernimmt vertraute Muster einer Spielebibliothek – Cover, Auswahl,
-Status, Achievements und Detailansicht – ohne den Inhalt hinter einem Spiel oder
-einer langen Introanimation zu verstecken.
+Die Kernidee ist eine **persönliche Website Console**: Die Startseite verhält
+sich wie der Spielehub einer Wii oder PlayStation. Websites erscheinen als
+auswählbare Titel mit Cover, Status, eigener Farbe und Detailansicht. Ein
+Spielerprofil verbindet die Projekte sichtbar mit D. Henschel.
 
 **Positionierung in einem Satz:**
 
@@ -56,14 +56,15 @@ und Spezialisierung geschärft.
 7. **Eigenständige Gestaltung:** Referenzen liefern Prinzipien, keine zu
    kopierende Vorlage.
 
-## 4. Visuelle Richtung: „Signal Deck“
+## 4. Visuelle Richtung: „Personal Home Console“
 
 ### Charakter
 
-- dunkel, präzise und technisch, aber nicht wie ein generisches Hacker-Terminal;
+- dunkel, präzise und technisch, aber deutlich als Spielebibliothek erkennbar;
 - große, redaktionelle Typografie trifft auf kleine Systemlabels;
 - eine helle Akzentfarbe markiert Auswahl und Fokus;
-- Projektbilder tragen Farbe und Individualität in den ansonsten ruhigen Hub;
+- echte Screenshots dienen als Covers und prägen Hintergrund sowie Akzentfarbe;
+- der helle Spielerbereich bringt einen persönlichen, Wii-artigen Kontrast;
 - subtile Rasterlinien, Statuspunkte und Indexnummern erzeugen Systemcharakter.
 
 ### Vorläufige Farbwelt
@@ -94,7 +95,7 @@ werden Lizenz, Dateigröße und Lesbarkeit geprüft.
 
 - kurze Auswahlbewegung beim Wechsel eines Projekts;
 - sanfte Tiefenstaffelung zwischen aktivem und inaktivem Cover;
-- keine unüberspringbare Bootsequenz;
+- eine kurze, überspringbare Bootsequenz mit Spielerprofil;
 - keine automatisch abgespielten Sounds;
 - `prefers-reduced-motion` schaltet Übergänge auf sofortige Zustandswechsel um.
 
@@ -102,16 +103,13 @@ werden Lizenz, Dateigröße und Lesbarkeit geprüft.
 
 ### Startseite
 
-1. **Header:** Wortmarke `DH`, Navigation, Sprachoption, Verfügbarkeitsstatus.
-2. **Hero / System ready:** Name, Rolle, kurze Positionierung, primärer CTA
-   „Projekte ansehen“, sekundärer CTA „Kontakt“.
-3. **Project Hub:** drei bis sechs kuratierte Projekte als auswählbare Bibliothek.
-4. **Project Inspector:** Rolle, Problem, Ergebnis, Stack und direkte Links des
-   ausgewählten Projekts.
-5. **Player Profile:** kurze Biografie, Arbeitsweise und relevante Erfahrung.
-6. **Capabilities / Loadout:** wenige, gruppierte Kompetenzen mit Kontext.
-7. **Contact / Start co-op:** E-Mail, GitHub, LinkedIn und klarer Abschluss.
-8. **Footer:** Impressum, Datenschutz, Copyright, Build-Information.
+1. **Startup:** kurzer, überspringbarer Profil-Login als eigenständiger Moment.
+2. **Systemleiste:** Wortmarke `DH`, Spielerprofil, Navigation, Uhrzeit und Status.
+3. **Project Hub:** horizontale Bibliothek aus echten Website-Covers.
+4. **Project Inspector:** Nutzen, Merkmale und direkter Start-Link des Titels.
+5. **Player Profile:** persönliche Einordnung, Portrait-Slot und Bibliotheksstatus.
+6. **Download Queue:** sichtbarer Ausblick auf Portrait und weitere Websites.
+7. **Footer:** Impressum, Datenschutz, Copyright und GitHub-Link.
 
 ### Projektseiten
 
@@ -139,18 +137,18 @@ erstellt beziehungsweise rechtlich geprüft.
 
 ### Desktop
 
-- Projektwechsel über Klick, Pfeiltasten oder `A`/`D`;
-- `Enter` öffnet die ausgewählte Case Study;
+- Projektwechsel über Klick, Pfeiltasten oder sichtbare Pfeil-Buttons;
+- der Start-Button öffnet die ausgewählte Website direkt;
 - alle Steuerungen besitzen sichtbare Beschriftungen und Fokuszustände;
 - ein Fortschrittsindex wie `02 / 05` zeigt die Position;
 - eine normale Linkliste bleibt semantisch im Dokument vorhanden.
 
 ### Touch und Mobile
 
-- keine erzwungene horizontale Steuerung;
-- Projekte erscheinen als gut lesbarer vertikaler Kartenstapel;
-- Swipen ist optional, niemals die einzige Bedienmöglichkeit;
-- Metadaten stehen direkt an der jeweiligen Karte.
+- die Cover-Reihe bleibt horizontal und vermittelt die Konsolenmetapher;
+- große Pfeil-Buttons und direkte Tabs bleiben neben Touch-Scrolling verfügbar;
+- die vollständige Detailansicht steht direkt unter dem aktiven Cover;
+- keine Information ist ausschließlich durch Wischen erreichbar.
 
 ### Barrierearme Variante
 
