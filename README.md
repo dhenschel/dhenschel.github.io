@@ -4,6 +4,8 @@ Geplantes persönliches Softwareentwickler-Portfolio für
 [www.dhenschel.de](https://www.dhenschel.de), statisch gehostet über GitHub
 Pages.
 
+**Aktuelle Vorschau:** [dhenschel.github.io](https://dhenschel.github.io/)
+
 Die visuelle Leitidee ist ein hochwertiger **Developer Console Hub**: Projekte
 werden wie Titel in einer modernen Spielebibliothek präsentiert, bleiben aber
 als klassische Portfolio-Inhalte klar, schnell und barrierearm erreichbar.
@@ -56,7 +58,10 @@ npm run preview      # lokalen Produktions-Build ansehen
 ```
 
 Ein Push auf `main` baut und veröffentlicht die Website automatisch über GitHub
-Actions. Die kanonische Produktionsadresse ist `https://www.dhenschel.de`.
+Actions. Das Repository ist
+[dhenschel/dhenschel.github.io](https://github.com/dhenschel/dhenschel.github.io).
+Die kanonische Produktionsadresse wird nach der noch ausstehenden
+DNS-Umstellung `https://www.dhenschel.de`.
 
 ## Lizenz
 
