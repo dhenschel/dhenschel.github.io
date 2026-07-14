@@ -7,7 +7,7 @@ import { siteProfile } from "../data/site";
   data-contact-dialog
   data-contact-email={siteProfile.contactEmail}
 >
-  <form class="contact-form" data-contact-form>
+  <form class="contact-form" data-contact-form autocomplete="off">
     <header>
       <div>
         <small>Nachricht</small>
@@ -24,21 +24,21 @@ import { siteProfile } from "../data/site";
 
     <label>
       <span>Dein Name</span>
-      <input name="name" autocomplete="name" required />
+      <input name="name" autocomplete="off" required />
     </label>
     <label>
       <span>Deine E-Mail</span>
-      <input name="email" type="email" autocomplete="email" required />
+      <input name="email" type="email" autocomplete="off" required />
     </label>
     <label>
       <span>Nachricht</span>
-      <textarea name="message" rows="5" required></textarea>
+      <textarea name="message" rows="5" autocomplete="off" required></textarea>
     </label>
 
     <footer>
       <p data-contact-status>
-        Der Versand wird aktiviert, sobald eine öffentliche Kontaktadresse
-        hinterlegt ist.
+        Beim Absenden öffnet sich dein E-Mail-Programm mit der vorbereiteten
+        Nachricht.
       </p>
       <button type="submit">Nachricht vorbereiten</button>
     </footer>
@@ -62,6 +62,16 @@ import { siteProfile } from "../data/site";
     "[data-contact-status]",
   );
   const contactEmail = contactDialog?.dataset.contactEmail ?? "";
+  const defaultContactStatus =
+    "Beim Absenden öffnet sich dein E-Mail-Programm mit der vorbereiteten Nachricht.";
+
+  const resetContactForm = () => {
+    contactForm?.reset();
+    if (contactStatus) contactStatus.textContent = defaultContactStatus;
+  };
+
+  resetContactForm();
+  window.addEventListener("pageshow", resetContactForm);
 
   contactOpeners.forEach((button) =>
     button.addEventListener("click", () => contactDialog?.showModal()),

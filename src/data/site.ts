@@ -4,5 +4,5 @@ export const siteProfile = {
   image: "/profile-placeholder.svg",
   imageAlt: "Profilbild von D. Henschel",
   github: "https://github.com/dhenschel",
-  contactEmail: "",
+  contactEmail: "danielhenschel04@gmail.com",
 };
