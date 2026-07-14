@@ -38,7 +38,6 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
                   loading={index === "01" ? "eager" : "lazy"}
                 />
                 <span class="channel-card__glass" aria-hidden="true" />
-                <span class="channel-card__title">{project.title}</span>
               </span>
             </a>
           ) : (
@@ -107,6 +106,12 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     "Die Website sucht noch ihren linken Socken.",
   ];
   let activeZoomAnimation: Animation | null = null;
+  let launchTimers: number[] = [];
+
+  const clearLaunchTimers = () => {
+    launchTimers.forEach((timer) => window.clearTimeout(timer));
+    launchTimers = [];
+  };
 
   const playLaunchSound = () => {
     try {
@@ -177,6 +182,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       document.documentElement.dataset.launching = "true";
       playLaunchSound();
 
+      clearLaunchTimers();
       activeZoomAnimation?.cancel();
       void launchOverlay.offsetWidth;
 
@@ -211,23 +217,24 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       const loadingDelay = reducedMotion ? 1300 : 2200;
       const navigationDelay = reducedMotion ? 3000 : 5200;
 
-      window.setTimeout(() => {
-        launchOverlay.dataset.state = "black";
-      }, blackDelay);
-
-      window.setTimeout(() => {
-        launchOverlay.dataset.state = "loading";
-      }, loadingDelay);
-
-      window.setTimeout(() => {
-        window.location.assign(destination);
-      }, navigationDelay);
+      launchTimers.push(
+        window.setTimeout(() => {
+          launchOverlay.dataset.state = "black";
+        }, blackDelay),
+        window.setTimeout(() => {
+          launchOverlay.dataset.state = "loading";
+        }, loadingDelay),
+        window.setTimeout(() => {
+          window.location.assign(destination);
+        }, navigationDelay),
+      );
     });
   });
 
   const resetLaunchTransition = () => {
     document.documentElement.removeAttribute("data-launching");
     if (!launchOverlay) return;
+    clearLaunchTimers();
     activeZoomAnimation?.cancel();
     activeZoomAnimation = null;
     launchOverlay.hidden = true;
@@ -239,4 +246,5 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   };
 
   window.addEventListener("pageshow", resetLaunchTransition);
+  window.addEventListener("pagehide", resetLaunchTransition);
 </script>
