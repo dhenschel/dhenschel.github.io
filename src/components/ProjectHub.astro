@@ -70,7 +70,10 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     <img data-launch-loading-image src="" alt="" />
     <strong data-launch-title></strong>
     <span class="launch-progress"><i></i></span>
-    <small>Website wird gestartet</small>
+    <p class="launch-fact">
+      <span>Völlig unnütze Info</span>
+      <small data-launch-tip>Pixel werden alphabetisch sortiert.</small>
+    </p>
   </div>
 </div>
 
@@ -90,9 +93,20 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   const launchLoadingImage = launchOverlay?.querySelector<HTMLImageElement>(
     "[data-launch-loading-image]",
   );
+  const launchTip =
+    launchOverlay?.querySelector<HTMLElement>("[data-launch-tip]");
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
+  const launchTips = [
+    "Pixel werden alphabetisch sortiert.",
+    "Das Internet wird kurz entknotet.",
+    "Der Ladebalken lädt gerade auch sich selbst.",
+    "Mindestens ein div wird fachgerecht vorgewärmt.",
+    "Kaffee wird auf Betriebstemperatur gebracht.",
+    "Die Website sucht noch ihren linken Socken.",
+  ];
+  let activeZoomAnimation: Animation | null = null;
 
   const playLaunchSound = () => {
     try {
@@ -136,15 +150,16 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
 
       event.preventDefault();
       const screen = link.querySelector<HTMLElement>(".channel-card__screen");
-      const bounds = screen?.getBoundingClientRect();
-      if (!bounds) {
+      if (!screen) {
         window.location.assign(link.href);
         return;
       }
+      const bounds = screen.getBoundingClientRect();
 
       const destination = link.href;
       const image = link.dataset.channelImage ?? "";
       const title = link.dataset.channelTitle ?? "Website";
+      const startRadius = getComputedStyle(screen).borderRadius;
 
       launchOverlay.style.setProperty("--launch-left", `${bounds.left}px`);
       launchOverlay.style.setProperty("--launch-top", `${bounds.top}px`);
@@ -153,18 +168,48 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       if (launchImage) launchImage.src = image;
       if (launchLoadingImage) launchLoadingImage.src = image;
       if (launchTitle) launchTitle.textContent = title;
+      if (launchTip) {
+        launchTip.textContent =
+          launchTips[Math.floor(Math.random() * launchTips.length)];
+      }
       launchOverlay.hidden = false;
       launchOverlay.dataset.state = "ready";
       document.documentElement.dataset.launching = "true";
       playLaunchSound();
 
+      activeZoomAnimation?.cancel();
+      void launchOverlay.offsetWidth;
+
       requestAnimationFrame(() => {
         launchOverlay.dataset.state = "zoom";
+        activeZoomAnimation = launchOverlay.animate(
+          [
+            {
+              top: `${bounds.top}px`,
+              left: `${bounds.left}px`,
+              width: `${bounds.width}px`,
+              height: `${bounds.height}px`,
+              borderRadius: startRadius,
+            },
+            {
+              top: "0px",
+              left: "0px",
+              width: `${window.innerWidth}px`,
+              height: `${window.innerHeight}px`,
+              borderRadius: "0px",
+            },
+          ],
+          {
+            duration: reducedMotion ? 240 : 720,
+            easing: "cubic-bezier(0.16, 0.82, 0.2, 1)",
+            fill: "forwards",
+          },
+        );
       });
 
-      const blackDelay = reducedMotion ? 220 : 560;
-      const loadingDelay = reducedMotion ? 420 : 980;
-      const navigationDelay = reducedMotion ? 1100 : 2100;
+      const blackDelay = reducedMotion ? 300 : 780;
+      const loadingDelay = reducedMotion ? 900 : 1600;
+      const navigationDelay = reducedMotion ? 2300 : 4200;
 
       window.setTimeout(() => {
         launchOverlay.dataset.state = "black";
@@ -183,6 +228,8 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   const resetLaunchTransition = () => {
     document.documentElement.removeAttribute("data-launching");
     if (!launchOverlay) return;
+    activeZoomAnimation?.cancel();
+    activeZoomAnimation = null;
     launchOverlay.hidden = true;
     delete launchOverlay.dataset.state;
     launchOverlay.style.removeProperty("--launch-left");

@@ -426,14 +426,18 @@ html[data-boot="skip"] .startup-screen {
 }
 
 .console-status {
+  margin-left: auto;
   gap: clamp(1.1rem, 2vw, 2rem);
 }
 
 .console-clock {
+  position: absolute;
+  left: 50%;
   display: flex;
   align-items: baseline;
   gap: clamp(0.7rem, 1.4vw, 1.25rem);
   line-height: 1;
+  transform: translateX(-50%);
 }
 
 .console-clock time {
@@ -1003,12 +1007,12 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   box-shadow: var(--console-shadow-strong);
   pointer-events: none;
   transition:
-    top 560ms cubic-bezier(0.16, 0.82, 0.2, 1),
-    left 560ms cubic-bezier(0.16, 0.82, 0.2, 1),
-    width 560ms cubic-bezier(0.16, 0.82, 0.2, 1),
-    height 560ms cubic-bezier(0.16, 0.82, 0.2, 1),
-    border-radius 560ms cubic-bezier(0.16, 0.82, 0.2, 1),
-    box-shadow 560ms ease;
+    top 720ms cubic-bezier(0.16, 0.82, 0.2, 1),
+    left 720ms cubic-bezier(0.16, 0.82, 0.2, 1),
+    width 720ms cubic-bezier(0.16, 0.82, 0.2, 1),
+    height 720ms cubic-bezier(0.16, 0.82, 0.2, 1),
+    border-radius 720ms cubic-bezier(0.16, 0.82, 0.2, 1),
+    box-shadow 720ms ease;
 }
 
 .launch-transition__backdrop {
@@ -1062,19 +1066,19 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   font-size: clamp(1.1rem, 2.2vw, 1.5rem);
 }
 
-.launch-transition__loading small {
-  margin-top: 0.65rem;
-  color: rgb(255 255 255 / 62%);
-  font-size: 0.72rem;
-}
-
 .launch-progress {
-  width: min(15rem, 72vw);
-  height: 0.35rem;
+  width: min(17rem, 76vw);
+  height: 0.72rem;
   margin-top: 1.25rem;
   overflow: hidden;
+  padding: 0.12rem;
+  border: 1px solid rgb(255 255 255 / 22%);
   border-radius: 999px;
-  background: rgb(255 255 255 / 18%);
+  background: rgb(255 255 255 / 10%);
+  box-shadow:
+    inset 0 0.1rem 0.25rem rgb(0 0 0 / 55%),
+    0 0 1.5rem rgb(36 136 255 / 13%);
+  box-sizing: border-box;
 }
 
 .launch-progress i {
@@ -1082,9 +1086,41 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: var(--console-blue);
+  background: repeating-linear-gradient(
+    135deg,
+    #1677e8 0,
+    #1677e8 0.65rem,
+    #65b5ff 0.65rem,
+    #65b5ff 1.3rem
+  );
+  background-size: 1.85rem 1.85rem;
+  box-shadow: 0 0 0.8rem rgb(36 136 255 / 72%);
   transform: scaleX(0);
   transform-origin: left;
+}
+
+.launch-fact {
+  display: grid;
+  justify-items: center;
+  gap: 0.38rem;
+  min-height: 2.8rem;
+  margin: 0.9rem 0 0;
+}
+
+.launch-fact span {
+  padding: 0.22rem 0.5rem;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 999px;
+  color: rgb(255 255 255 / 48%);
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.launch-fact small {
+  color: rgb(255 255 255 / 72%);
+  font-size: 0.76rem;
 }
 
 .launch-transition[data-state="zoom"],
@@ -1125,12 +1161,20 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 }
 
 .launch-transition[data-state="loading"] .launch-progress i {
-  animation: launch-progress 1.1s cubic-bezier(0.2, 0.78, 0.24, 1) forwards;
+  animation:
+    launch-progress 2.35s cubic-bezier(0.2, 0.78, 0.24, 1) forwards,
+    launch-stripes 0.55s linear infinite;
 }
 
 @keyframes launch-progress {
   to {
     transform: scaleX(1);
+  }
+}
+
+@keyframes launch-stripes {
+  to {
+    background-position: 1.85rem 0;
   }
 }
 
