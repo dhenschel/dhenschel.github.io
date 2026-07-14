@@ -1,275 +1,106 @@
 ---
 import { projects } from "../data/projects";
 
-const firstProject = projects[0];
+const onlineProjects = projects.filter((project) => project.url).length;
 ---
 
-<section
-  class="game-library"
-  data-game-library
-  style={`--game-accent: ${firstProject.accent}; --game-accent-rgb: ${firstProject.accentRgb};`}
-  aria-labelledby="library-title"
->
-  <div class="game-library__backdrop" aria-hidden="true">
-    <img
-      src={firstProject.image}
-      alt=""
-      width="1280"
-      height="720"
-      data-game-backdrop
-    />
-  </div>
-
-  <div class="game-library__content">
-    <header class="game-library__heading">
-      <div>
-        <p>Bibliothek</p>
-        <h1 id="library-title">Meine Websites</h1>
-      </div>
-      <p>Wähle einen Titel und starte das Projekt.</p>
-    </header>
-
-    <div class="game-library__rail-wrap">
-      <button
-        class="game-library__arrow game-library__arrow--previous"
-        type="button"
-        data-game-previous
-        aria-label="Vorheriger Titel"
-      >
-        <span aria-hidden="true">‹</span>
-      </button>
-
-      <div class="game-rail" role="tablist" aria-label="Websites auswählen">
-        {
-          projects.map((project, index) => (
-            <button
-              class:list={[
-                "game-tile",
-                { "game-tile--placeholder": project.placeholder },
-              ]}
-              type="button"
-              role="tab"
-              id={`game-tab-${project.slug}`}
-              aria-controls={`game-panel-${project.slug}`}
-              aria-selected={index === 0 ? "true" : "false"}
-              tabindex={index === 0 ? "0" : "-1"}
-              data-game-tile
-              data-game-index={index}
-              data-game-accent={project.accent}
-              data-game-accent-rgb={project.accentRgb}
-              data-game-image={project.image ?? ""}
-            >
-              <span class="game-tile__cover">
-                {project.image ? (
-                  <img
-                    src={project.image}
-                    alt=""
-                    width="1280"
-                    height="720"
-                    loading={index === 0 ? "eager" : "lazy"}
-                  />
-                ) : (
-                  <span class="empty-channel" aria-hidden="true">
-                    <span>+</span>
-                    <small>NEW</small>
-                  </span>
-                )}
-                <span class="game-tile__state">{project.status}</span>
-              </span>
-              <span class="game-tile__label">
-                <small>{project.category}</small>
-                <strong>{project.title}</strong>
-              </span>
-            </button>
-          ))
-        }
-      </div>
-
-      <button
-        class="game-library__arrow game-library__arrow--next"
-        type="button"
-        data-game-next
-        aria-label="Nächster Titel"
-      >
-        <span aria-hidden="true">›</span>
-      </button>
+<section class="channel-library" aria-labelledby="library-title">
+  <header class="channel-library__header">
+    <div>
+      <p><span aria-hidden="true"></span> Website Library</p>
+      <h1 id="library-title">Meine Kanäle</h1>
     </div>
+    <div class="channel-library__page" aria-label="Galerieseite 1 von 1">
+      <span>01</span>
+      <i></i>
+      <span>01</span>
+    </div>
+  </header>
 
-    <div class="game-library__readout">
-      <div class="game-library__counter" aria-live="polite">
-        <span data-game-count>01</span><span>/</span><span
-          >{projects.length.toString().padStart(2, "0")}</span
+  <ul class="channel-grid" aria-label="Websites">
+    {
+      projects.map((project) => (
+        <li
+          class:list={[
+            "channel-item",
+            { "channel-item--empty": project.placeholder },
+          ]}
+          style={`--channel-accent: ${project.accent}; --channel-accent-rgb: ${project.accentRgb};`}
         >
-      </div>
-
-      <div class="game-panels">
-        {
-          projects.map((project, index) => (
-            <article
-              class="game-panel"
-              role="tabpanel"
-              id={`game-panel-${project.slug}`}
-              aria-labelledby={`game-tab-${project.slug}`}
-              data-game-panel
-              data-game-index={index}
-              data-active={index === 0 ? "true" : "false"}
+          {project.url ? (
+            <a
+              class="channel-card"
+              href={project.url}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${project.title} öffnen`}
             >
-              <div class="game-panel__copy">
-                <p>
-                  {project.category} · {project.year}
-                </p>
-                <h2>{project.title}</h2>
-                <strong>{project.subtitle}</strong>
-                <p>{project.description}</p>
-              </div>
-
-              <div class="game-panel__actions">
-                <ul aria-label="Projektmerkmale">
-                  {project.tags.map((tag) => (
-                    <li>{tag}</li>
-                  ))}
-                </ul>
-                {project.url ? (
-                  <a
-                    class="game-start"
-                    href={project.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <span class="game-start__icon" aria-hidden="true">
-                      ▶
-                    </span>
-                    <span>
-                      <small>Titel starten</small>
-                      <strong>Website öffnen</strong>
-                    </span>
-                  </a>
-                ) : (
-                  <span class="game-start game-start--disabled">
-                    <span class="game-start__icon" aria-hidden="true">
-                      ＋
-                    </span>
-                    <span>
-                      <small>Noch nicht verfügbar</small>
-                      <strong>Neues Projekt folgt</strong>
-                    </span>
-                  </span>
-                )}
-              </div>
+              <span class="channel-card__screen">
+                <img
+                  src={project.image}
+                  alt={`Vorschau von ${project.title}`}
+                  width="1280"
+                  height="720"
+                  loading={project.index === "01" ? "eager" : "lazy"}
+                />
+                <span class="channel-card__shade" aria-hidden="true" />
+                <span class="channel-card__number">{project.index}</span>
+                <span class="channel-card__status">
+                  <i aria-hidden="true" /> {project.status}
+                </span>
+                <span class="channel-card__launch" aria-hidden="true">
+                  ↗
+                </span>
+              </span>
+              <span class="channel-card__info">
+                <span>
+                  <small>{project.category}</small>
+                  <strong>{project.title}</strong>
+                </span>
+                <span class="channel-card__year">{project.year}</span>
+              </span>
+            </a>
+          ) : (
+            <article
+              class="channel-card channel-card--empty"
+              aria-label={`${project.title}, noch nicht belegt`}
+            >
+              <span class="channel-card__screen">
+                <span class="empty-channel" aria-hidden="true">
+                  <span>＋</span>
+                  <small>Freier Kanal</small>
+                </span>
+                <span class="channel-card__number">{project.index}</span>
+              </span>
+              <span class="channel-card__info">
+                <span>
+                  <small>{project.category}</small>
+                  <strong>{project.title}</strong>
+                </span>
+                <span class="channel-card__year">SOON</span>
+              </span>
             </article>
-          ))
-        }
-      </div>
-    </div>
+          )}
+        </li>
+      ))
+    }
+  </ul>
 
-    <div class="game-library__controls" aria-hidden="true">
-      <span><kbd>←</kbd><kbd>→</kbd> Auswählen</span>
-      <span><kbd>Tab</kbd> Details</span>
-      <span class="game-library__online"><i></i> 3 Titel online</span>
+  <footer class="channel-dock">
+    <div class="channel-dock__hint" aria-hidden="true">
+      <span>A</span>
+      <p>
+        <strong>Kanal öffnen</strong><small
+          >Website wird in einem neuen Tab gestartet</small
+        >
+      </p>
     </div>
-  </div>
+    <div class="channel-dock__pages" aria-hidden="true">
+      <i class="is-active"></i><i></i><i></i>
+    </div>
+    <p class="channel-dock__online">
+      <i aria-hidden="true"></i>{onlineProjects.toString().padStart(2, "0")} Kanäle
+      online
+    </p>
+  </footer>
 </section>
-
-<noscript>
-  <p class="game-library__noscript">
-    JavaScript ist deaktiviert. Alle Projektlinks stehen in den Detailkarten
-    unter der Bibliothek zur Verfügung.
-  </p>
-</noscript>
-
-<script>
-  const library = document.querySelector<HTMLElement>("[data-game-library]");
-
-  if (library) {
-    document.documentElement.classList.add("game-library-ready");
-
-    const tiles = Array.from(
-      library.querySelectorAll<HTMLButtonElement>("[data-game-tile]"),
-    );
-    const panels = Array.from(
-      library.querySelectorAll<HTMLElement>("[data-game-panel]"),
-    );
-    const backdrop = library.querySelector<HTMLImageElement>(
-      "[data-game-backdrop]",
-    );
-    const counter = library.querySelector<HTMLElement>("[data-game-count]");
-    const previous = library.querySelector<HTMLButtonElement>(
-      "[data-game-previous]",
-    );
-    const next = library.querySelector<HTMLButtonElement>("[data-game-next]");
-    let activeIndex = 0;
-
-    const activate = (requestedIndex: number, focusTile = false) => {
-      activeIndex = (requestedIndex + tiles.length) % tiles.length;
-      const activeTile = tiles[activeIndex];
-
-      tiles.forEach((tile, index) => {
-        const selected = index === activeIndex;
-        tile.setAttribute("aria-selected", String(selected));
-        tile.tabIndex = selected ? 0 : -1;
-      });
-
-      panels.forEach((panel, index) => {
-        const selected = index === activeIndex;
-        panel.dataset.active = String(selected);
-        panel.hidden = !selected;
-      });
-
-      const accent = activeTile?.dataset.gameAccent;
-      const accentRgb = activeTile?.dataset.gameAccentRgb;
-      const image = activeTile?.dataset.gameImage;
-
-      if (accent) library.style.setProperty("--game-accent", accent);
-      if (accentRgb) library.style.setProperty("--game-accent-rgb", accentRgb);
-
-      if (backdrop) {
-        if (image) {
-          backdrop.src = image;
-          backdrop.hidden = false;
-        } else {
-          backdrop.hidden = true;
-        }
-      }
-
-      if (counter)
-        counter.textContent = String(activeIndex + 1).padStart(2, "0");
-
-      activeTile?.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-
-      if (focusTile) activeTile?.focus();
-    };
-
-    tiles.forEach((tile, index) => {
-      tile.addEventListener("click", () => activate(index));
-      tile.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          activate(index - 1, true);
-        }
-        if (event.key === "ArrowRight") {
-          event.preventDefault();
-          activate(index + 1, true);
-        }
-        if (event.key === "Home") {
-          event.preventDefault();
-          activate(0, true);
-        }
-        if (event.key === "End") {
-          event.preventDefault();
-          activate(tiles.length - 1, true);
-        }
-      });
-    });
-
-    previous?.addEventListener("click", () => activate(activeIndex - 1, true));
-    next?.addEventListener("click", () => activate(activeIndex + 1, true));
-
-    activate(0);
-  }
-</script>

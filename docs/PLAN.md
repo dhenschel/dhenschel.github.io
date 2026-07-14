@@ -104,12 +104,11 @@ werden Lizenz, Dateigröße und Lesbarkeit geprüft.
 ### Startseite
 
 1. **Startup:** kurzer, überspringbarer Profil-Login als eigenständiger Moment.
-2. **Systemleiste:** Wortmarke `DH`, Spielerprofil, Navigation, Uhrzeit und Status.
-3. **Project Hub:** horizontale Bibliothek aus echten Website-Covers.
-4. **Project Inspector:** Nutzen, Merkmale und direkter Start-Link des Titels.
-5. **Player Profile:** persönliche Einordnung, Portrait-Slot und Bibliotheksstatus.
-6. **Download Queue:** sichtbarer Ausblick auf Portrait und weitere Websites.
-7. **Footer:** Impressum, Datenschutz, Copyright und GitHub-Link.
+2. **Systemleiste:** feststehendes Home-Menü mit Spielerbild, GitHub, Uhrzeit und Status.
+3. **Channel-Galerie:** mehrzeiliges Raster aus echten Website-Covers.
+4. **Freie Kanäle:** sichtbare Plätze für kommende Websites.
+5. **System-Dock:** Bedienhinweis, Seitenstatus und Anzahl aktiver Kanäle.
+6. **Footer:** kompakter Zugang zu Impressum, Datenschutz und Copyright.
 
 ### Projektseiten
 
@@ -137,18 +136,18 @@ erstellt beziehungsweise rechtlich geprüft.
 
 ### Desktop
 
-- Projektwechsel über Klick, Pfeiltasten oder sichtbare Pfeil-Buttons;
-- der Start-Button öffnet die ausgewählte Website direkt;
-- alle Steuerungen besitzen sichtbare Beschriftungen und Fokuszustände;
-- ein Fortschrittsindex wie `02 / 05` zeigt die Position;
-- eine normale Linkliste bleibt semantisch im Dokument vorhanden.
+- alle Projekte sind gleichzeitig in einem 3×2-Channel-Raster sichtbar;
+- ein Klick auf ein belegtes Cover startet die Website direkt;
+- die feste Systemleiste bleibt beim Scrollen am oberen Bildschirmrand;
+- freie Plätze zeigen, wie das Home-Menü um weitere Websites wächst;
+- alle Links besitzen sichtbare Fokuszustände und semantische Beschriftungen.
 
 ### Touch und Mobile
 
-- die Cover-Reihe bleibt horizontal und vermittelt die Konsolenmetapher;
-- große Pfeil-Buttons und direkte Tabs bleiben neben Touch-Scrolling verfügbar;
-- die vollständige Detailansicht steht direkt unter dem aktiven Cover;
-- keine Information ist ausschließlich durch Wischen erreichbar.
+- die Galerie wird zweispaltig und behält den Home-Menü-Charakter;
+- Projekte bleiben direkt sichtbar und benötigen kein horizontales Wischen;
+- die Systemleiste reduziert sich auf Home, GitHub, Startup, Uhrzeit und Avatar;
+- die Kacheln bleiben auch auf schmalen Displays direkt startbar.
 
 ### Barrierearme Variante
 

@@ -7,18 +7,18 @@ Pages.
 **Aktuelle Vorschau:** [dhenschel.github.io](https://dhenschel.github.io/)
 
 Die visuelle Leitidee ist eine persönliche **Website Console**: Projekte werden
-wie Spiele in einer horizontalen Konsolenbibliothek präsentiert, erhalten ein
-eigenes Cover und lassen sich direkt aus ihrer Detailansicht starten.
+wie Kanäle in einem mehrzeiligen Konsolen-Home-Menü präsentiert, erhalten ein
+eigenes Cover und lassen sich direkt aus der Galerie starten.
 
 ## Projektstatus
 
-**Phase 2 – interaktive Konsolenbibliothek**
+**Phase 3 – persönliches Konsolen-Home-Menü**
 
 Die Website ist als statisches Astro-Projekt umgesetzt. ClipCollection,
 CozySite und Restaurant Lava sind mit eigenen Covers und direkten Links
-eingebunden. Titelwechsel, Projekt-Details, mobile Navigation, ein persönliches
-Spielerprofil und ein überspringbarer Startup-Prototyp sind vorhanden. Ein
-Portrait kann später an den vorbereiteten Avatar-Stellen ergänzt werden.
+eingebunden. Ein festes Systemmenü mit Uhrzeit, GitHub und Spielerprofil, eine
+responsive Channel-Galerie sowie ein überspringbarer Startup-Prototyp sind
+vorhanden. Das Portrait wird zentral über ein austauschbares Bild-Asset gepflegt.
 
 ## Dokumentation
 
@@ -33,7 +33,7 @@ Portrait kann später an den vorbereiteten Avatar-Stellen ergänzt werden.
 - Astro mit TypeScript für eine statische, schnelle Website
 - CSS Custom Properties und komponentennahes CSS für ein eigenes Designsystem
 - ein strukturierter TypeScript-Datensatz für Projekte und spätere Titel
-- kleine JavaScript-Inseln nur für Hub-Navigation und Startup-Animation
+- kleine JavaScript-Inseln nur für Uhrzeit und Startup-Animation
 - GitHub Actions für Prüfung, Build und Deployment nach GitHub Pages
 
 Der Stack ist bewusst statisch und wartungsarm. Die Konsolenwirkung entsteht

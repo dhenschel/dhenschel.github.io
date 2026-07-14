@@ -4,6 +4,7 @@ import ProjectHub from "../components/ProjectHub.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import StartupScreen from "../components/StartupScreen.astro";
 import { projects } from "../data/projects";
+import { siteProfile } from "../data/site";
 import "../styles/console.css";
 
 const structuredData = {
@@ -12,10 +13,10 @@ const structuredData = {
     {
       "@type": "Person",
       "@id": "https://www.dhenschel.de/#person",
-      name: "D. Henschel",
+      name: siteProfile.name,
       url: "https://www.dhenschel.de",
-      sameAs: ["https://github.com/dhenschel"],
-      jobTitle: "Software Developer",
+      sameAs: [siteProfile.github],
+      jobTitle: siteProfile.role,
     },
     {
       "@type": "CollectionPage",
@@ -43,8 +44,8 @@ const structuredData = {
 ---
 
 <BaseLayout
-  title="D. Henschel — Website Console"
-  description="Die persönliche Website-Konsole von D. Henschel mit ClipCollection, CozySite, Restaurant Lava und kommenden Projekten."
+  title="D. Henschel — Home Console"
+  description="Das persönliche Home-Menü von D. Henschel mit ClipCollection, CozySite, Restaurant Lava und kommenden Websites."
 >
   <script
     is:inline
@@ -54,140 +55,83 @@ const structuredData = {
 
   <StartupScreen />
 
+  <header class="console-topbar">
+    <a class="console-topbar__home" href="/" aria-label="Home-Menü">
+      <span class="console-topbar__home-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img">
+          <path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9Z"
+          ></path>
+        </svg>
+      </span>
+      <span><small>System</small><strong>Home</strong></span>
+    </a>
+
+    <div class="console-topbar__section">
+      <span class="console-topbar__online"><i></i> Online</span>
+      <span class="console-topbar__library">Website Library</span>
+    </div>
+
+    <nav class="console-actions" aria-label="Systemaktionen">
+      <a
+        class="console-action"
+        href={siteProfile.github}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="GitHub-Profil öffnen"
+      >
+        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+          <path
+            d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.88c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.86V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"
+          ></path>
+        </svg>
+        <span>GitHub</span>
+      </a>
+      <button
+        class="console-action"
+        type="button"
+        data-replay-startup
+        aria-label="Startup erneut abspielen"
+      >
+        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+          <path
+            d="M12 3a9 9 0 1 0 8.55 6.2l-1.9.63A7 7 0 1 1 17 7.15L14.2 10H21V3.2l-2.58 2.57A8.96 8.96 0 0 0 12 3Z"
+          ></path>
+        </svg>
+        <span>Startup</span>
+      </button>
+    </nav>
+
+    <div class="console-clock">
+      <time data-console-time>--:--</time>
+      <span data-console-date>--.--.----</span>
+    </div>
+
+    <div class="console-user">
+      <span><small>Player 01</small><strong>{siteProfile.name}</strong></span>
+      <div class="profile-picture profile-picture--bar">
+        <img
+          src={siteProfile.image}
+          alt={siteProfile.imageAlt}
+          width="800"
+          height="800"
+        />
+      </div>
+    </div>
+  </header>
+
   <main id="main-content" class="console-home">
-    <section class="console-stage" aria-label="Website-Konsole">
-      <header class="console-bar">
-        <a class="console-brand" href="/" aria-label="D. Henschel – Home">
-          <span>DH</span>
-          <strong>HOME</strong>
-        </a>
-
-        <div class="console-player">
-          <div class="player-avatar player-avatar--small" aria-hidden="true">
-            DH
-          </div>
-          <span><small>Player 01</small><strong>D. Henschel</strong></span>
+    <div class="console-background" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+    <section class="home-screen" aria-label="Website-Konsole">
+      <div class="home-screen__welcome">
+        <div>
+          <p>Player 01</p>
+          <strong>Willkommen zurück, D.</strong>
         </div>
-
-        <nav class="console-nav" aria-label="Schnellzugriff">
-          <a href="#profil">Profil</a>
-          <a
-            href="https://github.com/dhenschel"
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub ↗
-          </a>
-          <button type="button" data-replay-startup>Intro abspielen</button>
-        </nav>
-
-        <div class="console-time">
-          <time data-console-time>--:--</time>
-          <span data-console-date>--.--.----</span>
-        </div>
-      </header>
-
-      <div class="console-stage__intro">
-        <span class="console-stage__online"><i></i> System online</span>
-        <p>
-          Das ist meine kleine Website-Konsole. Jeder Kanal ist ein Projekt –
-          auswählen, ansehen und direkt starten.
-        </p>
+        <p>Wähle einen Kanal, um eine Website zu starten.</p>
       </div>
-
       <ProjectHub />
-    </section>
-
-    <section class="player-profile" id="profil" aria-labelledby="profile-title">
-      <div class="player-profile__inner">
-        <div class="player-profile__aside">
-          <p>Player card / 01</p>
-          <div class="player-avatar player-avatar--profile" aria-hidden="true">
-            <span>DH</span>
-            <small>Portrait folgt</small>
-          </div>
-          <button type="button" data-replay-startup>Startup ansehen</button>
-        </div>
-
-        <div class="player-profile__copy">
-          <p class="player-profile__kicker">D. Henschel · Software Developer</p>
-          <h2 id="profile-title">
-            Meine Projekte bekommen ein gemeinsames Zuhause.
-          </h2>
-          <p>
-            Diese Konsole sammelt Websites, Experimente und kleine Produkte, die
-            ich entwickle. Manche sind praktisch, manche bewusst verspielt – und
-            mit jedem neuen Projekt kommt ein weiterer Titel in die Bibliothek.
-          </p>
-          <div class="player-profile__links">
-            <a href="#weitere-titel">Was als Nächstes kommt ↓</a>
-            <a
-              href="https://github.com/dhenschel"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub-Profil ↗
-            </a>
-          </div>
-        </div>
-
-        <dl class="player-stats">
-          <div>
-            <dt>Veröffentlicht</dt><dd>03</dd><span>Websites online</span>
-          </div>
-          <div><dt>Bibliothek</dt><dd>∞</dd><span>bereit für mehr</span></div>
-          <div>
-            <dt>Aktueller Modus</dt><dd>BUILD</dd><span>Portfolio wächst</span>
-          </div>
-        </dl>
-      </div>
-    </section>
-
-    <section
-      class="release-queue"
-      id="weitere-titel"
-      aria-labelledby="queue-title"
-    >
-      <div class="release-queue__inner">
-        <header>
-          <p>Download queue</p>
-          <h2 id="queue-title">Als Nächstes</h2>
-          <span>Die Konsole ist vorbereitet – die Inhalte wachsen mit.</span>
-        </header>
-
-        <ol class="release-list">
-          <li>
-            <span class="release-list__state">01</span>
-            <div>
-              <strong>Persönliches Portrait</strong><p>
-                Das ausgewählte Foto ersetzt später den DH-Platzhalter im Player
-                Login.
-              </p>
-            </div>
-            <small>ASSET FEHLT</small>
-          </li>
-          <li>
-            <span class="release-list__state">02</span>
-            <div>
-              <strong>Weitere Websites</strong><p>
-                Jedes neue Projekt erhält Cover, Farbe, Beschreibung und einen
-                eigenen Start-Button.
-              </p>
-            </div>
-            <small>READY</small>
-          </li>
-          <li>
-            <span class="release-list__state">03</span>
-            <div>
-              <strong>Startup verfeinern</strong><p>
-                Animation, Timing und Sound können später mit deiner
-                persönlichen Bildwelt erweitert werden.
-              </p>
-            </div>
-            <small>PROTOTYPE</small>
-          </li>
-        </ol>
-      </div>
     </section>
   </main>
 

@@ -1,8 +1,9 @@
+---
+import { siteProfile } from "../data/site";
+---
+
 <script is:inline>
   (() => {
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
     let introSeen = false;
 
     try {
@@ -11,8 +12,7 @@
       introSeen = true;
     }
 
-    document.documentElement.dataset.boot =
-      reducedMotion || introSeen ? "skip" : "pending";
+    document.documentElement.dataset.boot = introSeen ? "skip" : "pending";
   })();
 </script>
 
@@ -30,18 +30,22 @@
   </button>
 
   <div class="startup-screen__system">
-    <span>DH HOME</span>
-    <span>PORTFOLIO SYSTEM / 01</span>
+    <span>DH / HOME</span>
+    <span>PORTFOLIO SYSTEM 02.0</span>
   </div>
 
   <div class="startup-screen__profile">
-    <!-- Später kann der Initialen-Platzhalter durch das ausgewählte Portrait ersetzt werden. -->
-    <div class="player-avatar player-avatar--boot" aria-hidden="true">
-      <span>DH</span>
+    <div class="profile-picture profile-picture--boot">
+      <img
+        src={siteProfile.image}
+        alt={siteProfile.imageAlt}
+        width="800"
+        height="800"
+      />
     </div>
     <p>Willkommen zurück</p>
-    <strong>D. Henschel</strong>
-    <small>Profil wird geladen</small>
+    <strong>{siteProfile.name}</strong>
+    <small>Home-Menü wird geladen</small>
     <div class="startup-screen__progress" aria-hidden="true"><span></span></div>
   </div>
 
@@ -58,6 +62,10 @@
   const replayStartupButtons = document.querySelectorAll<HTMLButtonElement>(
     "[data-replay-startup]",
   );
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const startupDuration = reducedMotion ? 900 : 2600;
   let startupTimer: number | undefined;
 
   const finishStartup = () => {
@@ -73,14 +81,13 @@
   };
 
   const playStartup = () => {
+    window.clearTimeout(startupTimer);
     document.documentElement.dataset.boot = "pending";
     startupScreen?.setAttribute("aria-hidden", "false");
-    startupTimer = window.setTimeout(finishStartup, 2200);
+    startupTimer = window.setTimeout(finishStartup, startupDuration);
   };
 
-  if (document.documentElement.dataset.boot === "pending") {
-    playStartup();
-  }
+  if (document.documentElement.dataset.boot === "pending") playStartup();
 
   skipStartup?.addEventListener("click", finishStartup);
   replayStartupButtons.forEach((button) =>
