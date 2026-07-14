@@ -883,6 +883,15 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   display: block;
 }
 
+.sound-toggle__off,
+.sound-toggle[aria-pressed="false"] .sound-toggle__on {
+  display: none;
+}
+
+.sound-toggle[aria-pressed="false"] .sound-toggle__off {
+  display: block;
+}
+
 /* Contact */
 
 .contact-dialog {

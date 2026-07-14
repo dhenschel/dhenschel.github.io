@@ -152,6 +152,26 @@ const structuredData = {
 
     <div class="console-bottombar__actions">
       <button
+        class="theme-toggle sound-toggle"
+        type="button"
+        data-sound-toggle
+        aria-label="Sound ausschalten"
+        aria-pressed="true"
+        title="Sound ausschalten"
+      >
+        <svg class="sound-toggle__on" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 9v6h4l5 4V5L8 9H4Zm11.7-1.7a1 1 0 0 1 1.4 0 6.6 6.6 0 0 1 0 9.4 1 1 0 1 1-1.4-1.4 4.6 4.6 0 0 0 0-6.6 1 1 0 0 1 0-1.4Zm2.8-2.8a1 1 0 0 1 1.4 0 10.6 10.6 0 0 1 0 15 1 1 0 1 1-1.4-1.4 8.6 8.6 0 0 0 0-12.2 1 1 0 0 1 0-1.4Z"
+          ></path>
+        </svg>
+        <svg class="sound-toggle__off" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 9v6h4l5 4V5L8 9H4Zm11.3.3 1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1-2.1-2.1Z"
+          ></path>
+        </svg>
+        <strong data-sound-label>Sound an</strong>
+      </button>
+      <button
         class="theme-toggle"
         type="button"
         data-theme-toggle
@@ -174,6 +194,10 @@ const structuredData = {
   <ContactDialog />
 
   <script>
+    import { initializeConsoleAudio } from "../scripts/console-audio";
+
+    initializeConsoleAudio();
+
     const timeElements = document.querySelectorAll<HTMLElement>(
       "[data-console-time]",
     );

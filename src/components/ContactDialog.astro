@@ -78,6 +78,7 @@ import { siteProfile } from "../data/site";
         contactStatus.textContent =
           "Noch keine öffentliche Empfängeradresse hinterlegt.";
       }
+      window.consoleAudio?.play("error");
       return;
     }
 
@@ -87,6 +88,7 @@ import { siteProfile } from "../data/site";
     const message = String(formData.get("message") ?? "");
     const subject = encodeURIComponent(`Portfolio-Anfrage von ${name}`);
     const body = encodeURIComponent(`${message}\n\nAntwort an: ${email}`);
+    window.consoleAudio?.play("confirm");
     window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
   });
 </script>
