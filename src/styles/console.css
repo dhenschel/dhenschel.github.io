@@ -428,6 +428,7 @@ html[data-boot="skip"] .startup-screen {
 .console-status {
   margin-left: auto;
   gap: clamp(1.1rem, 2vw, 2rem);
+  transform: translateY(-0.05rem);
 }
 
 .console-clock {
@@ -456,7 +457,7 @@ html[data-boot="skip"] .startup-screen {
   font-size: clamp(0.88rem, 1.25vw, 1.1rem);
   font-weight: 700;
   white-space: nowrap;
-  transform: translateY(-0.12rem);
+  transform: translateY(-0.06rem);
 }
 
 .console-online {
@@ -1044,8 +1045,8 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 }
 
 .launch-transition__loading > .launch-transition__cover {
-  width: 56vw !important;
-  min-width: 56vw;
+  width: 28vw !important;
+  min-width: 28vw;
   max-width: none;
   height: auto;
   aspect-ratio: 16 / 9;
@@ -1056,16 +1057,16 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 }
 
 .launch-transition__loading strong {
-  margin-top: 1rem;
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  margin-top: 1.25rem;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
 }
 
 .launch-progress {
-  width: min(17rem, 76vw);
-  height: 0.72rem;
-  margin-top: 1.25rem;
+  width: min(28rem, 72vw);
+  height: 1rem;
+  margin-top: 1.35rem;
   overflow: hidden;
-  padding: 0.12rem;
+  padding: 0.15rem;
   border: 1px solid rgb(255 255 255 / 22%);
   border-radius: 999px;
   background: rgb(255 255 255 / 10%);
@@ -1096,17 +1097,17 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 .launch-fact {
   display: grid;
   justify-items: center;
-  gap: 0.38rem;
-  min-height: 2.8rem;
-  margin: 0.9rem 0 0;
+  gap: 0.55rem;
+  min-height: 3.5rem;
+  margin: 1.15rem 0 0;
 }
 
 .launch-fact span {
-  padding: 0.22rem 0.5rem;
+  padding: 0.3rem 0.7rem;
   border: 1px solid rgb(255 255 255 / 15%);
   border-radius: 999px;
   color: rgb(255 255 255 / 48%);
-  font-size: 0.55rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1114,7 +1115,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 
 .launch-fact small {
   color: rgb(255 255 255 / 72%);
-  font-size: 0.76rem;
+  font-size: 1rem;
 }
 
 .launch-transition[data-state="zoom"],
