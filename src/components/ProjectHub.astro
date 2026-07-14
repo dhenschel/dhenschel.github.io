@@ -107,6 +107,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   ];
   let activeZoomAnimation: Animation | null = null;
   let launchTimers: number[] = [];
+  let launchRunId = 0;
 
   const clearLaunchTimers = () => {
     launchTimers.forEach((timer) => window.clearTimeout(timer));
@@ -141,6 +142,11 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
 
   channelLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
+      if (document.documentElement.dataset.launching === "true") {
+        event.preventDefault();
+        return;
+      }
+
       if (
         event.defaultPrevented ||
         event.button !== 0 ||
@@ -165,6 +171,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       const image = link.dataset.channelImage ?? "";
       const title = link.dataset.channelTitle ?? "Website";
       const startRadius = getComputedStyle(screen).borderRadius;
+      const currentRunId = ++launchRunId;
 
       launchOverlay.style.setProperty("--launch-left", `${bounds.left}px`);
       launchOverlay.style.setProperty("--launch-top", `${bounds.top}px`);
@@ -219,24 +226,32 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
 
       launchTimers.push(
         window.setTimeout(() => {
+          if (currentRunId !== launchRunId) return;
           launchOverlay.dataset.state = "black";
         }, blackDelay),
         window.setTimeout(() => {
+          if (currentRunId !== launchRunId) return;
           launchOverlay.dataset.state = "loading";
         }, loadingDelay),
         window.setTimeout(() => {
+          if (currentRunId !== launchRunId) return;
           window.location.assign(destination);
         }, navigationDelay),
       );
     });
   });
 
-  const resetLaunchTransition = () => {
-    document.documentElement.removeAttribute("data-launching");
-    if (!launchOverlay) return;
+  const suspendLaunchTransition = () => {
+    launchRunId += 1;
     clearLaunchTimers();
     activeZoomAnimation?.cancel();
     activeZoomAnimation = null;
+  };
+
+  const resetLaunchTransition = () => {
+    suspendLaunchTransition();
+    document.documentElement.removeAttribute("data-launching");
+    if (!launchOverlay) return;
     launchOverlay.hidden = true;
     delete launchOverlay.dataset.state;
     launchOverlay.style.removeProperty("--launch-left");
@@ -246,5 +261,14 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   };
 
   window.addEventListener("pageshow", resetLaunchTransition);
-  window.addEventListener("pagehide", resetLaunchTransition);
+  window.addEventListener("pagehide", suspendLaunchTransition);
+  window.addEventListener("popstate", resetLaunchTransition);
+  document.addEventListener("visibilitychange", () => {
+    if (
+      document.visibilityState === "visible" &&
+      document.documentElement.dataset.launching === "true"
+    ) {
+      resetLaunchTransition();
+    }
+  });
 </script>
