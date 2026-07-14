@@ -562,6 +562,9 @@ html[data-boot="skip"] .startup-screen {
   height: 42rem;
   border: 4rem solid var(--console-orbit);
   transform: rotate(-4deg);
+  transform-origin: 50% 62%;
+  animation: console-orbit-lower 28s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .console-background::after {
@@ -569,6 +572,9 @@ html[data-boot="skip"] .startup-screen {
   height: 29rem;
   border-top: 1px solid var(--console-orbit-accent);
   transform: rotate(4deg);
+  transform-origin: center;
+  animation: console-orbit-upper 22s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .console-background span {
@@ -578,11 +584,23 @@ html[data-boot="skip"] .startup-screen {
   border-radius: 50%;
   background: var(--console-particle);
   box-shadow: 0 0 1.2rem var(--console-accent-halo);
+  animation:
+    console-particle-drift var(--particle-duration, 16s) ease-in-out
+      var(--particle-delay, 0s) infinite alternate,
+    console-particle-pulse var(--particle-pulse, 5s) ease-in-out
+      var(--particle-delay, 0s) infinite alternate;
+  will-change: transform, opacity;
 }
 
 .console-background span:nth-child(1) {
   top: 24%;
   left: 8%;
+  --particle-x: 2.4rem;
+  --particle-y: -1.2rem;
+  --particle-scale: 1.18;
+  --particle-duration: 15s;
+  --particle-pulse: 4.8s;
+  --particle-delay: -3s;
 }
 
 .console-background span:nth-child(2) {
@@ -590,6 +608,12 @@ html[data-boot="skip"] .startup-screen {
   right: 12%;
   width: 1rem;
   height: 1rem;
+  --particle-x: -2.8rem;
+  --particle-y: 1.7rem;
+  --particle-scale: 0.86;
+  --particle-duration: 19s;
+  --particle-pulse: 6.2s;
+  --particle-delay: -9s;
 }
 
 .console-background span:nth-child(3) {
@@ -597,6 +621,12 @@ html[data-boot="skip"] .startup-screen {
   left: 25%;
   width: 0.4rem;
   height: 0.4rem;
+  --particle-x: 1.8rem;
+  --particle-y: -2.5rem;
+  --particle-scale: 1.32;
+  --particle-duration: 17s;
+  --particle-pulse: 4.2s;
+  --particle-delay: -6s;
 }
 
 .console-background span:nth-child(4) {
@@ -604,6 +634,12 @@ html[data-boot="skip"] .startup-screen {
   right: 34%;
   width: 0.75rem;
   height: 0.75rem;
+  --particle-x: -2rem;
+  --particle-y: 1.4rem;
+  --particle-scale: 1.12;
+  --particle-duration: 13s;
+  --particle-pulse: 5.4s;
+  --particle-delay: -11s;
 }
 
 .home-screen {
@@ -1222,6 +1258,55 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 }
 
+@keyframes console-orbit-lower {
+  0% {
+    transform: translate3d(-1.2%, 1.1%, 0) rotate(-4deg) scale(0.985);
+  }
+  52% {
+    transform: translate3d(0.4%, -0.8%, 0) rotate(-2.6deg) scale(1.012);
+  }
+  100% {
+    transform: translate3d(1.5%, -1.7%, 0) rotate(-5deg) scale(1.025);
+  }
+}
+
+@keyframes console-orbit-upper {
+  0% {
+    transform: translate3d(1.2%, -0.7%, 0) rotate(4deg) scale(1.02);
+  }
+  48% {
+    transform: translate3d(-0.4%, 1%, 0) rotate(2.5deg) scale(0.99);
+  }
+  100% {
+    transform: translate3d(-1.4%, -0.2%, 0) rotate(5deg) scale(1.01);
+  }
+}
+
+@keyframes console-particle-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(0.94);
+  }
+  to {
+    transform: translate3d(
+        var(--particle-x, 1.5rem),
+        var(--particle-y, -1.5rem),
+        0
+      )
+      scale(var(--particle-scale, 1.1));
+  }
+}
+
+@keyframes console-particle-pulse {
+  from {
+    opacity: 0.48;
+    filter: brightness(0.85);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1.28);
+  }
+}
+
 @keyframes launch-stripes {
   to {
     background-position: 1.85rem 0;
@@ -1449,6 +1534,12 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   .contact-dialog[open] {
     animation: none !important;
     transition: none !important;
+  }
+
+  .console-background::before,
+  .console-background::after,
+  .console-background span {
+    animation: none !important;
   }
 
   .launch-transition[data-state="loading"] .launch-progress i {
