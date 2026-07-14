@@ -431,13 +431,10 @@ html[data-boot="skip"] .startup-screen {
 }
 
 .console-clock {
-  position: absolute;
-  left: 50%;
   display: flex;
   align-items: baseline;
   gap: clamp(0.7rem, 1.4vw, 1.25rem);
   line-height: 1;
-  transform: translateX(-50%);
 }
 
 .console-clock time {
@@ -1162,7 +1159,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 
 .launch-transition[data-state="loading"] .launch-progress i {
   animation:
-    launch-progress 2.35s cubic-bezier(0.2, 0.78, 0.24, 1) forwards,
+    launch-progress 2.7s steps(9, end) forwards,
     launch-stripes 0.55s linear infinite;
 }
 

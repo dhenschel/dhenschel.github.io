@@ -208,8 +208,8 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       });
 
       const blackDelay = reducedMotion ? 300 : 780;
-      const loadingDelay = reducedMotion ? 900 : 1600;
-      const navigationDelay = reducedMotion ? 2300 : 4200;
+      const loadingDelay = reducedMotion ? 1300 : 2200;
+      const navigationDelay = reducedMotion ? 3000 : 5200;
 
       window.setTimeout(() => {
         launchOverlay.dataset.state = "black";
