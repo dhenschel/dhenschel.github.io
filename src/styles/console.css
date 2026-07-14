@@ -563,7 +563,7 @@ html[data-boot="skip"] .startup-screen {
   border: 4rem solid var(--console-orbit);
   transform: rotate(-4deg);
   transform-origin: 50% 62%;
-  animation: console-orbit-lower 28s ease-in-out infinite alternate;
+  animation: console-orbit-lower 15s ease-in-out infinite alternate;
   will-change: transform;
 }
 
@@ -573,7 +573,7 @@ html[data-boot="skip"] .startup-screen {
   border-top: 1px solid var(--console-orbit-accent);
   transform: rotate(4deg);
   transform-origin: center;
-  animation: console-orbit-upper 22s ease-in-out infinite alternate;
+  animation: console-orbit-upper 12s ease-in-out infinite alternate;
   will-change: transform;
 }
 
@@ -583,7 +583,7 @@ html[data-boot="skip"] .startup-screen {
   height: 0.6rem;
   border-radius: 50%;
   background: var(--console-particle);
-  box-shadow: 0 0 1.2rem var(--console-accent-halo);
+  box-shadow: 0 0 1.8rem var(--console-accent-halo);
   animation:
     console-particle-drift var(--particle-duration, 16s) ease-in-out
       var(--particle-delay, 0s) infinite alternate,
@@ -595,11 +595,11 @@ html[data-boot="skip"] .startup-screen {
 .console-background span:nth-child(1) {
   top: 24%;
   left: 8%;
-  --particle-x: 2.4rem;
-  --particle-y: -1.2rem;
-  --particle-scale: 1.18;
-  --particle-duration: 15s;
-  --particle-pulse: 4.8s;
+  --particle-x: 7.5rem;
+  --particle-y: -4rem;
+  --particle-scale: 1.3;
+  --particle-duration: 8.5s;
+  --particle-pulse: 3.2s;
   --particle-delay: -3s;
 }
 
@@ -608,11 +608,11 @@ html[data-boot="skip"] .startup-screen {
   right: 12%;
   width: 1rem;
   height: 1rem;
-  --particle-x: -2.8rem;
-  --particle-y: 1.7rem;
-  --particle-scale: 0.86;
-  --particle-duration: 19s;
-  --particle-pulse: 6.2s;
+  --particle-x: -8rem;
+  --particle-y: 5rem;
+  --particle-scale: 0.78;
+  --particle-duration: 10.5s;
+  --particle-pulse: 3.8s;
   --particle-delay: -9s;
 }
 
@@ -621,11 +621,11 @@ html[data-boot="skip"] .startup-screen {
   left: 25%;
   width: 0.4rem;
   height: 0.4rem;
-  --particle-x: 1.8rem;
-  --particle-y: -2.5rem;
-  --particle-scale: 1.32;
-  --particle-duration: 17s;
-  --particle-pulse: 4.2s;
+  --particle-x: 5.5rem;
+  --particle-y: -7rem;
+  --particle-scale: 1.5;
+  --particle-duration: 9.5s;
+  --particle-pulse: 2.8s;
   --particle-delay: -6s;
 }
 
@@ -634,11 +634,11 @@ html[data-boot="skip"] .startup-screen {
   right: 34%;
   width: 0.75rem;
   height: 0.75rem;
-  --particle-x: -2rem;
-  --particle-y: 1.4rem;
-  --particle-scale: 1.12;
-  --particle-duration: 13s;
-  --particle-pulse: 5.4s;
+  --particle-x: -6.5rem;
+  --particle-y: 4.5rem;
+  --particle-scale: 1.25;
+  --particle-duration: 7.5s;
+  --particle-pulse: 3.4s;
   --particle-delay: -11s;
 }
 
@@ -1260,25 +1260,31 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 
 @keyframes console-orbit-lower {
   0% {
-    transform: translate3d(-1.2%, 1.1%, 0) rotate(-4deg) scale(0.985);
+    opacity: 0.58;
+    transform: translate3d(-4%, 3%, 0) rotate(-7deg) scale(0.94);
   }
-  52% {
-    transform: translate3d(0.4%, -0.8%, 0) rotate(-2.6deg) scale(1.012);
+  45% {
+    opacity: 1;
+    transform: translate3d(1%, -2%, 0) rotate(-1deg) scale(1.02);
   }
   100% {
-    transform: translate3d(1.5%, -1.7%, 0) rotate(-5deg) scale(1.025);
+    opacity: 0.72;
+    transform: translate3d(4%, -4%, 0) rotate(-8.5deg) scale(1.07);
   }
 }
 
 @keyframes console-orbit-upper {
   0% {
-    transform: translate3d(1.2%, -0.7%, 0) rotate(4deg) scale(1.02);
+    opacity: 0.6;
+    transform: translate3d(4%, -2%, 0) rotate(7deg) scale(1.08);
   }
   48% {
-    transform: translate3d(-0.4%, 1%, 0) rotate(2.5deg) scale(0.99);
+    opacity: 1;
+    transform: translate3d(-1%, 3%, 0) rotate(1deg) scale(0.95);
   }
   100% {
-    transform: translate3d(-1.4%, -0.2%, 0) rotate(5deg) scale(1.01);
+    opacity: 0.65;
+    transform: translate3d(-5%, -1%, 0) rotate(8.5deg) scale(1.03);
   }
 }
 
@@ -1298,12 +1304,12 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 
 @keyframes console-particle-pulse {
   from {
-    opacity: 0.48;
-    filter: brightness(0.85);
+    opacity: 0.32;
+    filter: brightness(0.65);
   }
   to {
     opacity: 1;
-    filter: brightness(1.28);
+    filter: brightness(1.65);
   }
 }
 
