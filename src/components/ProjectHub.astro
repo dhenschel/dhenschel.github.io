@@ -147,6 +147,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     destination: string,
     blackDelay: number,
     loadingDelay: number,
+    closingDelay: number,
     navigationDelay: number,
   ) => {
     const controller = new AbortController();
@@ -162,7 +163,11 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       if (controller !== activeLaunchController || !launchOverlay) return;
       launchOverlay.dataset.state = "loading";
 
-      await waitForLaunch(navigationDelay - loadingDelay, signal);
+      await waitForLaunch(closingDelay - loadingDelay, signal);
+      if (controller !== activeLaunchController || !launchOverlay) return;
+      launchOverlay.dataset.state = "closing";
+
+      await waitForLaunch(navigationDelay - closingDelay, signal);
       if (
         signal.aborted ||
         controller !== activeLaunchController ||
@@ -286,12 +291,14 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
 
       const blackDelay = reducedMotion ? 300 : 780;
       const loadingDelay = reducedMotion ? 1300 : 2200;
-      const navigationDelay = reducedMotion ? 3000 : 5200;
+      const closingDelay = reducedMotion ? 2200 : 5600;
+      const navigationDelay = reducedMotion ? 2800 : 6500;
 
       void runLaunchSequence(
         destination,
         blackDelay,
         loadingDelay,
+        closingDelay,
         navigationDelay,
       );
     });

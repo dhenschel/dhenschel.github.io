@@ -1068,11 +1068,13 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   color: #fff;
   font-family: var(--console-font);
   text-align: center;
+  filter: brightness(1);
   opacity: 0;
   transform: translate(-50%, -47%) scale(0.96);
   transition:
     opacity 240ms ease,
-    transform 300ms ease;
+    transform 300ms ease,
+    filter 720ms cubic-bezier(0.55, 0, 0.9, 0.45);
 }
 
 .launch-transition__loading > .launch-transition__cover {
@@ -1151,7 +1153,8 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 
 .launch-transition[data-state="zoom"],
 .launch-transition[data-state="black"],
-.launch-transition[data-state="loading"] {
+.launch-transition[data-state="loading"],
+.launch-transition[data-state="closing"] {
   top: 0;
   left: 0;
   width: 100vw;
@@ -1170,26 +1173,38 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 }
 
 .launch-transition[data-state="black"] .launch-transition__backdrop,
-.launch-transition[data-state="loading"] .launch-transition__backdrop {
+.launch-transition[data-state="loading"] .launch-transition__backdrop,
+.launch-transition[data-state="closing"] .launch-transition__backdrop {
   filter: grayscale(0.7) brightness(0.25);
   opacity: 0;
   transform: scale(1.08);
 }
 
 .launch-transition[data-state="black"] .launch-transition__veil,
-.launch-transition[data-state="loading"] .launch-transition__veil {
+.launch-transition[data-state="loading"] .launch-transition__veil,
+.launch-transition[data-state="closing"] .launch-transition__veil {
   opacity: 1;
 }
 
-.launch-transition[data-state="loading"] .launch-transition__loading {
+.launch-transition[data-state="loading"] .launch-transition__loading,
+.launch-transition[data-state="closing"] .launch-transition__loading {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+.launch-transition[data-state="closing"] .launch-transition__loading {
+  filter: brightness(0);
 }
 
 .launch-transition[data-state="loading"] .launch-progress i {
   animation:
     launch-progress 2.7s steps(9, end) forwards,
     launch-stripes 0.55s linear infinite;
+}
+
+.launch-transition[data-state="closing"] .launch-progress i {
+  animation: none;
+  transform: scaleX(1);
 }
 
 @keyframes launch-progress {
