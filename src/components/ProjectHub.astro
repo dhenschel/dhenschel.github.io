@@ -66,7 +66,14 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   <img class="launch-transition__backdrop" data-launch-image src="" alt="" />
   <span class="launch-transition__veil"></span>
   <div class="launch-transition__loading" aria-hidden="true">
-    <img data-launch-loading-image src="" alt="" />
+    <img
+      class="launch-transition__cover"
+      data-launch-loading-image
+      src=""
+      alt=""
+      width="1280"
+      height="720"
+    />
     <strong data-launch-title></strong>
     <span class="launch-progress"><i></i></span>
     <p class="launch-fact">
@@ -94,6 +101,9 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   );
   const launchTip =
     launchOverlay?.querySelector<HTMLElement>("[data-launch-tip]");
+  if (launchOverlay) {
+    document.body.append(launchOverlay);
+  }
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
@@ -106,12 +116,68 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     "Die Website sucht noch ihren linken Socken.",
   ];
   let activeZoomAnimation: Animation | null = null;
-  let launchTimers: number[] = [];
-  let launchRunId = 0;
+  let activeLaunchController: AbortController | null = null;
 
-  const clearLaunchTimers = () => {
-    launchTimers.forEach((timer) => window.clearTimeout(timer));
-    launchTimers = [];
+  const waitForLaunch = (delay: number, signal: AbortSignal) =>
+    new Promise<void>((resolve, reject) => {
+      if (signal.aborted) {
+        reject(new DOMException("Launch cancelled", "AbortError"));
+        return;
+      }
+
+      const timer = window.setTimeout(resolve, delay);
+      signal.addEventListener(
+        "abort",
+        () => {
+          window.clearTimeout(timer);
+          reject(new DOMException("Launch cancelled", "AbortError"));
+        },
+        { once: true },
+      );
+    });
+
+  const cancelLaunchWork = () => {
+    activeLaunchController?.abort();
+    activeLaunchController = null;
+    activeZoomAnimation?.cancel();
+    activeZoomAnimation = null;
+  };
+
+  const runLaunchSequence = async (
+    destination: string,
+    blackDelay: number,
+    loadingDelay: number,
+    navigationDelay: number,
+  ) => {
+    const controller = new AbortController();
+    const { signal } = controller;
+    activeLaunchController = controller;
+
+    try {
+      await waitForLaunch(blackDelay, signal);
+      if (controller !== activeLaunchController || !launchOverlay) return;
+      launchOverlay.dataset.state = "black";
+
+      await waitForLaunch(loadingDelay - blackDelay, signal);
+      if (controller !== activeLaunchController || !launchOverlay) return;
+      launchOverlay.dataset.state = "loading";
+
+      await waitForLaunch(navigationDelay - loadingDelay, signal);
+      if (
+        signal.aborted ||
+        controller !== activeLaunchController ||
+        document.visibilityState !== "visible"
+      ) {
+        return;
+      }
+
+      activeLaunchController = null;
+      window.location.assign(destination);
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) {
+        console.error("Website launch failed", error);
+      }
+    }
   };
 
   const playLaunchSound = () => {
@@ -171,7 +237,6 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       const image = link.dataset.channelImage ?? "";
       const title = link.dataset.channelTitle ?? "Website";
       const startRadius = getComputedStyle(screen).borderRadius;
-      const currentRunId = ++launchRunId;
 
       launchOverlay.style.setProperty("--launch-left", `${bounds.left}px`);
       launchOverlay.style.setProperty("--launch-top", `${bounds.top}px`);
@@ -189,8 +254,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       document.documentElement.dataset.launching = "true";
       playLaunchSound();
 
-      clearLaunchTimers();
-      activeZoomAnimation?.cancel();
+      cancelLaunchWork();
       void launchOverlay.offsetWidth;
 
       requestAnimationFrame(() => {
@@ -224,28 +288,17 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       const loadingDelay = reducedMotion ? 1300 : 2200;
       const navigationDelay = reducedMotion ? 3000 : 5200;
 
-      launchTimers.push(
-        window.setTimeout(() => {
-          if (currentRunId !== launchRunId) return;
-          launchOverlay.dataset.state = "black";
-        }, blackDelay),
-        window.setTimeout(() => {
-          if (currentRunId !== launchRunId) return;
-          launchOverlay.dataset.state = "loading";
-        }, loadingDelay),
-        window.setTimeout(() => {
-          if (currentRunId !== launchRunId) return;
-          window.location.assign(destination);
-        }, navigationDelay),
+      void runLaunchSequence(
+        destination,
+        blackDelay,
+        loadingDelay,
+        navigationDelay,
       );
     });
   });
 
   const suspendLaunchTransition = () => {
-    launchRunId += 1;
-    clearLaunchTimers();
-    activeZoomAnimation?.cancel();
-    activeZoomAnimation = null;
+    cancelLaunchWork();
   };
 
   const resetLaunchTransition = () => {
@@ -260,14 +313,18 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     launchOverlay.style.removeProperty("--launch-height");
   };
 
-  window.addEventListener("pageshow", resetLaunchTransition);
+  window.addEventListener("pageshow", (event) => {
+    resetLaunchTransition();
+    if (event.persisted) {
+      window.setTimeout(() => window.location.reload(), 0);
+    }
+  });
   window.addEventListener("pagehide", suspendLaunchTransition);
   window.addEventListener("popstate", resetLaunchTransition);
   document.addEventListener("visibilitychange", () => {
-    if (
-      document.visibilityState === "visible" &&
-      document.documentElement.dataset.launching === "true"
-    ) {
+    if (document.visibilityState === "hidden") {
+      suspendLaunchTransition();
+    } else if (document.documentElement.dataset.launching === "true") {
       resetLaunchTransition();
     }
   });
