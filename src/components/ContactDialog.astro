@@ -1,0 +1,92 @@
+---
+import { siteProfile } from "../data/site";
+---
+
+<dialog
+  class="contact-dialog"
+  data-contact-dialog
+  data-contact-email={siteProfile.contactEmail}
+>
+  <form class="contact-form" data-contact-form>
+    <header>
+      <div>
+        <small>Nachricht</small>
+        <h2>Kontakt aufnehmen</h2>
+      </div>
+      <button
+        type="button"
+        data-contact-close
+        aria-label="Kontaktformular schließen"
+      >
+        ×
+      </button>
+    </header>
+
+    <label>
+      <span>Dein Name</span>
+      <input name="name" autocomplete="name" required />
+    </label>
+    <label>
+      <span>Deine E-Mail</span>
+      <input name="email" type="email" autocomplete="email" required />
+    </label>
+    <label>
+      <span>Nachricht</span>
+      <textarea name="message" rows="5" required></textarea>
+    </label>
+
+    <footer>
+      <p data-contact-status>
+        Der Versand wird aktiviert, sobald eine öffentliche Kontaktadresse
+        hinterlegt ist.
+      </p>
+      <button type="submit">Nachricht vorbereiten</button>
+    </footer>
+  </form>
+</dialog>
+
+<script>
+  const contactDialog = document.querySelector<HTMLDialogElement>(
+    "[data-contact-dialog]",
+  );
+  const contactOpeners = document.querySelectorAll<HTMLButtonElement>(
+    "[data-contact-open]",
+  );
+  const contactCloser = document.querySelector<HTMLButtonElement>(
+    "[data-contact-close]",
+  );
+  const contactForm = document.querySelector<HTMLFormElement>(
+    "[data-contact-form]",
+  );
+  const contactStatus = document.querySelector<HTMLElement>(
+    "[data-contact-status]",
+  );
+  const contactEmail = contactDialog?.dataset.contactEmail ?? "";
+
+  contactOpeners.forEach((button) =>
+    button.addEventListener("click", () => contactDialog?.showModal()),
+  );
+  contactCloser?.addEventListener("click", () => contactDialog?.close());
+  contactDialog?.addEventListener("click", (event) => {
+    if (event.target === contactDialog) contactDialog.close();
+  });
+
+  contactForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!contactEmail) {
+      if (contactStatus) {
+        contactStatus.textContent =
+          "Noch keine öffentliche Empfängeradresse hinterlegt.";
+      }
+      return;
+    }
+
+    const formData = new FormData(contactForm);
+    const name = String(formData.get("name") ?? "");
+    const email = String(formData.get("email") ?? "");
+    const message = String(formData.get("message") ?? "");
+    const subject = encodeURIComponent(`Portfolio-Anfrage von ${name}`);
+    const body = encodeURIComponent(`${message}\n\nAntwort an: ${email}`);
+    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+  });
+</script>

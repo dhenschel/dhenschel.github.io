@@ -1,39 +1,33 @@
 ---
 import { projects } from "../data/projects";
 
-const onlineProjects = projects.filter((project) => project.url).length;
+const channelCount = 12;
+const channels = Array.from({ length: channelCount }, (_, index) => ({
+  index: String(index + 1).padStart(2, "0"),
+  project: projects[index],
+}));
 ---
 
 <section class="channel-library" aria-labelledby="library-title">
-  <header class="channel-library__header">
-    <div>
-      <p><span aria-hidden="true"></span> Website Library</p>
-      <h1 id="library-title">Meine Kanäle</h1>
-    </div>
-    <div class="channel-library__page" aria-label="Galerieseite 1 von 1">
-      <span>01</span>
-      <i></i>
-      <span>01</span>
-    </div>
-  </header>
+  <h1 id="library-title" class="visually-hidden">Meine Websites</h1>
 
-  <ul class="channel-grid" aria-label="Websites">
+  <div class="channel-library__pages" aria-label="Menüseite 1 von 1">
+    <span class="is-active"></span><span></span><span></span><span></span>
+  </div>
+
+  <ul class="channel-grid" aria-label="Website-Kanäle">
     {
-      projects.map((project) => (
-        <li
-          class:list={[
-            "channel-item",
-            { "channel-item--empty": project.placeholder },
-          ]}
-          style={`--channel-accent: ${project.accent}; --channel-accent-rgb: ${project.accentRgb};`}
-        >
-          {project.url ? (
+      channels.map(({ index, project }) => (
+        <li class:list={["channel-item", { "channel-item--empty": !project }]}>
+          {project ? (
             <a
               class="channel-card"
               href={project.url}
-              target="_blank"
-              rel="noreferrer"
+              data-channel-link
+              data-channel-title={project.title}
+              data-channel-image={project.image}
               aria-label={`${project.title} öffnen`}
+              style={`--channel-accent: ${project.accent}; --channel-accent-rgb: ${project.accentRgb};`}
             >
               <span class="channel-card__screen">
                 <img
@@ -41,43 +35,21 @@ const onlineProjects = projects.filter((project) => project.url).length;
                   alt={`Vorschau von ${project.title}`}
                   width="1280"
                   height="720"
-                  loading={project.index === "01" ? "eager" : "lazy"}
+                  loading={index === "01" ? "eager" : "lazy"}
                 />
-                <span class="channel-card__shade" aria-hidden="true" />
-                <span class="channel-card__number">{project.index}</span>
-                <span class="channel-card__status">
-                  <i aria-hidden="true" /> {project.status}
-                </span>
-                <span class="channel-card__launch" aria-hidden="true">
-                  ↗
-                </span>
-              </span>
-              <span class="channel-card__info">
-                <span>
-                  <small>{project.category}</small>
-                  <strong>{project.title}</strong>
-                </span>
-                <span class="channel-card__year">{project.year}</span>
+                <span class="channel-card__glass" aria-hidden="true" />
+                <span class="channel-card__title">{project.title}</span>
               </span>
             </a>
           ) : (
             <article
               class="channel-card channel-card--empty"
-              aria-label={`${project.title}, noch nicht belegt`}
+              aria-label={`Freier Kanal ${index}`}
             >
               <span class="channel-card__screen">
                 <span class="empty-channel" aria-hidden="true">
-                  <span>＋</span>
-                  <small>Freier Kanal</small>
+                  <span>+</span>
                 </span>
-                <span class="channel-card__number">{project.index}</span>
-              </span>
-              <span class="channel-card__info">
-                <span>
-                  <small>{project.category}</small>
-                  <strong>{project.title}</strong>
-                </span>
-                <span class="channel-card__year">SOON</span>
               </span>
             </article>
           )}
@@ -86,21 +58,111 @@ const onlineProjects = projects.filter((project) => project.url).length;
     }
   </ul>
 
-  <footer class="channel-dock">
-    <div class="channel-dock__hint" aria-hidden="true">
-      <span>A</span>
-      <p>
-        <strong>Kanal öffnen</strong><small
-          >Website wird in einem neuen Tab gestartet</small
-        >
-      </p>
-    </div>
-    <div class="channel-dock__pages" aria-hidden="true">
-      <i class="is-active"></i><i></i><i></i>
-    </div>
-    <p class="channel-dock__online">
-      <i aria-hidden="true"></i>{onlineProjects.toString().padStart(2, "0")} Kanäle
-      online
-    </p>
-  </footer>
+  <p class="channel-library__hint" aria-hidden="true">
+    <span>A</span> Auswählen
+  </p>
 </section>
+
+<div class="launch-transition" data-launch-transition aria-hidden="true" hidden>
+  <img data-launch-image src="" alt="" />
+  <span class="launch-transition__veil"></span>
+  <strong data-launch-title></strong>
+</div>
+
+<script>
+  const channelLinks = document.querySelectorAll<HTMLAnchorElement>(
+    "[data-channel-link]",
+  );
+  const launchOverlay = document.querySelector<HTMLElement>(
+    "[data-launch-transition]",
+  );
+  const launchImage = launchOverlay?.querySelector<HTMLImageElement>(
+    "[data-launch-image]",
+  );
+  const launchTitle = launchOverlay?.querySelector<HTMLElement>(
+    "[data-launch-title]",
+  );
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  const playLaunchSound = () => {
+    try {
+      const AudioContextClass = window.AudioContext;
+      const context = new AudioContextClass();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(420, context.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(
+        760,
+        context.currentTime + 0.18,
+      );
+      gain.gain.setValueAtTime(0.0001, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.08, context.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        context.currentTime + 0.24,
+      );
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.25);
+    } catch {
+      // Audio feedback is optional when Web Audio is unavailable.
+    }
+  };
+
+  channelLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        !launchOverlay
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      const screen = link.querySelector<HTMLElement>(".channel-card__screen");
+      const bounds = screen?.getBoundingClientRect();
+      if (!bounds) {
+        window.location.assign(link.href);
+        return;
+      }
+
+      const destination = link.href;
+      const image = link.dataset.channelImage ?? "";
+      const title = link.dataset.channelTitle ?? "Website";
+
+      launchOverlay.style.setProperty("--launch-left", `${bounds.left}px`);
+      launchOverlay.style.setProperty("--launch-top", `${bounds.top}px`);
+      launchOverlay.style.setProperty("--launch-width", `${bounds.width}px`);
+      launchOverlay.style.setProperty("--launch-height", `${bounds.height}px`);
+      if (launchImage) launchImage.src = image;
+      if (launchTitle) launchTitle.textContent = title;
+      launchOverlay.hidden = false;
+      launchOverlay.dataset.state = "ready";
+      document.documentElement.dataset.launching = "true";
+      playLaunchSound();
+
+      requestAnimationFrame(() => {
+        launchOverlay.dataset.state = "expand";
+      });
+
+      const fadeDelay = reducedMotion ? 80 : 720;
+      const navigationDelay = reducedMotion ? 220 : 1380;
+
+      window.setTimeout(() => {
+        launchOverlay.dataset.state = "fade";
+      }, fadeDelay);
+
+      window.setTimeout(() => {
+        window.location.assign(destination);
+      }, navigationDelay);
+    });
+  });
+</script>

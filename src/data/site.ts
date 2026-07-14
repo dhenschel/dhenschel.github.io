@@ -1,7 +1,8 @@
 export const siteProfile = {
-  name: "D. Henschel",
+  name: "dhenschel",
   role: "Software Developer",
   image: "/profile-placeholder.svg",
   imageAlt: "Profilbild von D. Henschel",
   github: "https://github.com/dhenschel",
+  contactEmail: "",
 };

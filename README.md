@@ -12,13 +12,16 @@ eigenes Cover und lassen sich direkt aus der Galerie starten.
 
 ## Projektstatus
 
-**Phase 3 – persönliches Konsolen-Home-Menü**
+**Phase 4 – persönliches Konsolen-Home-Menü**
 
 Die Website ist als statisches Astro-Projekt umgesetzt. ClipCollection,
 CozySite und Restaurant Lava sind mit eigenen Covers und direkten Links
-eingebunden. Ein festes Systemmenü mit Uhrzeit, GitHub und Spielerprofil, eine
-responsive Channel-Galerie sowie ein überspringbarer Startup-Prototyp sind
-vorhanden. Das Portrait wird zentral über ein austauschbares Bild-Asset gepflegt.
+eingebunden. Das aufgeräumte, Nintendo-inspirierte Systemmenü besitzt ein
+responsives 4×3-Kanalraster, feste Leisten, einen hellen und einen tiefblauen
+dunklen Modus sowie einen auffälligen Profil-Start mit animiertem Mauszeiger und
+optionalen UI-Klängen. Beim Öffnen wächst die gewählte Website-Kachel bis auf
+Bildschirmgröße und blendet anschließend zur Zielseite über. Das Portrait wird
+zentral über ein austauschbares Bild-Asset gepflegt.
 
 ## Dokumentation
 
@@ -33,7 +36,8 @@ vorhanden. Das Portrait wird zentral über ein austauschbares Bild-Asset gepfleg
 - Astro mit TypeScript für eine statische, schnelle Website
 - CSS Custom Properties und komponentennahes CSS für ein eigenes Designsystem
 - ein strukturierter TypeScript-Datensatz für Projekte und spätere Titel
-- kleine JavaScript-Inseln nur für Uhrzeit und Startup-Animation
+- kleine JavaScript-Inseln für Uhrzeit, Theme, Startup-, Kontakt- und
+  Startanimation
 - GitHub Actions für Prüfung, Build und Deployment nach GitHub Pages
 
 Der Stack ist bewusst statisch und wartungsarm. Die Konsolenwirkung entsteht

@@ -1,6 +1,6 @@
 # Produkt- und Designplan
 
-Stand: 13. Juli 2026
+Stand: 14. Juli 2026
 
 ## 1. Vision
 
@@ -60,43 +60,44 @@ und Spezialisierung geschärft.
 
 ### Charakter
 
-- dunkel, präzise und technisch, aber deutlich als Spielebibliothek erkennbar;
-- große, redaktionelle Typografie trifft auf kleine Systemlabels;
-- eine helle Akzentfarbe markiert Auswahl und Fokus;
-- echte Screenshots dienen als Covers und prägen Hintergrund sowie Akzentfarbe;
-- der helle Spielerbereich bringt einen persönlichen, Wii-artigen Kontrast;
-- subtile Rasterlinien, Statuspunkte und Indexnummern erzeugen Systemcharakter.
+- freundlich, ruhig und unmittelbar als Spielebibliothek erkennbar;
+- abgerundete, gut lesbare Systemtypografie statt Hacker- oder Terminalästhetik;
+- kräftiges Blau markiert Auswahl, Fokus und primäre Aktionen;
+- echte Screenshots dienen als Kanal-Covers und erhalten nur dezente Overlays;
+- ein heller Modus erinnert an Nintendo-Menüs, der dunkle Modus nutzt tiefes Blau;
+- großzügige Abstände, wenige Labels und klare Icons halten das Menü aufgeräumt.
 
 ### Vorläufige Farbwelt
 
-| Rolle          | Arbeitswert | Zweck                  |
-| -------------- | ----------- | ---------------------- |
-| Hintergrund    | `#0B0D10`   | fast schwarzes Graphit |
-| Oberfläche     | `#141820`   | Panels und Karten      |
-| Primärtext     | `#F1F0EA`   | warmes Off-White       |
-| Sekundärtext   | `#9AA3AE`   | Metadaten              |
-| Primärakzent   | `#65F6D2`   | Fokus, Status, Links   |
-| Sekundärakzent | `#FF7A59`   | wichtige Highlights    |
+| Rolle              | Arbeitswert | Zweck                  |
+| ------------------ | ----------- | ---------------------- |
+| Hintergrund hell   | `#EDF4FF`   | luftige Konsolenfläche |
+| Oberfläche hell    | `#FFFFFF`   | Leisten und Dialoge    |
+| Hintergrund dunkel | `#06152F`   | tiefes Konsolenblau    |
+| Oberfläche dunkel  | `#0B2147`   | Leisten und Karten     |
+| Primärtext hell    | `#172133`   | klare Beschriftung     |
+| Primärtext dunkel  | `#F5F9FF`   | hoher Kontrast         |
+| Primärakzent       | `#278CF3`   | Fokus, Status, Links   |
 
 Die finalen Werte werden erst im visuellen Prototyp nach Kontrastprüfung
 festgelegt.
 
 ### Typografie
 
-- Display/UI: eine charaktervolle Grotesk-Schrift mit kompakter Laufweite;
-- Systemlabels/Code: eine gut lesbare Monospace-Schrift;
-- Schriften werden möglichst selbst gehostet und sparsam geschnitten;
-- Text bleibt in normaler Groß-/Kleinschreibung, Systemlabels dürfen versal sein.
-
-Mögliche Ausgangspunkte sind Space Grotesk und JetBrains Mono. Vor der Nutzung
-werden Lizenz, Dateigröße und Lesbarkeit geprüft.
+- UI und Beschriftung: eine weiche, vertraute Sans-Serif mit Nintendo-artiger
+  Freundlichkeit;
+- keine Monospace- oder Code-Typografie im Hauptmenü;
+- der aktuelle System-Font-Stack vermeidet zusätzliche Downloads;
+- Text bleibt in normaler Groß-/Kleinschreibung und wird nicht technisch codiert.
 
 ### Bewegung
 
-- kurze Auswahlbewegung beim Wechsel eines Projekts;
-- sanfte Tiefenstaffelung zwischen aktivem und inaktivem Cover;
-- eine kurze, überspringbare Bootsequenz mit Spielerprofil;
-- keine automatisch abgespielten Sounds;
+- die ausgewählte Kachel wächst nur leicht und ihr Cover bewegt sich dezent;
+- beim Start wächst die Kachel bis auf Bildschirmgröße, verliert Farbe und blendet
+  über Schwarz zur Zielseite;
+- eine auffällige, überspringbare Profilsequenz lässt einen Mauszeiger zum Profil
+  fahren und es anklicken;
+- UI-Klänge starten erst nach dem bewussten Klick auf „Menü starten“;
 - `prefers-reduced-motion` schaltet Übergänge auf sofortige Zustandswechsel um.
 
 ## 5. Informationsarchitektur
@@ -105,10 +106,11 @@ werden Lizenz, Dateigröße und Lesbarkeit geprüft.
 
 1. **Startup:** kurzer, überspringbarer Profil-Login als eigenständiger Moment.
 2. **Systemleiste:** feststehendes Home-Menü mit Spielerbild, GitHub, Uhrzeit und Status.
-3. **Channel-Galerie:** mehrzeiliges Raster aus echten Website-Covers.
+3. **Channel-Galerie:** 4×3-Raster aus echten Website-Covers und freien Kanälen.
 4. **Freie Kanäle:** sichtbare Plätze für kommende Websites.
-5. **System-Dock:** Bedienhinweis, Seitenstatus und Anzahl aktiver Kanäle.
-6. **Footer:** kompakter Zugang zu Impressum, Datenschutz und Copyright.
+5. **System-Dock:** Kontakt, rechtliche Links, Bedienhinweis und Theme-Wechsel.
+6. **Kontakt:** modaler Dialog; Versand wird nach Hinterlegung einer öffentlichen
+   Adresse oder eines datenschutzgerechten Formular-Endpunkts aktiviert.
 
 ### Projektseiten
 
@@ -136,8 +138,9 @@ erstellt beziehungsweise rechtlich geprüft.
 
 ### Desktop
 
-- alle Projekte sind gleichzeitig in einem 3×2-Channel-Raster sichtbar;
-- ein Klick auf ein belegtes Cover startet die Website direkt;
+- zwölf Plätze sind gleichzeitig in einem 4×3-Channel-Raster sichtbar;
+- ein Klick auf ein belegtes Cover startet die Vollbild-Überblendung und danach
+  die Website direkt;
 - die feste Systemleiste bleibt beim Scrollen am oberen Bildschirmrand;
 - freie Plätze zeigen, wie das Home-Menü um weitere Websites wächst;
 - alle Links besitzen sichtbare Fokuszustände und semantische Beschriftungen.
@@ -146,7 +149,7 @@ erstellt beziehungsweise rechtlich geprüft.
 
 - die Galerie wird zweispaltig und behält den Home-Menü-Charakter;
 - Projekte bleiben direkt sichtbar und benötigen kein horizontales Wischen;
-- die Systemleiste reduziert sich auf Home, GitHub, Startup, Uhrzeit und Avatar;
+- die Systemleiste reduziert sich auf Profil, GitHub, Uhrzeit und Online-Status;
 - die Kacheln bleiben auch auf schmalen Displays direkt startbar.
 
 ### Barrierearme Variante
@@ -209,7 +212,7 @@ Sprachauswahl bleibt eine bewusste, stabile Nutzerentscheidung.
 ### Enthalten
 
 - responsive Startseite;
-- drei bis sechs Projekte im Console Hub;
+- drei Projekte und insgesamt zwölf vorbereitete Plätze im Console Hub;
 - mindestens eine vollständige Case Study;
 - Über-mich- und Kontaktbereich;
 - Impressum und Datenschutz;
@@ -220,7 +223,8 @@ Sprachauswahl bleibt eine bewusste, stabile Nutzerentscheidung.
 
 - englische Vollversion;
 - Projektfilter und vollständiges Archiv;
-- dezente Soundkulisse nach aktivem Opt-in;
+- eine weitergehende Soundkulisse nach aktivem Opt-in;
+- eine echte Besucheranzeige über einen datenschutzgerechten externen Zähler;
 - Gamepad-Unterstützung;
 - WebGL- oder Canvas-Details;
 - Blog/Devlog und RSS;

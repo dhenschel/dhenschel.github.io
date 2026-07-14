@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactDialog from "../components/ContactDialog.astro";
 import ProjectHub from "../components/ProjectHub.astro";
-import SiteFooter from "../components/SiteFooter.astro";
 import StartupScreen from "../components/StartupScreen.astro";
 import { projects } from "../data/projects";
 import { siteProfile } from "../data/site";
@@ -13,30 +13,28 @@ const structuredData = {
     {
       "@type": "Person",
       "@id": "https://www.dhenschel.de/#person",
-      name: siteProfile.name,
+      name: "D. Henschel",
       url: "https://www.dhenschel.de",
       sameAs: [siteProfile.github],
       jobTitle: siteProfile.role,
     },
     {
       "@type": "CollectionPage",
-      name: "D. Henschel — Website Console",
+      name: "D. Henschel — Website-Menü",
       url: "https://www.dhenschel.de/",
       about: { "@id": "https://www.dhenschel.de/#person" },
       mainEntity: {
         "@type": "ItemList",
-        itemListElement: projects
-          .filter((project) => project.url)
-          .map((project, index) => ({
-            "@type": "ListItem",
-            position: index + 1,
-            item: {
-              "@type": "WebSite",
-              name: project.title,
-              url: project.url,
-              creator: { "@id": "https://www.dhenschel.de/#person" },
-            },
-          })),
+        itemListElement: projects.map((project, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "WebSite",
+            name: project.title,
+            url: project.url,
+            creator: { "@id": "https://www.dhenschel.de/#person" },
+          },
+        })),
       },
     },
   ],
@@ -44,9 +42,29 @@ const structuredData = {
 ---
 
 <BaseLayout
-  title="D. Henschel — Home Console"
-  description="Das persönliche Home-Menü von D. Henschel mit ClipCollection, CozySite, Restaurant Lava und kommenden Websites."
+  title="D. Henschel — Website-Menü"
+  description="Das persönliche Website-Menü von D. Henschel mit ClipCollection, CozySite, Restaurant Lava und kommenden Projekten."
 >
+  <script is:inline>
+    (() => {
+      const storageKey = "dh-console-theme";
+      let storedTheme = null;
+      try {
+        storedTheme = localStorage.getItem(storageKey);
+      } catch {
+        storedTheme = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      document.documentElement.dataset.consoleTheme =
+        storedTheme === "dark" || storedTheme === "light"
+          ? storedTheme
+          : systemTheme;
+    })();
+  </script>
+
   <script
     is:inline
     type="application/ld+json"
@@ -56,86 +74,100 @@ const structuredData = {
   <StartupScreen />
 
   <header class="console-topbar">
-    <a class="console-topbar__home" href="/" aria-label="Home-Menü">
-      <span class="console-topbar__home-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" role="img">
-          <path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9Z"
-          ></path>
-        </svg>
-      </span>
-      <span><small>System</small><strong>Home</strong></span>
-    </a>
+    <div class="console-identity">
+      <button
+        class="console-profile-button"
+        type="button"
+        data-replay-startup
+        aria-label="Profil dhenschel und Startup erneut abspielen"
+      >
+        <span class="profile-picture profile-picture--bar">
+          <img
+            src={siteProfile.image}
+            alt={siteProfile.imageAlt}
+            width="800"
+            height="800"
+          />
+        </span>
+        <strong>{siteProfile.name}</strong>
+      </button>
 
-    <div class="console-topbar__section">
-      <span class="console-topbar__online"><i></i> Online</span>
-      <span class="console-topbar__library">Website Library</span>
-    </div>
-
-    <nav class="console-actions" aria-label="Systemaktionen">
       <a
-        class="console-action"
+        class="console-system-item console-system-item--github"
         href={siteProfile.github}
         target="_blank"
         rel="noreferrer"
         aria-label="GitHub-Profil öffnen"
       >
-        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-          <path
-            d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.88c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.86V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"
-          ></path>
-        </svg>
-        <span>GitHub</span>
+        <span>
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path
+              d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.88c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.86V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"
+            ></path>
+          </svg>
+        </span>
+        <strong>GitHub</strong>
       </a>
-      <button
-        class="console-action"
-        type="button"
-        data-replay-startup
-        aria-label="Startup erneut abspielen"
-      >
-        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-          <path
-            d="M12 3a9 9 0 1 0 8.55 6.2l-1.9.63A7 7 0 1 1 17 7.15L14.2 10H21V3.2l-2.58 2.57A8.96 8.96 0 0 0 12 3Z"
-          ></path>
-        </svg>
-        <span>Startup</span>
-      </button>
-    </nav>
-
-    <div class="console-clock">
-      <time data-console-time>--:--</time>
-      <span data-console-date>--.--.----</span>
     </div>
 
-    <div class="console-user">
-      <span><small>Player 01</small><strong>{siteProfile.name}</strong></span>
-      <div class="profile-picture profile-picture--bar">
-        <img
-          src={siteProfile.image}
-          alt={siteProfile.imageAlt}
-          width="800"
-          height="800"
-        />
+    <div class="console-status">
+      <div class="console-clock">
+        <time data-console-time>--:--</time>
+        <span data-console-date>--.--.----</span>
       </div>
+      <span class="console-online"><i></i> Online</span>
     </div>
   </header>
 
   <main id="main-content" class="console-home">
     <div class="console-background" aria-hidden="true">
-      <span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
     </div>
-    <section class="home-screen" aria-label="Website-Konsole">
-      <div class="home-screen__welcome">
-        <div>
-          <p>Player 01</p>
-          <strong>Willkommen zurück, D.</strong>
-        </div>
-        <p>Wähle einen Kanal, um eine Website zu starten.</p>
-      </div>
+    <div class="home-screen">
       <ProjectHub />
-    </section>
+    </div>
   </main>
 
-  <SiteFooter />
+  <footer class="console-bottombar">
+    <button class="contact-button" type="button" data-contact-open>
+      <span>
+        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+          <path
+            d="M3 5h18v14H3V5Zm2 2v.3l7 5.25 7-5.25V7H5Zm14 10V9.8l-7 5.25L5 9.8V17h14Z"
+          ></path>
+        </svg>
+      </span>
+      <strong>Kontakt</strong>
+    </button>
+
+    <nav aria-label="Rechtliches">
+      <a href="/impressum/">Impressum</a>
+      <a href="/datenschutz/">Datenschutz</a>
+    </nav>
+
+    <div class="console-bottombar__actions">
+      <span class="console-start-hint"><i>A</i> Start</span>
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        aria-label="Farbschema wechseln"
+      >
+        <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0-5 1 1.8L12 5l-1-1.2L12 2Zm0 20-1-1.8 1-1.2 1 1.2L12 22ZM2 12l1.8-1L5 12l-1.2 1L2 12Zm20 0-1.8 1L19 12l1.2-1L22 12ZM4.9 4.9l2 .55.2 1.65-1.65-.2-.55-2Zm14.2 14.2-2-.55-.2-1.65 1.65.2.55 2Zm0-14.2-.55 2-1.65.2.2-1.65 2-.55ZM4.9 19.1l.55-2 1.65-.2-.2 1.65-2 .55Z"
+          ></path>
+        </svg>
+        <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 9 9 0 1 0 20.5 15.2Z"
+          ></path>
+        </svg>
+        <strong data-theme-label>Theme</strong>
+      </button>
+    </div>
+  </footer>
+
+  <ContactDialog />
 
   <script>
     const timeElements = document.querySelectorAll<HTMLElement>(
@@ -144,6 +176,11 @@ const structuredData = {
     const dateElements = document.querySelectorAll<HTMLElement>(
       "[data-console-date]",
     );
+    const themeToggle = document.querySelector<HTMLButtonElement>(
+      "[data-theme-toggle]",
+    );
+    const themeLabel =
+      document.querySelector<HTMLElement>("[data-theme-label]");
 
     const updateConsoleTime = () => {
       const now = new Date();
@@ -164,7 +201,43 @@ const structuredData = {
       dateElements.forEach((element) => (element.textContent = date));
     };
 
+    const updateThemeLabel = () => {
+      const theme = document.documentElement.dataset.consoleTheme;
+      if (themeLabel) {
+        themeLabel.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+      }
+    };
+
+    themeToggle?.addEventListener("click", () => {
+      const current = document.documentElement.dataset.consoleTheme;
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.dataset.consoleTheme = next;
+      try {
+        localStorage.setItem("dh-console-theme", next);
+      } catch {
+        // Theme persistence is optional.
+      }
+      updateThemeLabel();
+    });
+
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+    systemTheme.addEventListener("change", (event) => {
+      let storedTheme = null;
+      try {
+        storedTheme = localStorage.getItem("dh-console-theme");
+      } catch {
+        storedTheme = null;
+      }
+      if (!storedTheme) {
+        document.documentElement.dataset.consoleTheme = event.matches
+          ? "dark"
+          : "light";
+        updateThemeLabel();
+      }
+    });
+
     updateConsoleTime();
+    updateThemeLabel();
     window.setInterval(updateConsoleTime, 60_000);
   </script>
 </BaseLayout>

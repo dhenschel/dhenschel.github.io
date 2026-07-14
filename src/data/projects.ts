@@ -12,7 +12,6 @@ export interface Project {
   accent: string;
   accentRgb: string;
   tags: string[];
-  placeholder?: boolean;
 }
 
 export const projects: Project[] = [
@@ -63,48 +62,5 @@ export const projects: Project[] = [
     accent: "#d19a55",
     accentRgb: "209 154 85",
     tags: ["Restaurant", "Content", "Responsive"],
-  },
-  {
-    slug: "next-project",
-    index: "04",
-    title: "Nächster Kanal",
-    subtitle: "Dieser Slot wartet auf die nächste Idee.",
-    category: "Coming Soon",
-    description:
-      "Die Bibliothek ist bewusst erweiterbar. Neue Websites erscheinen später wie neue Spiele direkt in diesem Menü.",
-    year: "SOON",
-    status: "EMPTY SLOT",
-    accent: "#d7c7ff",
-    accentRgb: "215 199 255",
-    tags: ["New Project", "In Progress"],
-    placeholder: true,
-  },
-  {
-    slug: "free-channel-05",
-    index: "05",
-    title: "Freier Kanal",
-    subtitle: "Platz für eine weitere Website.",
-    category: "Coming Soon",
-    description: "Ein freier Platz im Home-Menü für ein kommendes Projekt.",
-    year: "SOON",
-    status: "EMPTY SLOT",
-    accent: "#f7b8d4",
-    accentRgb: "247 184 212",
-    tags: ["New Project"],
-    placeholder: true,
-  },
-  {
-    slug: "free-channel-06",
-    index: "06",
-    title: "Freier Kanal",
-    subtitle: "Platz für eine weitere Website.",
-    category: "Coming Soon",
-    description: "Ein freier Platz im Home-Menü für ein kommendes Projekt.",
-    year: "SOON",
-    status: "EMPTY SLOT",
-    accent: "#b8c8ff",
-    accentRgb: "184 200 255",
-    tags: ["New Project"],
-    placeholder: true,
   },
 ];
