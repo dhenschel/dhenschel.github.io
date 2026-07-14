@@ -64,9 +64,14 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
 </section>
 
 <div class="launch-transition" data-launch-transition aria-hidden="true" hidden>
-  <img data-launch-image src="" alt="" />
+  <img class="launch-transition__backdrop" data-launch-image src="" alt="" />
   <span class="launch-transition__veil"></span>
-  <strong data-launch-title></strong>
+  <div class="launch-transition__loading" aria-hidden="true">
+    <img data-launch-loading-image src="" alt="" />
+    <strong data-launch-title></strong>
+    <span class="launch-progress"><i></i></span>
+    <small>Website wird gestartet</small>
+  </div>
 </div>
 
 <script>
@@ -81,6 +86,9 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   );
   const launchTitle = launchOverlay?.querySelector<HTMLElement>(
     "[data-launch-title]",
+  );
+  const launchLoadingImage = launchOverlay?.querySelector<HTMLImageElement>(
+    "[data-launch-loading-image]",
   );
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
@@ -143,6 +151,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       launchOverlay.style.setProperty("--launch-width", `${bounds.width}px`);
       launchOverlay.style.setProperty("--launch-height", `${bounds.height}px`);
       if (launchImage) launchImage.src = image;
+      if (launchLoadingImage) launchLoadingImage.src = image;
       if (launchTitle) launchTitle.textContent = title;
       launchOverlay.hidden = false;
       launchOverlay.dataset.state = "ready";
@@ -150,19 +159,37 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       playLaunchSound();
 
       requestAnimationFrame(() => {
-        launchOverlay.dataset.state = "expand";
+        launchOverlay.dataset.state = "zoom";
       });
 
-      const fadeDelay = reducedMotion ? 80 : 720;
-      const navigationDelay = reducedMotion ? 220 : 1380;
+      const blackDelay = reducedMotion ? 220 : 560;
+      const loadingDelay = reducedMotion ? 420 : 980;
+      const navigationDelay = reducedMotion ? 1100 : 2100;
 
       window.setTimeout(() => {
-        launchOverlay.dataset.state = "fade";
-      }, fadeDelay);
+        launchOverlay.dataset.state = "black";
+      }, blackDelay);
+
+      window.setTimeout(() => {
+        launchOverlay.dataset.state = "loading";
+      }, loadingDelay);
 
       window.setTimeout(() => {
         window.location.assign(destination);
       }, navigationDelay);
     });
   });
+
+  const resetLaunchTransition = () => {
+    document.documentElement.removeAttribute("data-launching");
+    if (!launchOverlay) return;
+    launchOverlay.hidden = true;
+    delete launchOverlay.dataset.state;
+    launchOverlay.style.removeProperty("--launch-left");
+    launchOverlay.style.removeProperty("--launch-top");
+    launchOverlay.style.removeProperty("--launch-width");
+    launchOverlay.style.removeProperty("--launch-height");
+  };
+
+  window.addEventListener("pageshow", resetLaunchTransition);
 </script>

@@ -144,6 +144,14 @@ import { siteProfile } from "../data/site";
     );
   };
 
+  const showStartupMenu = () => {
+    clearStartupTimers();
+    document.documentElement.dataset.boot = "ready";
+    startupScreen?.setAttribute("aria-hidden", "false");
+    if (startupScreen) startupScreen.dataset.phase = "ready";
+    window.setTimeout(() => startConsole?.focus(), 30);
+  };
+
   if (document.documentElement.dataset.boot === "ready") {
     startupScreen?.setAttribute("aria-hidden", "false");
   }
@@ -151,6 +159,6 @@ import { siteProfile } from "../data/site";
   startConsole?.addEventListener("click", playStartup);
   skipStartup?.addEventListener("click", finishStartup);
   replayStartupButtons.forEach((button) =>
-    button.addEventListener("click", playStartup),
+    button.addEventListener("click", showStartupMenu),
   );
 </script>

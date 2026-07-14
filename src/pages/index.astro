@@ -79,7 +79,7 @@ const structuredData = {
         class="console-profile-button"
         type="button"
         data-replay-startup
-        aria-label="Profil dhenschel und Startup erneut abspielen"
+        aria-label="Profilmenü von dhenschel öffnen"
       >
         <span class="profile-picture profile-picture--bar">
           <img
@@ -129,7 +129,13 @@ const structuredData = {
   </main>
 
   <footer class="console-bottombar">
-    <button class="contact-button" type="button" data-contact-open>
+    <button
+      class="contact-button"
+      type="button"
+      data-contact-open
+      aria-label="Kontaktformular öffnen"
+      title="Kontakt"
+    >
       <span>
         <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
           <path
@@ -137,7 +143,6 @@ const structuredData = {
           ></path>
         </svg>
       </span>
-      <strong>Kontakt</strong>
     </button>
 
     <nav aria-label="Rechtliches">
@@ -192,8 +197,8 @@ const structuredData = {
       }).format(now);
       const date = new Intl.DateTimeFormat("de-DE", {
         timeZone: "Europe/Berlin",
-        day: "2-digit",
-        month: "2-digit",
+        day: "numeric",
+        month: "long",
         year: "numeric",
       }).format(now);
 
