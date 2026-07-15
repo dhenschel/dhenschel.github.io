@@ -558,22 +558,26 @@ html[data-boot="skip"] .startup-screen {
 }
 
 .console-background::before {
-  bottom: -31rem;
-  height: 42rem;
+  bottom: var(--orbit-lower-bottom, -31rem);
+  height: var(--orbit-lower-height, 42rem);
   border: 4rem solid var(--console-orbit);
   transform: rotate(-4deg);
   transform-origin: 50% 62%;
-  animation: console-orbit-lower 15s ease-in-out infinite alternate;
+  animation: console-orbit-lower var(--orbit-lower-duration, 15s) ease-in-out
+    var(--orbit-lower-delay, 0s) infinite
+    var(--orbit-lower-direction, alternate);
   will-change: transform;
 }
 
 .console-background::after {
-  top: 10rem;
-  height: 29rem;
+  top: var(--orbit-upper-top, 10rem);
+  height: var(--orbit-upper-height, 29rem);
   border-top: 1px solid var(--console-orbit-accent);
   transform: rotate(4deg);
   transform-origin: center;
-  animation: console-orbit-upper 12s ease-in-out infinite alternate;
+  animation: console-orbit-upper var(--orbit-upper-duration, 12s) ease-in-out
+    var(--orbit-upper-delay, 0s) infinite
+    var(--orbit-upper-direction, alternate);
   will-change: transform;
 }
 

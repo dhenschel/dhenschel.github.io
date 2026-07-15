@@ -120,9 +120,118 @@ const structuredData = {
   </header>
 
   <main id="main-content" class="console-home">
-    <div class="console-background" aria-hidden="true">
+    <div class="console-background" data-console-background aria-hidden="true">
       <span></span><span></span><span></span><span></span>
     </div>
+    <script>
+      const consoleBackground = document.querySelector<HTMLElement>(
+        "[data-console-background]",
+      );
+
+      const randomBetween = (minimum: number, maximum: number) =>
+        minimum + Math.random() * (maximum - minimum);
+      const randomInteger = (minimum: number, maximum: number) =>
+        Math.floor(randomBetween(minimum, maximum + 1));
+      const randomSigned = (minimum: number, maximum: number) =>
+        randomBetween(minimum, maximum) * (Math.random() < 0.5 ? -1 : 1);
+      const decimal = (value: number) => value.toFixed(2);
+
+      if (consoleBackground) {
+        const particleCount = randomInteger(3, 7);
+        const particles = Array.from(
+          consoleBackground.querySelectorAll<HTMLElement>("span"),
+        );
+
+        while (particles.length < particleCount) {
+          const particle = document.createElement("span");
+          consoleBackground.append(particle);
+          particles.push(particle);
+        }
+
+        particles.forEach((particle, index) => {
+          if (index >= particleCount) {
+            particle.remove();
+            return;
+          }
+
+          const size = randomBetween(0.38, 1.15);
+          const duration = randomBetween(7, 12);
+          particle.style.top = `${decimal(randomBetween(12, 84))}%`;
+          particle.style.left = `${decimal(randomBetween(4, 92))}%`;
+          particle.style.right = "auto";
+          particle.style.bottom = "auto";
+          particle.style.width = `${decimal(size)}rem`;
+          particle.style.height = `${decimal(size)}rem`;
+          particle.style.setProperty(
+            "--particle-x",
+            `${decimal(randomSigned(4, 9))}rem`,
+          );
+          particle.style.setProperty(
+            "--particle-y",
+            `${decimal(randomSigned(3.5, 8))}rem`,
+          );
+          particle.style.setProperty(
+            "--particle-scale",
+            decimal(randomBetween(0.76, 1.52)),
+          );
+          particle.style.setProperty(
+            "--particle-duration",
+            `${decimal(duration)}s`,
+          );
+          particle.style.setProperty(
+            "--particle-pulse",
+            `${decimal(randomBetween(2.6, 4.2))}s`,
+          );
+          particle.style.setProperty(
+            "--particle-delay",
+            `-${decimal(randomBetween(0, duration))}s`,
+          );
+          particle.style.animationDirection =
+            Math.random() < 0.5 ? "alternate" : "alternate-reverse";
+        });
+
+        consoleBackground.style.setProperty(
+          "--orbit-lower-bottom",
+          `${decimal(randomBetween(-34, -28))}rem`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-lower-height",
+          `${decimal(randomBetween(38, 48))}rem`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-lower-duration",
+          `${decimal(randomBetween(12, 18))}s`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-lower-delay",
+          `-${decimal(randomBetween(0, 15))}s`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-lower-direction",
+          Math.random() < 0.5 ? "alternate" : "alternate-reverse",
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-upper-top",
+          `${decimal(randomBetween(7, 16))}rem`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-upper-height",
+          `${decimal(randomBetween(25, 36))}rem`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-upper-duration",
+          `${decimal(randomBetween(10, 16))}s`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-upper-delay",
+          `-${decimal(randomBetween(0, 13))}s`,
+        );
+        consoleBackground.style.setProperty(
+          "--orbit-upper-direction",
+          Math.random() < 0.5 ? "alternate" : "alternate-reverse",
+        );
+      }
+    </script>
     <div class="home-screen">
       <ProjectHub />
     </div>
