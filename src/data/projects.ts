@@ -40,7 +40,7 @@ export const projects: Project[] = [
     description:
       "Das GitHub-Profil von dhenschel mit öffentlichen Repositories, Projekten und aktuellen Entwicklungsarbeiten.",
     url: "https://github.com/dhenschel",
-    image: "/projects/github.svg",
+    image: "/projects/github.svg?v=wordmark-dark",
     year: "2026",
     status: "ONLINE",
     accent: "#181717",
