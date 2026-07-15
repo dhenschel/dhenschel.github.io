@@ -75,7 +75,7 @@
   body,
   body * {
     cursor:
-      url("/cursor-hand.svg") 18 2,
+      url("/cursor-hand.svg") 14 2,
       pointer !important;
   }
 
