@@ -7,6 +7,8 @@ import { projects } from "../data/projects";
 import { siteProfile } from "../data/site";
 import "../styles/console.css";
 
+const websiteProjects = projects.filter((project) => project.url);
+
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -25,7 +27,7 @@ const structuredData = {
       about: { "@id": "https://www.dhenschel.de/#person" },
       mainEntity: {
         "@type": "ItemList",
-        itemListElement: projects.map((project, index) => ({
+        itemListElement: websiteProjects.map((project, index) => ({
           "@type": "ListItem",
           position: index + 1,
           item: {
@@ -62,6 +64,8 @@ const structuredData = {
         storedTheme === "dark" || storedTheme === "light"
           ? storedTheme
           : systemTheme;
+      document.documentElement.dataset.consoleView =
+        window.location.hash === "#about" ? "about" : "gallery";
     })();
   </script>
 
@@ -75,6 +79,21 @@ const structuredData = {
 
   <header class="console-topbar">
     <div class="console-identity">
+      <button
+        class="console-back-button"
+        type="button"
+        data-console-back
+        aria-label="Zur Website-Galerie zurückkehren"
+        aria-hidden="true"
+        tabindex="-1"
+        title="Zurück zur Galerie"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m14.8 4.8-7.2 7.2 7.2 7.2 1.6-1.6-5.6-5.6 5.6-5.6-1.6-1.6Z"
+          ></path>
+        </svg>
+      </button>
+
       <button
         class="console-profile-button"
         type="button"
@@ -232,8 +251,34 @@ const structuredData = {
         );
       }
     </script>
-    <div class="home-screen">
-      <ProjectHub />
+    <div class="home-screen console-view-stage">
+      <div
+        class="console-view console-view--gallery"
+        data-console-view-panel="gallery"
+      >
+        <ProjectHub />
+      </div>
+
+      <section
+        class="console-view about-screen"
+        data-console-view-panel="about"
+        aria-labelledby="about-title"
+        aria-hidden="true"
+        inert
+      >
+        <div class="about-panel">
+          <header class="about-panel__header">
+            <span>Profilkanal</span>
+            <h1 id="about-title" tabindex="-1" data-about-heading>About Me</h1>
+          </header>
+          <div
+            class="about-panel__content"
+            data-about-content
+            aria-label="Persönliche Informationen"
+          >
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -297,6 +342,34 @@ const structuredData = {
         </svg>
         <strong data-theme-label>Theme</strong>
       </button>
+      <button
+        class="theme-toggle fullscreen-toggle"
+        type="button"
+        data-fullscreen-toggle
+        aria-label="Vollbildmodus starten"
+        aria-pressed="false"
+        title="Vollbildmodus starten"
+      >
+        <svg
+          class="fullscreen-toggle__enter"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4h6v2H6v4H4V4Zm10 0h6v6h-2V6h-4V4ZM4 14h2v4h4v2H4v-6Zm14 0h2v6h-6v-2h4v-4Z"
+          ></path>
+        </svg>
+        <svg
+          class="fullscreen-toggle__exit"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 4h2v6H4V8h4V4Zm6 0h2v4h4v2h-6V4ZM4 14h6v6H8v-4H4v-2Zm10 0h6v2h-4v4h-2v-6Z"
+          ></path>
+        </svg>
+        <strong data-fullscreen-label>Vollbild</strong>
+      </button>
     </div>
   </footer>
 
@@ -318,6 +391,104 @@ const structuredData = {
     );
     const themeLabel =
       document.querySelector<HTMLElement>("[data-theme-label]");
+    const fullscreenToggle = document.querySelector<HTMLButtonElement>(
+      "[data-fullscreen-toggle]",
+    );
+    const fullscreenLabel = document.querySelector<HTMLElement>(
+      "[data-fullscreen-label]",
+    );
+    const consoleBackButton = document.querySelector<HTMLButtonElement>(
+      "[data-console-back]",
+    );
+    const galleryPanel = document.querySelector<HTMLElement>(
+      '[data-console-view-panel="gallery"]',
+    );
+    const aboutPanel = document.querySelector<HTMLElement>(
+      '[data-console-view-panel="about"]',
+    );
+    const aboutHeading = document.querySelector<HTMLElement>(
+      "[data-about-heading]",
+    );
+    const firstChannel = document.querySelector<HTMLAnchorElement>(
+      "[data-channel-link]",
+    );
+    let viewFocusTimer: number | null = null;
+
+    type ConsoleView = "gallery" | "about";
+    type HistoryMode = "none" | "push" | "replace";
+
+    const applyConsoleView = (
+      view: ConsoleView,
+      historyMode: HistoryMode = "none",
+      focusTarget = false,
+    ) => {
+      const baseUrl = `${window.location.pathname}${window.location.search}`;
+      const viewUrl = view === "about" ? `${baseUrl}#about` : baseUrl;
+
+      if (historyMode === "push") {
+        window.history.pushState({ consoleView: view }, "", viewUrl);
+      } else if (historyMode === "replace") {
+        window.history.replaceState({ consoleView: view }, "", viewUrl);
+      }
+
+      document.documentElement.dataset.consoleView = view;
+      const galleryIsActive = view === "gallery";
+      galleryPanel?.setAttribute("aria-hidden", String(!galleryIsActive));
+      galleryPanel?.toggleAttribute("inert", !galleryIsActive);
+      aboutPanel?.setAttribute("aria-hidden", String(galleryIsActive));
+      aboutPanel?.toggleAttribute("inert", galleryIsActive);
+
+      if (consoleBackButton) {
+        consoleBackButton.setAttribute("aria-hidden", String(galleryIsActive));
+        consoleBackButton.tabIndex = galleryIsActive ? -1 : 0;
+      }
+
+      window.dispatchEvent(
+        new CustomEvent("console:view-changed", { detail: { view } }),
+      );
+
+      if (viewFocusTimer !== null) window.clearTimeout(viewFocusTimer);
+      if (focusTarget) {
+        const reducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        viewFocusTimer = window.setTimeout(
+          () => {
+            (galleryIsActive ? firstChannel : aboutHeading)?.focus({
+              preventScroll: true,
+            });
+          },
+          reducedMotion ? 0 : 440,
+        );
+      }
+    };
+
+    window.addEventListener("console:view-request", (event) => {
+      const requestedView = (event as CustomEvent<{ view?: string }>).detail
+        ?.view;
+      if (requestedView !== "about") return;
+      if (document.documentElement.dataset.consoleView === "about") return;
+      applyConsoleView("about", "push", true);
+    });
+
+    consoleBackButton?.addEventListener("click", () => {
+      if (
+        window.location.hash === "#about" &&
+        window.history.state?.consoleView === "about"
+      ) {
+        window.history.back();
+        return;
+      }
+      applyConsoleView("gallery", "replace", true);
+    });
+
+    window.addEventListener("popstate", () => {
+      applyConsoleView(
+        window.location.hash === "#about" ? "about" : "gallery",
+        "none",
+        true,
+      );
+    });
 
     const updateConsoleTime = () => {
       const now = new Date();
@@ -357,6 +528,42 @@ const structuredData = {
       updateThemeLabel();
     });
 
+    const updateFullscreenControl = () => {
+      if (!fullscreenToggle) return;
+      const isFullscreen = Boolean(document.fullscreenElement);
+      fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
+      fullscreenToggle.setAttribute(
+        "aria-label",
+        isFullscreen ? "Vollbildmodus beenden" : "Vollbildmodus starten",
+      );
+      fullscreenToggle.title = isFullscreen
+        ? "Vollbildmodus beenden"
+        : "Vollbildmodus starten";
+      if (fullscreenLabel) {
+        fullscreenLabel.textContent = isFullscreen
+          ? "Vollbild beenden"
+          : "Vollbild";
+      }
+    };
+
+    if (fullscreenToggle && !document.fullscreenEnabled) {
+      fullscreenToggle.hidden = true;
+    } else {
+      fullscreenToggle?.addEventListener("click", async () => {
+        try {
+          if (document.fullscreenElement) {
+            await document.exitFullscreen();
+          } else {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch {
+          // Some browsers can reject fullscreen outside an active user gesture.
+        }
+      });
+      document.addEventListener("fullscreenchange", updateFullscreenControl);
+      updateFullscreenControl();
+    }
+
     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
     systemTheme.addEventListener("change", (event) => {
       let storedTheme = null;
@@ -375,6 +582,7 @@ const structuredData = {
 
     updateConsoleTime();
     updateThemeLabel();
+    applyConsoleView(window.location.hash === "#about" ? "about" : "gallery");
     window.setInterval(updateConsoleTime, 60_000);
   </script>
 </BaseLayout>

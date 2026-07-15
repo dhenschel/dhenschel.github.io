@@ -315,7 +315,10 @@ const bindInterfaceSounds = () => {
       lastPointerAt = performance.now();
       if (!audioEnabled || audioUnlocked) return;
       const target = event.target instanceof Element ? event.target : null;
-      const launchesWebsite = Boolean(target?.closest("[data-channel-link]"));
+      const channelLink = target?.closest<HTMLElement>("[data-channel-link]");
+      const launchesWebsite = Boolean(
+        channelLink && !channelLink.dataset.channelView,
+      );
       void getReadyContext().then(() => {
         if (!launchesWebsite) startMusic();
       });
@@ -345,9 +348,15 @@ const bindInterfaceSounds = () => {
       return;
     }
 
-    if (control.matches("[data-contact-close], [data-skip-startup]")) {
+    if (
+      control.matches(
+        "[data-contact-close], [data-skip-startup], [data-console-back]",
+      )
+    ) {
       playEffect("back");
-    } else if (control.matches("[data-theme-toggle]")) {
+    } else if (
+      control.matches("[data-theme-toggle], [data-fullscreen-toggle]")
+    ) {
       playEffect("toggle");
     } else {
       playEffect("confirm");

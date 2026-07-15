@@ -8,6 +8,7 @@ export interface Project {
   url?: string;
   image?: string;
   previewVideo?: string;
+  view?: "about";
   year: string;
   status: string;
   accent: string;
@@ -17,8 +18,22 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    slug: "clipcollection",
+    slug: "about-me",
     index: "01",
+    title: "About Me",
+    subtitle: "Persönlicher Profilkanal.",
+    category: "System Channel",
+    description: "Persönliche Informationen über D. Henschel.",
+    view: "about",
+    year: "2026",
+    status: "SYSTEM",
+    accent: "#2488ff",
+    accentRgb: "36 136 255",
+    tags: ["Profil", "Portfolio"],
+  },
+  {
+    slug: "clipcollection",
+    index: "02",
     title: "ClipCollection",
     subtitle: "Deine Clips. Eine Sammlung.",
     category: "Video Gallery",
@@ -34,7 +49,7 @@ export const projects: Project[] = [
   },
   {
     slug: "cozysite",
-    index: "02",
+    index: "03",
     title: "CozySite",
     subtitle: "Ein Playground für kleine Ideen.",
     category: "Interactive Playground",
@@ -50,7 +65,7 @@ export const projects: Project[] = [
   },
   {
     slug: "lava-restaurant",
-    index: "03",
+    index: "04",
     title: "Restaurant Lava",
     subtitle: "Digitale Heimat für ein Restaurant.",
     category: "Business Website",
@@ -67,7 +82,7 @@ export const projects: Project[] = [
   },
   {
     slug: "bootbucht24",
-    index: "04",
+    index: "05",
     title: "BootBucht24",
     subtitle: "Gebrauchte Boote. Verdächtig günstig.",
     category: "Satirical Marketplace",

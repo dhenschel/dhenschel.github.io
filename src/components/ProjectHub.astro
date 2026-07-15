@@ -1,5 +1,6 @@
 ---
 import { projects } from "../data/projects";
+import { siteProfile } from "../data/site";
 
 const channelCount = 12;
 const channels = Array.from({ length: channelCount }, (_, index) => ({
@@ -22,34 +23,54 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
           {project ? (
             <a
               class="channel-card"
-              href={project.url}
+              href={project.view ? `#${project.view}` : (project.url ?? "#")}
               data-channel-link
               data-channel-title={project.title}
               data-channel-image={project.image}
+              data-channel-view={project.view}
               aria-label={`${project.title} öffnen`}
               style={`--channel-accent: ${project.accent}; --channel-accent-rgb: ${project.accentRgb};`}
             >
               <span class="channel-card__screen">
-                <img
-                  class="channel-card__cover"
-                  src={project.image}
-                  alt={`Vorschau von ${project.title}`}
-                  width="1280"
-                  height="720"
-                  loading={index === "01" ? "eager" : "lazy"}
-                />
-                {project.previewVideo && (
-                  <video
-                    class="channel-card__preview"
-                    data-channel-preview
-                    data-preview-src={project.previewVideo}
-                    muted
-                    playsinline
-                    preload="none"
-                    disablepictureinpicture
-                    disableRemotePlayback
-                    aria-hidden="true"
-                  />
+                {project.view === "about" ? (
+                  <span class="about-channel-cover" aria-hidden="true">
+                    <span class="about-channel-cover__avatar">
+                      <img
+                        src={siteProfile.image}
+                        alt=""
+                        width="800"
+                        height="800"
+                      />
+                    </span>
+                    <span class="about-channel-cover__copy">
+                      <small>Profil</small>
+                      <strong>About Me</strong>
+                    </span>
+                  </span>
+                ) : (
+                  <>
+                    <img
+                      class="channel-card__cover"
+                      src={project.image}
+                      alt={`Vorschau von ${project.title}`}
+                      width="1280"
+                      height="720"
+                      loading={Number(index) <= 5 ? "eager" : "lazy"}
+                    />
+                    {project.previewVideo && (
+                      <video
+                        class="channel-card__preview"
+                        data-channel-preview
+                        data-preview-src={project.previewVideo}
+                        muted
+                        playsinline
+                        preload="none"
+                        disablepictureinpicture
+                        disableRemotePlayback
+                        aria-hidden="true"
+                      />
+                    )}
+                  </>
                 )}
                 <span class="channel-card__glass" aria-hidden="true" />
               </span>
@@ -240,6 +261,8 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   const stopAllChannelPreviews = () =>
     channelPreviewStops.forEach((stopPreview) => stopPreview());
 
+  window.addEventListener("console:view-changed", stopAllChannelPreviews);
+
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") stopAllChannelPreviews();
   });
@@ -408,6 +431,57 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     link.addEventListener("click", (event) => {
       if (document.documentElement.dataset.launching === "true") {
         event.preventDefault();
+        return;
+      }
+
+      const targetView = link.dataset.channelView;
+      if (
+        targetView &&
+        !event.defaultPrevented &&
+        event.button === 0 &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        event.preventDefault();
+        if (document.documentElement.dataset.viewTransitioning === "true") {
+          return;
+        }
+
+        const screen = link.querySelector<HTMLElement>(".channel-card__screen");
+        if (!screen) {
+          window.dispatchEvent(
+            new CustomEvent("console:view-request", {
+              detail: { view: targetView },
+            }),
+          );
+          return;
+        }
+
+        stopAllChannelPreviews();
+        cancelLaunchWork();
+        document.documentElement.dataset.viewTransitioning = "true";
+        playSelectionSound();
+
+        void (async () => {
+          try {
+            const selectionCompleted = await runSelectionAnimation(
+              link,
+              screen,
+            );
+            if (!selectionCompleted || document.visibilityState !== "visible") {
+              return;
+            }
+            window.dispatchEvent(
+              new CustomEvent("console:view-request", {
+                detail: { view: targetView },
+              }),
+            );
+          } finally {
+            delete document.documentElement.dataset.viewTransitioning;
+          }
+        })();
         return;
       }
 
