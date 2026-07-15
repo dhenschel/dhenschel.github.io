@@ -32,8 +32,24 @@ export const projects: Project[] = [
     tags: ["Profil", "Portfolio"],
   },
   {
-    slug: "clipcollection",
+    slug: "github",
     index: "02",
+    title: "GitHub",
+    subtitle: "Code, Projekte und Experimente.",
+    category: "Developer Profile",
+    description:
+      "Das GitHub-Profil von dhenschel mit öffentlichen Repositories, Projekten und aktuellen Entwicklungsarbeiten.",
+    url: "https://github.com/dhenschel",
+    image: "/projects/github.svg",
+    year: "2026",
+    status: "ONLINE",
+    accent: "#181717",
+    accentRgb: "24 23 23",
+    tags: ["GitHub", "Code", "Open Source"],
+  },
+  {
+    slug: "clipcollection",
+    index: "03",
     title: "ClipCollection",
     subtitle: "Deine Clips. Eine Sammlung.",
     category: "Video Gallery",
@@ -49,7 +65,7 @@ export const projects: Project[] = [
   },
   {
     slug: "cozysite",
-    index: "03",
+    index: "04",
     title: "CozySite",
     subtitle: "Ein Playground für kleine Ideen.",
     category: "Interactive Playground",
@@ -65,7 +81,7 @@ export const projects: Project[] = [
   },
   {
     slug: "lava-restaurant",
-    index: "04",
+    index: "05",
     title: "Restaurant Lava",
     subtitle: "Digitale Heimat für ein Restaurant.",
     category: "Business Website",
@@ -82,7 +98,7 @@ export const projects: Project[] = [
   },
   {
     slug: "bootbucht24",
-    index: "05",
+    index: "06",
     title: "BootBucht24",
     subtitle: "Gebrauchte Boote. Verdächtig günstig.",
     category: "Satirical Marketplace",

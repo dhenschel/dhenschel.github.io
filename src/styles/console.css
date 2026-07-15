@@ -436,8 +436,7 @@ html[data-console-view="about"] .console-back-button {
   transform: translate(0, -50%) scale(1);
 }
 
-.console-profile-button,
-.console-system-item {
+.console-profile-button {
   display: grid;
   justify-items: center;
   gap: 0.35rem;
@@ -450,8 +449,7 @@ html[data-console-view="about"] .console-back-button {
   cursor: pointer;
 }
 
-.console-profile-button strong,
-.console-system-item strong {
+.console-profile-button strong {
   max-width: 7.5rem;
   overflow: hidden;
   font-size: 0.79rem;
@@ -481,38 +479,8 @@ html[data-console-view="about"] .console-back-button {
   transform: translateY(-0.15rem) scale(1.04);
 }
 
-.console-profile-button:focus-visible,
-.console-system-item:focus-visible {
+.console-profile-button:focus-visible {
   outline: none;
-}
-
-.console-system-item > span {
-  display: grid;
-  width: 3.15rem;
-  height: 3.15rem;
-  place-items: center;
-  border-radius: 50%;
-  color: #fff;
-  background: var(--console-blue);
-  box-shadow: var(--console-shadow);
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.console-system-item svg {
-  width: 2rem;
-  fill: currentcolor;
-}
-
-.console-system-item strong {
-  font-size: 0.72rem;
-}
-
-.console-system-item:hover > span,
-.console-system-item:focus-visible > span {
-  box-shadow: var(--console-shadow-strong);
-  transform: translateY(-0.15rem) scale(1.08);
 }
 
 .console-status {
@@ -1683,17 +1651,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
     height: 3.45rem;
   }
 
-  .console-system-item > span {
-    width: 2.75rem;
-    height: 2.75rem;
-  }
-
-  .console-system-item svg {
-    width: 1.75rem;
-  }
-
-  .console-profile-button strong,
-  .console-system-item strong {
+  .console-profile-button strong {
     font-size: 0.68rem;
   }
 
