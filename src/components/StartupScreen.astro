@@ -105,11 +105,11 @@ import { siteProfile } from "../data/site";
       : (buttonBounds?.top ?? window.innerHeight / 2) +
         (buttonBounds?.height ?? 0) / 2;
     const targetX = profileBounds
-      ? profileBounds.left + profileBounds.width * 0.85
-      : window.innerWidth / 2 + 3.6 * 16;
+      ? profileBounds.left + profileBounds.width / 2
+      : window.innerWidth / 2;
     const targetY = profileBounds
-      ? profileBounds.top + profileBounds.height * 0.58
-      : window.innerHeight / 2 - 0.9 * 16;
+      ? profileBounds.top + profileBounds.height / 2
+      : window.innerHeight / 2 - 3.5 * 16;
     const cursorHotspotX = 14;
     const cursorHotspotY = 2;
     const originX = window.innerWidth / 2;
