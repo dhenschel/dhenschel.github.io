@@ -15,8 +15,8 @@ eigenes Cover und lassen sich direkt aus der Galerie starten.
 **Phase 4 – persönliches Konsolen-Home-Menü**
 
 Die Website ist als statisches Astro-Projekt umgesetzt. ClipCollection,
-CozySite und Restaurant Lava sind mit eigenen Covers und direkten Links
-eingebunden. Das aufgeräumte, Nintendo-inspirierte Systemmenü besitzt ein
+CozySite, Restaurant Lava und BootBucht24 sind mit eigenen Covers und direkten
+Links eingebunden. Das aufgeräumte, Nintendo-inspirierte Systemmenü besitzt ein
 responsives 4×3-Kanalraster, feste Leisten, einen hellen und einen tiefblauen
 dunklen Modus sowie einen auffälligen Profil-Start mit animiertem Mauszeiger und
 optionalen UI-Klängen. Beim Öffnen wächst die gewählte Website-Kachel bis auf

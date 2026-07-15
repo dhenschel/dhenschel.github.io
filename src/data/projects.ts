@@ -63,4 +63,20 @@ export const projects: Project[] = [
     accentRgb: "209 154 85",
     tags: ["Restaurant", "Content", "Responsive"],
   },
+  {
+    slug: "bootbucht24",
+    index: "04",
+    title: "BootBucht24",
+    subtitle: "Gebrauchte Boote. Verdächtig günstig.",
+    category: "Satirical Marketplace",
+    description:
+      "Ein humorvoller Fake-Marktplatz für gebrauchte Boote mit Suche, Filtern und Angeboten, die Besucher unerwartet auf Kurs bringen.",
+    url: "https://dhenschel.github.io/BootBucht24/",
+    image: "/projects/bootbucht24.png",
+    year: "2026",
+    status: "ONLINE",
+    accent: "#116466",
+    accentRgb: "17 100 102",
+    tags: ["Satire", "Marketplace", "Vanilla JS"],
+  },
 ];
