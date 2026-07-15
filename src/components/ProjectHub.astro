@@ -115,6 +115,8 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     "Kaffee wird auf Betriebstemperatur gebracht.",
     "Die Website sucht noch ihren linken Socken.",
   ];
+  let activeSelectionAnimation: Animation | null = null;
+  let activeSelectedLink: HTMLAnchorElement | null = null;
   let activeZoomAnimation: Animation | null = null;
   let activeLaunchController: AbortController | null = null;
 
@@ -139,8 +141,62 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   const cancelLaunchWork = () => {
     activeLaunchController?.abort();
     activeLaunchController = null;
+    activeSelectionAnimation?.cancel();
+    activeSelectionAnimation = null;
     activeZoomAnimation?.cancel();
     activeZoomAnimation = null;
+    if (activeSelectedLink) {
+      delete activeSelectedLink.dataset.launchSelected;
+      activeSelectedLink = null;
+    }
+  };
+
+  const playSelectionSound = () => {
+    window.consoleAudio?.play("confirm");
+  };
+
+  const runSelectionAnimation = async (
+    link: HTMLAnchorElement,
+    screen: HTMLElement,
+  ) => {
+    activeSelectedLink = link;
+    link.dataset.launchSelected = "true";
+
+    if (reducedMotion || typeof screen.animate !== "function") {
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve()),
+      );
+      return true;
+    }
+
+    const isHighlighted =
+      link.matches(":hover") || link.matches(":focus-visible");
+    const highlightedScale = window.matchMedia("(max-width: 700px)").matches
+      ? 1.045
+      : 1.075;
+    const restingScale = isHighlighted ? highlightedScale : 1;
+    const selectionAnimation = screen.animate(
+      [
+        { transform: `scale(${restingScale})`, offset: 0 },
+        { transform: "scale(0.94)", offset: 0.34 },
+        { transform: "scale(1.105)", offset: 0.72 },
+        { transform: `scale(${restingScale})`, offset: 1 },
+      ],
+      {
+        duration: 420,
+        easing: "cubic-bezier(0.2, 0.82, 0.24, 1)",
+      },
+    );
+    activeSelectionAnimation = selectionAnimation;
+
+    try {
+      await selectionAnimation.finished;
+      if (selectionAnimation !== activeSelectionAnimation) return false;
+      activeSelectionAnimation = null;
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const runLaunchSequence = async (
@@ -214,72 +270,89 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
         window.location.assign(link.href);
         return;
       }
-      const bounds = screen.getBoundingClientRect();
 
       const destination = link.href;
       const image = link.dataset.channelImage ?? "";
       const title = link.dataset.channelTitle ?? "Website";
-      const startRadius = getComputedStyle(screen).borderRadius;
-
-      launchOverlay.style.setProperty("--launch-left", `${bounds.left}px`);
-      launchOverlay.style.setProperty("--launch-top", `${bounds.top}px`);
-      launchOverlay.style.setProperty("--launch-width", `${bounds.width}px`);
-      launchOverlay.style.setProperty("--launch-height", `${bounds.height}px`);
-      if (launchImage) launchImage.src = image;
-      if (launchLoadingImage) launchLoadingImage.src = image;
-      if (launchTitle) launchTitle.textContent = title;
-      if (launchTip) {
-        launchTip.textContent =
-          launchTips[Math.floor(Math.random() * launchTips.length)];
-      }
-      launchOverlay.hidden = false;
-      launchOverlay.dataset.state = "ready";
-      document.documentElement.dataset.launching = "true";
-      window.dispatchEvent(new CustomEvent("console:launch-start"));
-      playLaunchSound();
 
       cancelLaunchWork();
-      void launchOverlay.offsetWidth;
+      document.documentElement.dataset.launching = "true";
+      window.dispatchEvent(new CustomEvent("console:launch-start"));
+      playSelectionSound();
 
-      requestAnimationFrame(() => {
-        launchOverlay.dataset.state = "zoom";
-        activeZoomAnimation = launchOverlay.animate(
-          [
-            {
-              top: `${bounds.top}px`,
-              left: `${bounds.left}px`,
-              width: `${bounds.width}px`,
-              height: `${bounds.height}px`,
-              borderRadius: startRadius,
-            },
-            {
-              top: "0px",
-              left: "0px",
-              width: `${window.innerWidth}px`,
-              height: `${window.innerHeight}px`,
-              borderRadius: "0px",
-            },
-          ],
-          {
-            duration: reducedMotion ? 240 : 720,
-            easing: "cubic-bezier(0.16, 0.82, 0.2, 1)",
-            fill: "forwards",
-          },
+      void (async () => {
+        const selectionCompleted = await runSelectionAnimation(link, screen);
+        if (
+          !selectionCompleted ||
+          document.documentElement.dataset.launching !== "true" ||
+          document.visibilityState !== "visible"
+        ) {
+          return;
+        }
+
+        const bounds = screen.getBoundingClientRect();
+        const startRadius = getComputedStyle(screen).borderRadius;
+
+        launchOverlay.style.setProperty("--launch-left", `${bounds.left}px`);
+        launchOverlay.style.setProperty("--launch-top", `${bounds.top}px`);
+        launchOverlay.style.setProperty("--launch-width", `${bounds.width}px`);
+        launchOverlay.style.setProperty(
+          "--launch-height",
+          `${bounds.height}px`,
         );
-      });
+        if (launchImage) launchImage.src = image;
+        if (launchLoadingImage) launchLoadingImage.src = image;
+        if (launchTitle) launchTitle.textContent = title;
+        if (launchTip) {
+          launchTip.textContent =
+            launchTips[Math.floor(Math.random() * launchTips.length)];
+        }
+        launchOverlay.hidden = false;
+        launchOverlay.dataset.state = "ready";
+        playLaunchSound();
 
-      const blackDelay = reducedMotion ? 300 : 780;
-      const loadingDelay = reducedMotion ? 1300 : 2200;
-      const closingDelay = reducedMotion ? 2200 : 5600;
-      const navigationDelay = reducedMotion ? 2800 : 6500;
+        void launchOverlay.offsetWidth;
 
-      void runLaunchSequence(
-        destination,
-        blackDelay,
-        loadingDelay,
-        closingDelay,
-        navigationDelay,
-      );
+        requestAnimationFrame(() => {
+          launchOverlay.dataset.state = "zoom";
+          activeZoomAnimation = launchOverlay.animate(
+            [
+              {
+                top: `${bounds.top}px`,
+                left: `${bounds.left}px`,
+                width: `${bounds.width}px`,
+                height: `${bounds.height}px`,
+                borderRadius: startRadius,
+              },
+              {
+                top: "0px",
+                left: "0px",
+                width: `${window.innerWidth}px`,
+                height: `${window.innerHeight}px`,
+                borderRadius: "0px",
+              },
+            ],
+            {
+              duration: reducedMotion ? 240 : 720,
+              easing: "cubic-bezier(0.16, 0.82, 0.2, 1)",
+              fill: "forwards",
+            },
+          );
+        });
+
+        const blackDelay = reducedMotion ? 300 : 780;
+        const loadingDelay = reducedMotion ? 1300 : 2200;
+        const closingDelay = reducedMotion ? 2200 : 5600;
+        const navigationDelay = reducedMotion ? 2800 : 6500;
+
+        void runLaunchSequence(
+          destination,
+          blackDelay,
+          loadingDelay,
+          closingDelay,
+          navigationDelay,
+        );
+      })();
     });
   });
 

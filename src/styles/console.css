@@ -725,6 +725,23 @@ html[data-boot="skip"] .startup-screen {
     box-shadow 220ms ease;
 }
 
+.channel-card__screen::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at center,
+    rgb(var(--channel-accent-rgb) / 42%) 0 8%,
+    rgb(36 136 255 / 30%) 30%,
+    transparent 68%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.25);
+}
+
 .channel-card__screen img {
   display: block;
   width: 100%;
@@ -758,6 +775,18 @@ html[data-boot="skip"] .startup-screen {
     var(--console-shadow-strong),
     0 0 0 0.22rem var(--console-accent-halo);
   transform: scale(1.075);
+}
+
+.channel-card[data-launch-selected="true"] .channel-card__screen {
+  border-color: var(--console-blue);
+  box-shadow:
+    var(--console-shadow-strong),
+    0 0 0 0.38rem var(--console-accent-halo),
+    0 0 2.4rem var(--console-accent-halo);
+}
+
+.channel-card[data-launch-selected="true"] .channel-card__screen::after {
+  animation: channel-select-flash 420ms cubic-bezier(0.2, 0.82, 0.24, 1);
 }
 
 .channel-card:hover .channel-card__screen img,
@@ -1317,6 +1346,21 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 }
 
+@keyframes channel-select-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+  38% {
+    opacity: 0.78;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
 @keyframes launch-stripes {
   to {
     background-position: 1.85rem 0;
@@ -1535,6 +1579,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   .startup-cursor,
   .startup-profile,
   .channel-card__screen,
+  .channel-card__screen::after,
   .channel-card__screen img,
   .launch-transition,
   .launch-transition img,
