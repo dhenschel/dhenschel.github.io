@@ -391,7 +391,7 @@ html[data-boot="skip"] .startup-screen {
 
 .console-back-button {
   position: absolute;
-  top: 50%;
+  top: 2.15rem;
   left: 0;
   display: grid;
   width: 3.25rem;
@@ -893,47 +893,16 @@ html[data-console-view="about"] .about-screen {
 .about-channel-cover {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  gap: clamp(0.75rem, 1.4vw, 1.35rem);
-  padding: clamp(0.8rem, 1.5vw, 1.4rem);
-  color: #fff;
-  background:
-    radial-gradient(circle at 22% 24%, rgb(255 255 255 / 28%), transparent 34%),
-    linear-gradient(135deg, #2488ff, #1359b5 70%, #0b3d84);
-}
-
-.about-channel-cover__avatar {
-  display: block;
-  width: clamp(3.5rem, 5.3vw, 5.8rem);
-  aspect-ratio: 1;
-  flex: 0 0 auto;
-  overflow: hidden;
-  border: 0.18rem solid rgb(255 255 255 / 84%);
-  border-radius: 50%;
-  background: #74e4cb;
-  box-shadow: 0 0.65rem 1.5rem rgb(3 36 88 / 32%);
-}
-
-.about-channel-cover__copy {
   display: grid;
-  min-width: 0;
-  gap: 0.12rem;
+  place-items: center;
+  color: #0b0d10;
+  background: #fff;
 }
 
-.about-channel-cover__copy small {
-  color: rgb(255 255 255 / 74%);
-  font-size: clamp(0.55rem, 0.75vw, 0.72rem);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.about-channel-cover__copy strong {
-  font-size: clamp(1.15rem, 2vw, 2rem);
-  letter-spacing: -0.04em;
+.about-channel-cover strong {
+  font-size: clamp(1.35rem, 2.35vw, 2.45rem);
+  letter-spacing: -0.055em;
   line-height: 1;
-  white-space: nowrap;
 }
 
 .channel-card__screen img {
@@ -1213,6 +1182,12 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 
 .fullscreen-toggle[aria-pressed="true"] .fullscreen-toggle__exit {
   display: block;
+}
+
+.fullscreen-toggle {
+  width: 2.8rem;
+  justify-content: center;
+  padding: 0;
 }
 
 .sound-toggle__off,
@@ -1690,6 +1665,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   .console-back-button {
+    top: 1.725rem;
     width: 2.7rem;
     height: 2.7rem;
   }
@@ -1792,6 +1768,11 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   .theme-toggle {
     min-height: 2.55rem;
     padding: 0 0.8rem;
+  }
+
+  .fullscreen-toggle {
+    width: 2.55rem;
+    padding: 0;
   }
 
   .startup-screen__brand {

@@ -368,7 +368,6 @@ const structuredData = {
             d="M8 4h2v6H4V8h4V4Zm6 0h2v4h4v2h-6V4ZM4 14h6v6H8v-4H4v-2Zm10 0h6v2h-4v4h-2v-6Z"
           ></path>
         </svg>
-        <strong data-fullscreen-label>Vollbild</strong>
       </button>
     </div>
   </footer>
@@ -393,9 +392,6 @@ const structuredData = {
       document.querySelector<HTMLElement>("[data-theme-label]");
     const fullscreenToggle = document.querySelector<HTMLButtonElement>(
       "[data-fullscreen-toggle]",
-    );
-    const fullscreenLabel = document.querySelector<HTMLElement>(
-      "[data-fullscreen-label]",
     );
     const consoleBackButton = document.querySelector<HTMLButtonElement>(
       "[data-console-back]",
@@ -539,11 +535,6 @@ const structuredData = {
       fullscreenToggle.title = isFullscreen
         ? "Vollbildmodus beenden"
         : "Vollbildmodus starten";
-      if (fullscreenLabel) {
-        fullscreenLabel.textContent = isFullscreen
-          ? "Vollbild beenden"
-          : "Vollbild";
-      }
     };
 
     if (fullscreenToggle && !document.fullscreenEnabled) {

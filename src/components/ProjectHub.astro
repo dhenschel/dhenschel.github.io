@@ -1,6 +1,5 @@
 ---
 import { projects } from "../data/projects";
-import { siteProfile } from "../data/site";
 
 const channelCount = 12;
 const channels = Array.from({ length: channelCount }, (_, index) => ({
@@ -34,18 +33,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
               <span class="channel-card__screen">
                 {project.view === "about" ? (
                   <span class="about-channel-cover" aria-hidden="true">
-                    <span class="about-channel-cover__avatar">
-                      <img
-                        src={siteProfile.image}
-                        alt=""
-                        width="800"
-                        height="800"
-                      />
-                    </span>
-                    <span class="about-channel-cover__copy">
-                      <small>Profil</small>
-                      <strong>About Me</strong>
-                    </span>
+                    <strong>About Me</strong>
                   </span>
                 ) : (
                   <>
