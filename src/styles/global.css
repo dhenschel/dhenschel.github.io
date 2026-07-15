@@ -71,6 +71,19 @@
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  html,
+  body,
+  body * {
+    cursor:
+      url("/cursor-hand.svg") 18 2,
+      pointer !important;
+  }
+
+  input,
+  textarea {
+    cursor: text !important;
+  }
+
   ::selection {
     color: var(--ink);
     background: var(--mint);
