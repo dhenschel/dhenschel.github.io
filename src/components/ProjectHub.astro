@@ -26,6 +26,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
               data-channel-link
               data-channel-title={project.title}
               data-channel-image={project.image}
+              data-has-preview={project.previewVideo ? "true" : undefined}
               aria-label={`${project.title} öffnen`}
               style={`--channel-accent: ${project.accent}; --channel-accent-rgb: ${project.accentRgb};`}
             >
