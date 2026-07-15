@@ -91,6 +91,15 @@ import { siteProfile } from "../data/site";
     document.documentElement.dataset.boot = "done";
     startupScreen?.setAttribute("aria-hidden", "true");
     if (startupScreen) startupScreen.dataset.phase = "done";
+    if (document.documentElement.dataset.cursorHidden === "true") {
+      const cursorRestoreDelay = reducedMotionStartup ? 0 : 540;
+      startupTimers.push(
+        window.setTimeout(
+          () => document.documentElement.removeAttribute("data-cursor-hidden"),
+          cursorRestoreDelay,
+        ),
+      );
+    }
     try {
       sessionStorage.setItem("dh-intro-seen", "true");
     } catch {
@@ -100,6 +109,7 @@ import { siteProfile } from "../data/site";
 
   const playStartup = () => {
     clearStartupTimers();
+    document.documentElement.dataset.cursorHidden = "true";
     document.documentElement.dataset.boot = "pending";
     startupScreen?.setAttribute("aria-hidden", "false");
     if (startupScreen) startupScreen.dataset.phase = "selecting";
@@ -122,6 +132,7 @@ import { siteProfile } from "../data/site";
 
   const showStartupMenu = () => {
     clearStartupTimers();
+    document.documentElement.removeAttribute("data-cursor-hidden");
     document.documentElement.dataset.boot = "ready";
     startupScreen?.setAttribute("aria-hidden", "false");
     if (startupScreen) startupScreen.dataset.phase = "ready";

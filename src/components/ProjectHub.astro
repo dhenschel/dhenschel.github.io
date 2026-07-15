@@ -233,6 +233,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     try {
       await waitForLaunch(blackDelay, signal);
       if (controller !== activeLaunchController || !launchOverlay) return;
+      document.documentElement.dataset.cursorHidden = "true";
       launchOverlay.dataset.state = "black";
 
       await waitForLaunch(loadingDelay - blackDelay, signal);
@@ -383,6 +384,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   const resetLaunchTransition = () => {
     suspendLaunchTransition();
     document.documentElement.removeAttribute("data-launching");
+    document.documentElement.removeAttribute("data-cursor-hidden");
     if (!launchOverlay) return;
     launchOverlay.hidden = true;
     delete launchOverlay.dataset.state;

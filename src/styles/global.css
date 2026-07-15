@@ -84,6 +84,12 @@
     cursor: text !important;
   }
 
+  html[data-cursor-hidden="true"],
+  html[data-cursor-hidden="true"] body,
+  html[data-cursor-hidden="true"] body * {
+    cursor: none !important;
+  }
+
   ::selection {
     color: var(--ink);
     background: var(--mint);
