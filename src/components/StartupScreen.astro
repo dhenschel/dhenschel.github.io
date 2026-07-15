@@ -67,6 +67,9 @@ import { siteProfile } from "../data/site";
   const startConsole = document.querySelector<HTMLButtonElement>(
     "[data-start-console]",
   );
+  const startupProfilePicture = startupScreen?.querySelector<HTMLElement>(
+    ".profile-picture--boot",
+  );
   const skipStartup = document.querySelector<HTMLButtonElement>(
     "[data-skip-startup]",
   );
@@ -85,6 +88,50 @@ import { siteProfile } from "../data/site";
 
   const playTone = (frequency: number, duration: number, volume = 0.06) =>
     window.consoleAudio?.tone(frequency, duration, volume);
+
+  const setStartupCursorPath = (event: MouseEvent) => {
+    if (!startupScreen) return;
+
+    const buttonBounds = startConsole?.getBoundingClientRect();
+    const profileBounds = startupProfilePicture?.getBoundingClientRect();
+    const hasPointerPosition =
+      event.detail > 0 && (event.clientX !== 0 || event.clientY !== 0);
+    const startX = hasPointerPosition
+      ? event.clientX
+      : (buttonBounds?.left ?? window.innerWidth / 2) +
+        (buttonBounds?.width ?? 0) / 2;
+    const startY = hasPointerPosition
+      ? event.clientY
+      : (buttonBounds?.top ?? window.innerHeight / 2) +
+        (buttonBounds?.height ?? 0) / 2;
+    const targetX = profileBounds
+      ? profileBounds.left + profileBounds.width * 0.85
+      : window.innerWidth / 2 + 3.6 * 16;
+    const targetY = profileBounds
+      ? profileBounds.top + profileBounds.height * 0.58
+      : window.innerHeight / 2 - 0.9 * 16;
+    const cursorHotspotX = 14;
+    const cursorHotspotY = 2;
+    const originX = window.innerWidth / 2;
+    const originY = window.innerHeight / 2;
+
+    startupScreen.style.setProperty(
+      "--startup-cursor-start-x",
+      `${startX - originX - cursorHotspotX}px`,
+    );
+    startupScreen.style.setProperty(
+      "--startup-cursor-start-y",
+      `${startY - originY - cursorHotspotY}px`,
+    );
+    startupScreen.style.setProperty(
+      "--startup-cursor-target-x",
+      `${targetX - originX - cursorHotspotX}px`,
+    );
+    startupScreen.style.setProperty(
+      "--startup-cursor-target-y",
+      `${targetY - originY - cursorHotspotY}px`,
+    );
+  };
 
   const finishStartup = () => {
     clearStartupTimers();
@@ -107,8 +154,9 @@ import { siteProfile } from "../data/site";
     }
   };
 
-  const playStartup = () => {
+  const playStartup = (event: MouseEvent) => {
     clearStartupTimers();
+    setStartupCursorPath(event);
     document.documentElement.dataset.cursorHidden = "true";
     document.documentElement.dataset.boot = "pending";
     startupScreen?.setAttribute("aria-hidden", "false");
