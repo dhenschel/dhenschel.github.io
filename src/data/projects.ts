@@ -7,6 +7,7 @@ export interface Project {
   description: string;
   url?: string;
   image?: string;
+  previewVideo?: string;
   year: string;
   status: string;
   accent: string;
@@ -24,7 +25,7 @@ export const projects: Project[] = [
     description:
       "Eine zentrale Galerie für kuratierte Video-Clips mit Kategorien, Filtern und direktem Zugriff auf die Sammlung.",
     url: "https://clipcollection.de/",
-    image: "/projects/clipcollection.png",
+    image: "/projects/clipcollection.jpg",
     year: "2026",
     status: "ONLINE",
     accent: "#f2f4f7",
@@ -40,7 +41,7 @@ export const projects: Project[] = [
     description:
       "Ein verspieltes Web-Experiment mit konfigurierbarem Entenregen, überraschenden Events und viel Raum für neue Ideen.",
     url: "https://www.cozysite.de/",
-    image: "/projects/cozysite.png",
+    image: "/projects/cozysite.jpg",
     year: "2026",
     status: "ONLINE",
     accent: "#bae9ff",
@@ -56,7 +57,8 @@ export const projects: Project[] = [
     description:
       "Eine kompakte Restaurant-Website mit Speisekarte, Öffnungszeiten, Standort und direkter Kontaktmöglichkeit.",
     url: "https://lava-restaurant.com/",
-    image: "/projects/lava-restaurant.png",
+    image: "/projects/lava-restaurant.jpg",
+    previewVideo: "/projects/previews/lava-restaurant.mp4",
     year: "2025–2026",
     status: "ONLINE",
     accent: "#d19a55",
@@ -72,7 +74,7 @@ export const projects: Project[] = [
     description:
       "Ein humorvoller Fake-Marktplatz für gebrauchte Boote mit Suche, Filtern und Angeboten, die Besucher unerwartet auf Kurs bringen.",
     url: "https://dhenschel.github.io/BootBucht24/",
-    image: "/projects/bootbucht24.png",
+    image: "/projects/bootbucht24.jpg",
     year: "2026",
     status: "ONLINE",
     accent: "#116466",

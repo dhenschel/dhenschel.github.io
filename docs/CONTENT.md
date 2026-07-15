@@ -39,6 +39,14 @@ Für den Start werden drei bis sechs Projekte benötigt. Pro Projekt:
 - optional kurzes Video ohne Ton als UI-Demonstration;
 - Einschränkungen durch NDA oder fehlende Veröffentlichungsrechte.
 
+### Medienformate für die Konsole
+
+- Cover: `public/projects/{slug}.jpg`, 1280 × 720 Pixel;
+- Videovorschau: `public/projects/previews/{slug}.mp4`;
+- Video: H.264, 30 FPS, zehn Sekunden, ohne Audiospur, möglichst 1–3 MB;
+- die Videodatei wird im jeweiligen Projektelement über `previewVideo`
+  eingetragen und erst nach längerem Hover geladen.
+
 ## Beruflicher Hintergrund
 
 - relevante Stationen mit Rolle und Zeitraum;

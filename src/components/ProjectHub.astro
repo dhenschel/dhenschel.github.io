@@ -31,12 +31,26 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
             >
               <span class="channel-card__screen">
                 <img
+                  class="channel-card__cover"
                   src={project.image}
                   alt={`Vorschau von ${project.title}`}
                   width="1280"
                   height="720"
                   loading={index === "01" ? "eager" : "lazy"}
                 />
+                {project.previewVideo && (
+                  <video
+                    class="channel-card__preview"
+                    data-channel-preview
+                    data-preview-src={project.previewVideo}
+                    muted
+                    playsinline
+                    preload="none"
+                    disablepictureinpicture
+                    disableRemotePlayback
+                    aria-hidden="true"
+                  />
+                )}
                 <span class="channel-card__glass" aria-hidden="true" />
               </span>
             </a>
@@ -107,6 +121,122 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
+  const supportsHoverPreview = window.matchMedia(
+    "(hover: hover) and (pointer: fine)",
+  ).matches;
+  const previewDelay = 1100;
+  const previewDuration = 10000;
+  const previewFadeDuration = 300;
+  const channelPreviewStops: Array<() => void> = [];
+
+  channelLinks.forEach((link) => {
+    const preview = link.querySelector<HTMLVideoElement>(
+      "[data-channel-preview]",
+    );
+    const previewSource = preview?.dataset.previewSrc;
+    if (!preview || !previewSource || reducedMotion || !supportsHoverPreview) {
+      return;
+    }
+
+    let armTimer: number | null = null;
+    let playbackTimer: number | null = null;
+    let resetTimer: number | null = null;
+    let previewRun = 0;
+
+    const clearPreviewTimers = () => {
+      if (armTimer !== null) window.clearTimeout(armTimer);
+      if (playbackTimer !== null) window.clearTimeout(playbackTimer);
+      if (resetTimer !== null) window.clearTimeout(resetTimer);
+      armTimer = null;
+      playbackTimer = null;
+      resetTimer = null;
+    };
+
+    const resetPreviewTime = () => {
+      if (preview.readyState > 0) preview.currentTime = 0;
+    };
+
+    const stopPreview = (cooldown = false) => {
+      const wasVisible = link.dataset.previewState === "playing";
+      previewRun += 1;
+      clearPreviewTimers();
+      preview.pause();
+      link.dataset.previewState = cooldown ? "cooldown" : "idle";
+      if (wasVisible) {
+        resetTimer = window.setTimeout(resetPreviewTime, previewFadeDuration);
+      } else {
+        resetPreviewTime();
+      }
+    };
+
+    const startPreview = async () => {
+      armTimer = null;
+      if (
+        link.dataset.previewState !== "arming" ||
+        !link.matches(":hover") ||
+        document.documentElement.dataset.launching === "true"
+      ) {
+        stopPreview();
+        return;
+      }
+
+      const currentRun = ++previewRun;
+      link.dataset.previewState = "loading";
+      if (!preview.src) {
+        preview.src = previewSource;
+        preview.load();
+      }
+      preview.muted = true;
+      resetPreviewTime();
+
+      try {
+        await preview.play();
+        if (
+          currentRun !== previewRun ||
+          !link.matches(":hover") ||
+          document.documentElement.dataset.launching === "true"
+        ) {
+          return;
+        }
+        link.dataset.previewState = "playing";
+        playbackTimer = window.setTimeout(
+          () => stopPreview(true),
+          previewDuration,
+        );
+      } catch {
+        if (currentRun === previewRun) stopPreview(true);
+      }
+    };
+
+    const armPreview = () => {
+      const state = link.dataset.previewState;
+      if (
+        document.documentElement.dataset.launching === "true" ||
+        state === "arming" ||
+        state === "loading" ||
+        state === "playing" ||
+        state === "cooldown"
+      ) {
+        return;
+      }
+      link.dataset.previewState = "arming";
+      armTimer = window.setTimeout(startPreview, previewDelay);
+    };
+
+    link.addEventListener("pointerenter", armPreview);
+    link.addEventListener("pointerleave", () => stopPreview());
+    preview.addEventListener("ended", () => stopPreview(true));
+    channelPreviewStops.push(() => stopPreview());
+  });
+
+  const stopAllChannelPreviews = () =>
+    channelPreviewStops.forEach((stopPreview) => stopPreview());
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") stopAllChannelPreviews();
+  });
+  window.addEventListener("pagehide", stopAllChannelPreviews);
+
   const launchTips = [
     "Pixel werden alphabetisch sortiert.",
     "Das Internet wird kurz entknotet.",
@@ -296,6 +426,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       const image = link.dataset.channelImage ?? "";
       const title = link.dataset.channelTitle ?? "Website";
 
+      stopAllChannelPreviews();
       cancelLaunchWork();
       document.documentElement.dataset.launching = "true";
       window.dispatchEvent(new CustomEvent("console:launch-start"));

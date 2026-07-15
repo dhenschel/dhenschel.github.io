@@ -21,7 +21,8 @@ responsives 4×3-Kanalraster, feste Leisten, einen hellen und einen tiefblauen
 dunklen Modus sowie einen auffälligen Profil-Start mit animiertem Mauszeiger und
 optionalen UI-Klängen. Beim Öffnen wächst die gewählte Website-Kachel bis auf
 Bildschirmgröße und blendet anschließend zur Zielseite über. Das Portrait wird
-zentral über ein austauschbares Bild-Asset gepflegt.
+zentral über ein austauschbares Bild-Asset gepflegt. Projektkarten können nach
+längerem Hover eine verzögert geladene, zehnsekündige Videovorschau abspielen.
 
 ## Dokumentation
 
