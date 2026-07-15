@@ -754,7 +754,8 @@ html[data-boot="skip"] .startup-screen {
   transform: scale(1.01);
   transition:
     opacity 520ms cubic-bezier(0.22, 0.7, 0.2, 1),
-    filter 460ms cubic-bezier(0.22, 0.7, 0.2, 1);
+    filter 460ms cubic-bezier(0.22, 0.7, 0.2, 1),
+    transform 320ms cubic-bezier(0.2, 0.8, 0.25, 1);
 }
 
 .channel-card__preview {
@@ -812,11 +813,6 @@ html[data-boot="skip"] .startup-screen {
   transform: scale(1.075);
 }
 
-.channel-card[data-has-preview="true"]:hover .channel-card__screen,
-.channel-card[data-has-preview="true"]:focus-visible .channel-card__screen {
-  transform: translateZ(0);
-}
-
 .channel-card[data-launch-selected="true"] .channel-card__screen {
   border-color: var(--console-blue);
   box-shadow:
@@ -831,15 +827,7 @@ html[data-boot="skip"] .startup-screen {
 
 .channel-card:hover .channel-card__screen img,
 .channel-card:focus-visible .channel-card__screen img {
-  animation: preview-pan 4.5s ease-in-out infinite alternate;
-}
-
-.channel-card[data-has-preview="true"] .channel-card__cover,
-.channel-card[data-has-preview="true"]:hover .channel-card__cover,
-.channel-card[data-has-preview="true"]:focus-visible .channel-card__cover,
-.channel-card[data-preview-state="playing"] .channel-card__cover {
-  animation: none;
-  transform: none;
+  transform: scale(1.075);
 }
 
 .channel-card--empty .channel-card__screen {
@@ -1419,15 +1407,6 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 @keyframes launch-stripes {
   to {
     background-position: 1.85rem 0;
-  }
-}
-
-@keyframes preview-pan {
-  from {
-    transform: scale(1.03) translate3d(-0.4%, -0.2%, 0);
-  }
-  to {
-    transform: scale(1.11) translate3d(1.2%, 0.7%, 0);
   }
 }
 
