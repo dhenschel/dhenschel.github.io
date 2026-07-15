@@ -126,7 +126,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   ).matches;
   const previewDelay = 1100;
   const previewDuration = 10000;
-  const previewFadeDuration = 300;
+  const previewExitDuration = 820;
   const channelPreviewStops: Array<() => void> = [];
 
   channelLinks.forEach((link) => {
@@ -156,14 +156,22 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       if (preview.readyState > 0) preview.currentTime = 0;
     };
 
-    const stopPreview = (cooldown = false) => {
+    const stopPreview = (cooldown = false, slowExit = false) => {
       const wasVisible = link.dataset.previewState === "playing";
       previewRun += 1;
       clearPreviewTimers();
       preview.pause();
+      if (wasVisible && slowExit) {
+        link.dataset.previewExit = "slow";
+      } else {
+        delete link.dataset.previewExit;
+      }
       link.dataset.previewState = cooldown ? "cooldown" : "idle";
-      if (wasVisible) {
-        resetTimer = window.setTimeout(resetPreviewTime, previewFadeDuration);
+      if (wasVisible && slowExit) {
+        resetTimer = window.setTimeout(() => {
+          resetPreviewTime();
+          delete link.dataset.previewExit;
+        }, previewExitDuration);
       } else {
         resetPreviewTime();
       }
@@ -200,7 +208,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
         }
         link.dataset.previewState = "playing";
         playbackTimer = window.setTimeout(
-          () => stopPreview(true),
+          () => stopPreview(true, true),
           previewDuration,
         );
       } catch {
@@ -225,7 +233,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
 
     link.addEventListener("pointerenter", armPreview);
     link.addEventListener("pointerleave", () => stopPreview());
-    preview.addEventListener("ended", () => stopPreview(true));
+    preview.addEventListener("ended", () => stopPreview(true, true));
     channelPreviewStops.push(() => stopPreview());
   });
 
