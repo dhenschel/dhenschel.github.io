@@ -226,6 +226,7 @@ html[data-boot="skip"] .startup-screen {
   margin: 0 0 0.35rem;
   color: var(--console-muted);
   font-size: 1rem;
+  transform: translateY(-1.15rem);
 }
 
 .startup-profile-carousel {
@@ -1916,6 +1917,10 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   .startup-screen__content {
     width: 100%;
     padding: 0 0.7rem;
+  }
+
+  .startup-screen__content > p:first-child {
+    transform: none;
   }
 
   .startup-profile-carousel {
