@@ -1343,6 +1343,22 @@ html[data-console-view="music"] .music-screen {
   transform: translateX(-50%) scale(1.08);
 }
 
+.music-disc::before {
+  position: absolute;
+  z-index: 2;
+  inset: -0.72rem;
+  border: 0.52rem solid transparent;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 transparent;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    opacity 220ms ease;
+}
+
 .music-disc::after {
   position: absolute;
   z-index: -1;
@@ -1405,9 +1421,16 @@ html[data-console-view="music"] .music-screen {
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 75%),
     var(--console-shadow-strong),
-    0 0 0 0.48rem var(--console-blue),
     0 0 2rem var(--console-accent-halo);
   animation: music-disc-playing 14s linear infinite;
+}
+
+.music-disc[data-active-track="true"]::before {
+  border-color: var(--console-blue);
+  box-shadow:
+    0 0 0 0.12rem rgb(255 255 255 / 38%),
+    0 0 2.4rem var(--console-accent-halo);
+  opacity: 1;
 }
 
 .music-disc__rings {
@@ -2449,6 +2472,16 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 @keyframes music-disc-playing {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes music-disc-playing-resume {
+  from {
+    transform: rotate(var(--music-resume-angle, 0deg));
+  }
+
+  to {
+    transform: rotate(calc(var(--music-resume-angle, 0deg) + 360deg));
   }
 }
 

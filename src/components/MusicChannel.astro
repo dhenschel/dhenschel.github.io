@@ -154,12 +154,26 @@ import { musicTracks } from "../data/music";
 
   const getSelectedTrack = () => musicTracks[selectedMusicIndex];
 
+  const getDiscRotation = (surface: HTMLElement) => {
+    const currentTransform = getComputedStyle(surface).transform;
+    if (currentTransform === "none") return 0;
+    const matrix = new DOMMatrixReadOnly(currentTransform);
+    const currentAngle = (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI;
+    return ((currentAngle % 360) + 360) % 360;
+  };
+
   const updateMusicState = () => {
     musicDiscs.forEach((disc) => {
       const trackId = disc.dataset.trackId as MusicTrackId;
       const isActive = trackId === musicState.activeTrackId;
       disc.dataset.activeTrack = String(isActive);
       disc.setAttribute("aria-pressed", String(isActive));
+      if (!isActive) {
+        const surface = disc.querySelector<HTMLElement>(".music-disc__surface");
+        surface?.style.removeProperty("animation");
+        surface?.style.removeProperty("--music-hover-angle");
+        surface?.style.removeProperty("--music-resume-angle");
+      }
       const status = disc.querySelector<HTMLElement>(
         "[data-music-disc-status]",
       );
@@ -296,21 +310,26 @@ import { musicTracks } from "../data/music";
         disc.dataset.carouselPosition !== "active"
       )
         return;
-      const currentTransform = getComputedStyle(surface).transform;
-      let currentAngle = 0;
-      if (currentTransform !== "none") {
-        const matrix = new DOMMatrixReadOnly(currentTransform);
-        currentAngle = (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI;
-      }
-      currentAngle = ((currentAngle % 360) + 360) % 360;
+      const currentAngle = getDiscRotation(surface);
       surface.style.setProperty("--music-hover-angle", `${currentAngle}deg`);
       surface.style.animation =
-        "music-disc-hover-align 560ms cubic-bezier(0.2, 0.72, 0.24, 1) forwards";
+        "music-disc-hover-align 840ms cubic-bezier(0.2, 0.72, 0.24, 1) forwards";
     });
 
     disc.addEventListener("pointerleave", () => {
       if (!surface) return;
-      surface.style.removeProperty("animation");
+      if (
+        disc.dataset.activeTrack === "true" &&
+        disc.dataset.carouselPosition === "active"
+      ) {
+        const currentAngle = getDiscRotation(surface);
+        surface.style.setProperty("--music-resume-angle", `${currentAngle}deg`);
+        surface.style.animation =
+          "music-disc-playing-resume 14s linear infinite";
+      } else {
+        surface.style.removeProperty("animation");
+        surface.style.removeProperty("--music-resume-angle");
+      }
       surface.style.removeProperty("--music-hover-angle");
     });
 
