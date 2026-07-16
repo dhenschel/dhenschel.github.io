@@ -1405,7 +1405,7 @@ html[data-console-view="music"] .music-screen {
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 75%),
     var(--console-shadow-strong),
-    0 0 0 0.3rem var(--console-blue),
+    0 0 0 0.48rem var(--console-blue),
     0 0 2rem var(--console-accent-halo);
   animation: music-disc-playing 14s linear infinite;
 }

@@ -237,6 +237,11 @@ import { musicTracks } from "../data/music";
         "--music-disc-direction",
         String(Math.sign(offset)),
       );
+      if (position !== "active") {
+        const surface = disc.querySelector<HTMLElement>(".music-disc__surface");
+        surface?.style.removeProperty("animation");
+        surface?.style.removeProperty("--music-hover-angle");
+      }
       disc.tabIndex = position === "active" ? 0 : -1;
       disc.removeAttribute("aria-hidden");
     });
@@ -285,7 +290,12 @@ import { musicTracks } from "../data/music";
     const surface = disc.querySelector<HTMLElement>(".music-disc__surface");
 
     disc.addEventListener("pointerenter", () => {
-      if (!surface || disc.dataset.activeTrack !== "true") return;
+      if (
+        !surface ||
+        disc.dataset.activeTrack !== "true" ||
+        disc.dataset.carouselPosition !== "active"
+      )
+        return;
       const currentTransform = getComputedStyle(surface).transform;
       let currentAngle = 0;
       if (currentTransform !== "none") {
@@ -295,7 +305,7 @@ import { musicTracks } from "../data/music";
       currentAngle = ((currentAngle % 360) + 360) % 360;
       surface.style.setProperty("--music-hover-angle", `${currentAngle}deg`);
       surface.style.animation =
-        "music-disc-hover-align 280ms cubic-bezier(0.2, 0.8, 0.25, 1) forwards";
+        "music-disc-hover-align 560ms cubic-bezier(0.2, 0.72, 0.24, 1) forwards";
     });
 
     disc.addEventListener("pointerleave", () => {
