@@ -3,8 +3,9 @@ const INTERACTIVE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 type MusicScene = {
-  bass: number;
-  pad: readonly number[];
+  bass: readonly [number, number];
+  chord: readonly number[];
+  pulsePattern: number;
 };
 
 type MotifNote = readonly [
@@ -14,69 +15,112 @@ type MotifNote = readonly [
   velocity: number,
 ];
 
-const MUSIC_TEMPO = 76;
+type MusicPulse = readonly [beat: number, duration: number, velocity: number];
+
+const MUSIC_TEMPO = 98;
 const MUSIC_BEAT_SECONDS = 60 / MUSIC_TEMPO;
 const MUSIC_BEATS_PER_BAR = 4;
 const MUSIC_BAR_SECONDS = MUSIC_BEAT_SECONDS * MUSIC_BEATS_PER_BAR;
-const MUSIC_LEVEL = 0.115;
+const MUSIC_LEVEL = 0.108;
 const MUSIC_LOOKAHEAD_MS = 120;
 const MUSIC_SCHEDULE_AHEAD_SECONDS = 0.48;
 
-// An original D-major sound world: open sixths, ninths and suspended tones keep
-// the harmony friendly without turning the interface atmosphere into a song.
-const MUSIC_SCALE = [62, 64, 66, 69, 71, 74, 76] as const;
+// An original E-flat-major sound world. Short sixth, ninth and suspended chord
+// impulses create a friendly interface pulse without imitating an existing tune.
+const MUSIC_SCALE = [63, 65, 67, 70, 72, 75, 77] as const;
 const MUSIC_SCENES: readonly MusicScene[] = [
-  { bass: 38, pad: [50, 57, 62, 64, 66, 71] }, // D6/9
-  { bass: 38, pad: [45, 50, 57, 59, 64, 66] }, // D/A, still at home
-  { bass: 43, pad: [50, 55, 59, 62, 66, 69] }, // Gmaj9/D
-  { bass: 43, pad: [50, 55, 57, 59, 64, 66] }, // G6/9/D
-  { bass: 35, pad: [47, 54, 57, 62, 64] }, // Bm7(add11)
-  { bass: 33, pad: [45, 52, 57, 59, 62, 64] }, // Asus2(add11)
-  { bass: 31, pad: [43, 50, 55, 57, 59, 64] }, // G6/9
-  { bass: 38, pad: [45, 50, 57, 59, 64, 66] }, // D6/9/A
+  { bass: [39, 46], chord: [55, 58, 60, 65], pulsePattern: 0 }, // Eb6/9
+  { bass: [36, 43], chord: [55, 58, 62, 63], pulsePattern: 1 }, // Cm9
+  { bass: [44, 51], chord: [56, 60, 63, 67], pulsePattern: 2 }, // Abmaj9
+  { bass: [46, 53], chord: [58, 60, 63, 67], pulsePattern: 3 }, // Bb13sus
+  { bass: [43, 46], chord: [55, 58, 63, 65], pulsePattern: 1 }, // Eb/G
+  { bass: [41, 48], chord: [56, 60, 63, 67], pulsePattern: 0 }, // Fm9
+  { bass: [46, 53], chord: [58, 60, 63, 65], pulsePattern: 2 }, // Bb7sus
+  { bass: [39, 46], chord: [55, 58, 60, 65], pulsePattern: 3 }, // Eb6/9
 ];
 
-// Small related musical gestures. Every phrase returns to motif 0, while the
-// remaining cells act as restrained answers or occasional points of light.
+// Compact call-and-response gestures replace a continuous lead melody. Their
+// short phrasing and deliberate rests make them feel like part of the menu UI.
 const MUSIC_MOTIFS: readonly (readonly MotifNote[])[] = [
   [
-    [0.65, 2, 0.58, 0.82],
-    [1.45, 1, 0.58, 0.68],
-    [2.45, 0, 1.05, 0.62],
+    [0.72, 2, 0.22, 0.82],
+    [1.04, 3, 0.18, 0.62],
+    [1.5, 1, 0.32, 0.7],
   ],
   [
-    [0.8, 0, 0.58, 0.58],
-    [1.65, 2, 0.58, 0.7],
-    [2.75, 4, 0.88, 0.56],
+    [2.12, 0, 0.24, 0.64],
+    [2.48, 2, 0.19, 0.72],
+    [2.96, 1, 0.28, 0.55],
   ],
   [
-    [0.55, 1, 0.46, 0.54],
-    [1.22, 2, 0.46, 0.62],
-    [2.08, 3, 0.72, 0.66],
-    [3.08, 2, 0.5, 0.48],
+    [0.42, 4, 0.18, 0.48],
+    [0.72, 3, 0.18, 0.58],
+    [1.08, 2, 0.25, 0.6],
   ],
   [
-    [1.1, 4, 0.56, 0.52],
-    [1.95, 3, 0.56, 0.46],
-    [2.95, 1, 0.92, 0.5],
+    [2.36, 1, 0.21, 0.52],
+    [2.68, 2, 0.18, 0.6],
+    [3.04, 4, 0.24, 0.48],
   ],
   [
-    [0.9, 0, 0.72, 0.52],
-    [2.45, 1, 0.72, 0.46],
+    [0.82, 2, 0.25, 0.52],
+    [2.72, 0, 0.28, 0.46],
   ],
   [
-    [1.55, 5, 0.38, 0.4],
-    [2.28, 4, 0.52, 0.44],
+    [3.06, 5, 0.12, 0.4],
+    [3.3, 6, 0.17, 0.34],
   ],
 ];
 
-// Four complementary eight-bar arrangements create a cycle of roughly two
-// minutes before the same distribution of motifs returns.
+const MUSIC_PULSE_PATTERNS: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 0.62, 0.88],
+    [1.72, 0.48, 0.5],
+    [3, 0.55, 0.64],
+  ],
+  [
+    [0.48, 0.48, 0.54],
+    [2, 0.62, 0.76],
+    [3.46, 0.36, 0.42],
+  ],
+  [
+    [0, 0.58, 0.72],
+    [2.46, 0.58, 0.66],
+  ],
+  [
+    [0.72, 0.46, 0.48],
+    [1.96, 0.58, 0.68],
+    [3.22, 0.44, 0.5],
+  ],
+];
+
+const MUSIC_BASS_PATTERNS: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 0.48, 0.82],
+    [2.72, 0.42, 0.54],
+  ],
+  [
+    [0.48, 0.42, 0.54],
+    [2, 0.48, 0.72],
+  ],
+  [
+    [0, 0.45, 0.7],
+    [1.72, 0.34, 0.42],
+    [3.22, 0.4, 0.48],
+  ],
+  [
+    [0.22, 0.4, 0.5],
+    [2.46, 0.48, 0.66],
+  ],
+];
+
+// Four complementary eight-bar arrangements create roughly 80 seconds of
+// structured variation before the same distribution of gestures returns.
 const MUSIC_PHRASES: readonly (readonly (number | null)[])[] = [
-  [0, 4, 2, null, 1, 4, 3, 5],
-  [0, null, 3, 4, 2, null, 1, 4],
-  [0, 4, null, 2, 1, 5, 3, null],
-  [0, null, 2, 5, 1, 4, null, 3],
+  [0, 1, null, 5, 2, null, 3, 4],
+  [0, null, 1, 4, 2, 3, null, 5],
+  [0, 4, 2, null, 1, null, 3, 5],
+  [0, 1, null, 4, 2, 5, 3, null],
 ];
 
 let audioContext: AudioContext | null = null;
@@ -126,13 +170,13 @@ const createAudioGraph = () => {
   effectsGain = audioContext.createGain();
 
   masterGain.gain.value = 0.8;
-  musicDry.gain.value = 0.94;
-  musicEcho.delayTime.value = MUSIC_BEAT_SECONDS / 2;
+  musicDry.gain.value = 0.96;
+  musicEcho.delayTime.value = MUSIC_BEAT_SECONDS * 0.75;
   musicEchoFilter.type = "lowpass";
-  musicEchoFilter.frequency.value = 1250;
+  musicEchoFilter.frequency.value = 1850;
   musicEchoFilter.Q.value = 0.35;
-  musicEchoFeedback.gain.value = 0.075;
-  musicEchoWet.gain.value = 0.055;
+  musicEchoFeedback.gain.value = 0.04;
+  musicEchoWet.gain.value = 0.038;
   musicGain.gain.value = MUSIC_LEVEL;
   effectsGain.gain.value = 0.9;
   compressor.threshold.value = -18;
@@ -284,7 +328,7 @@ const playTone = (frequency: number, duration: number, volume = 0.06) => {
 
 const midiToFrequency = (note: number) => 440 * 2 ** ((note - 69) / 12);
 
-const schedulePadChord = (
+const scheduleChordPulse = (
   context: AudioContext,
   destination: AudioNode,
   notes: readonly number[],
@@ -292,23 +336,21 @@ const schedulePadChord = (
   duration: number,
   level: number,
 ) => {
-  const end = start + duration;
-  const releaseAt = Math.max(start + 0.8, end - 0.8);
+  const end = start + Math.max(duration, 0.32);
   const filter = context.createBiquadFilter();
   const envelope = context.createGain();
   const fundamentalMix = context.createGain();
   const overtoneMix = context.createGain();
 
   filter.type = "lowpass";
-  filter.Q.value = 0.55;
-  filter.frequency.setValueAtTime(980, start);
-  filter.frequency.exponentialRampToValueAtTime(1520, start + duration * 0.46);
+  filter.Q.value = 0.7;
+  filter.frequency.setValueAtTime(2200, start);
   filter.frequency.exponentialRampToValueAtTime(920, end);
-  fundamentalMix.gain.value = 0.72;
-  overtoneMix.gain.value = 0.045;
+  fundamentalMix.gain.value = 0.76;
+  overtoneMix.gain.value = 0.034;
   envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.48);
-  envelope.gain.setValueAtTime(level * 0.9, releaseAt);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.014);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.3, start + 0.13);
   envelope.gain.exponentialRampToValueAtTime(0.0001, end);
 
   fundamentalMix.connect(filter);
@@ -317,16 +359,16 @@ const schedulePadChord = (
 
   notes.forEach((note, index) => {
     const frequency = midiToFrequency(note);
-    const detune = (index - (notes.length - 1) / 2) * 0.8;
+    const detune = (index - (notes.length - 1) / 2) * 0.45;
     const fundamental = context.createOscillator();
     const overtone = context.createOscillator();
 
-    fundamental.type = "sine";
+    fundamental.type = "triangle";
     fundamental.frequency.value = frequency;
     fundamental.detune.value = detune;
-    overtone.type = "triangle";
+    overtone.type = "sine";
     overtone.frequency.value = frequency * 2;
-    overtone.detune.value = -detune + 2.5;
+    overtone.detune.value = -detune + 1.5;
     fundamental.connect(fundamentalMix);
     overtone.connect(overtoneMix);
     fundamental.start(start);
@@ -336,7 +378,7 @@ const schedulePadChord = (
   });
 };
 
-const scheduleWarmBass = (
+const scheduleMenuBass = (
   context: AudioContext,
   destination: AudioNode,
   note: number,
@@ -344,7 +386,7 @@ const scheduleWarmBass = (
   duration: number,
   level: number,
 ) => {
-  const end = start + duration;
+  const end = start + Math.max(duration, 0.26);
   const oscillator = context.createOscillator();
   const warmth = context.createOscillator();
   const warmthMix = context.createGain();
@@ -353,16 +395,18 @@ const scheduleWarmBass = (
   const frequency = midiToFrequency(note);
 
   oscillator.type = "sine";
-  oscillator.frequency.value = frequency;
+  oscillator.frequency.setValueAtTime(frequency * 1.018, start);
+  oscillator.frequency.exponentialRampToValueAtTime(frequency, start + 0.065);
   warmth.type = "triangle";
   warmth.frequency.value = frequency * 2;
-  warmthMix.gain.value = 0.055;
+  warmthMix.gain.value = 0.07;
   filter.type = "lowpass";
-  filter.frequency.value = 420;
-  filter.Q.value = 0.45;
+  filter.frequency.setValueAtTime(680, start);
+  filter.frequency.exponentialRampToValueAtTime(330, end);
+  filter.Q.value = 0.6;
   envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.18);
-  envelope.gain.setValueAtTime(level * 0.82, end - 0.55);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.012);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.32, start + 0.12);
   envelope.gain.exponentialRampToValueAtTime(0.0001, end);
 
   oscillator.connect(filter);
@@ -374,7 +418,7 @@ const scheduleWarmBass = (
   warmth.stop(end + 0.04);
 };
 
-const scheduleSoftPluck = (
+const scheduleMenuKey = (
   context: AudioContext,
   destination: AudioNode,
   note: number,
@@ -382,7 +426,7 @@ const scheduleSoftPluck = (
   duration: number,
   level: number,
 ) => {
-  const end = start + Math.max(duration, 0.72);
+  const end = start + Math.max(duration, 0.28);
   const fundamental = context.createOscillator();
   const color = context.createOscillator();
   const colorMix = context.createGain();
@@ -395,13 +439,14 @@ const scheduleSoftPluck = (
   color.type = "triangle";
   color.frequency.value = frequency * 2;
   color.detune.value = 4;
-  colorMix.gain.value = 0.075;
+  colorMix.gain.value = 0.1;
   filter.type = "lowpass";
-  filter.frequency.value = 2850;
-  filter.Q.value = 0.8;
+  filter.frequency.setValueAtTime(3600, start);
+  filter.frequency.exponentialRampToValueAtTime(1500, end);
+  filter.Q.value = 0.72;
   envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.016);
-  envelope.gain.exponentialRampToValueAtTime(level * 0.3, start + 0.22);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.009);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.22, start + 0.095);
   envelope.gain.exponentialRampToValueAtTime(0.0001, end);
 
   fundamental.connect(filter);
@@ -411,6 +456,32 @@ const scheduleSoftPluck = (
   color.start(start);
   fundamental.stop(end + 0.04);
   color.stop(end + 0.04);
+};
+
+const scheduleSoftTick = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  level: number,
+) => {
+  const end = start + 0.055;
+  const oscillator = context.createOscillator();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+
+  oscillator.type = "triangle";
+  oscillator.frequency.setValueAtTime(1480, start);
+  oscillator.frequency.exponentialRampToValueAtTime(860, end);
+  filter.type = "bandpass";
+  filter.frequency.value = 1200;
+  filter.Q.value = 0.9;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.004);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+
+  oscillator.connect(filter).connect(envelope).connect(destination);
+  oscillator.start(start);
+  oscillator.stop(end + 0.02);
 };
 
 const scheduleMusicBar = (
@@ -424,35 +495,60 @@ const scheduleMusicBar = (
   const scene = MUSIC_SCENES[barIndex];
   const phrase = MUSIC_PHRASES[phraseIndex];
   const motifIndex = phrase[barIndex];
-  const breath = 0.965 + Math.sin((absoluteBar + 1) * 1.7) * 0.035;
+  const breath = 0.98 + Math.sin((absoluteBar + 1) * 1.31) * 0.02;
+  const pulsePattern = MUSIC_PULSE_PATTERNS[scene.pulsePattern];
+  const bassPattern = MUSIC_BASS_PATTERNS[scene.pulsePattern];
 
-  schedulePadChord(
-    context,
-    destination,
-    scene.pad,
-    start,
-    MUSIC_BAR_SECONDS * 1.18,
-    0.0145 * breath,
-  );
-  scheduleWarmBass(
-    context,
-    destination,
-    scene.bass,
-    start + 0.04,
-    MUSIC_BAR_SECONDS * 0.86,
-    0.027 * breath,
-  );
+  pulsePattern.forEach(([beat, duration, velocity]) => {
+    scheduleChordPulse(
+      context,
+      destination,
+      scene.chord,
+      start + beat * MUSIC_BEAT_SECONDS,
+      duration * MUSIC_BEAT_SECONDS,
+      0.018 * velocity * breath,
+    );
+  });
+
+  bassPattern.forEach(([beat, duration, velocity], index) => {
+    scheduleMenuBass(
+      context,
+      destination,
+      scene.bass[index % scene.bass.length],
+      start + beat * MUSIC_BEAT_SECONDS,
+      duration * MUSIC_BEAT_SECONDS,
+      0.031 * velocity * breath,
+    );
+  });
+
+  if (absoluteBar % 4 === 1) {
+    scheduleSoftTick(
+      context,
+      destination,
+      start + 3.48 * MUSIC_BEAT_SECONDS,
+      0.0065 * breath,
+    );
+  } else if (absoluteBar % 4 === 3) {
+    [1.48, 3.48].forEach((beat, index) =>
+      scheduleSoftTick(
+        context,
+        destination,
+        start + beat * MUSIC_BEAT_SECONDS,
+        (index === 0 ? 0.0045 : 0.006) * breath,
+      ),
+    );
+  }
 
   if (motifIndex === null) return;
   MUSIC_MOTIFS[motifIndex].forEach(
     ([beat, scaleDegree, duration, velocity]) => {
-      scheduleSoftPluck(
+      scheduleMenuKey(
         context,
         destination,
         MUSIC_SCALE[scaleDegree],
         start + beat * MUSIC_BEAT_SECONDS,
-        duration * MUSIC_BEAT_SECONDS + 0.42,
-        0.036 * velocity * breath,
+        duration * MUSIC_BEAT_SECONDS + 0.08,
+        0.038 * velocity * breath,
       );
     },
   );
