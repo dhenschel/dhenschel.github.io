@@ -233,6 +233,10 @@ import { musicTracks } from "../data/music";
       disc.dataset.carouselPosition = position;
       disc.dataset.carouselDistance = String(Math.min(distance, 5));
       disc.style.setProperty("--music-disc-index", String(offset));
+      disc.style.setProperty(
+        "--music-disc-direction",
+        String(Math.sign(offset)),
+      );
       disc.tabIndex = position === "active" ? 0 : -1;
       disc.removeAttribute("aria-hidden");
     });
@@ -241,6 +245,7 @@ import { musicTracks } from "../data/music";
     if (musicNext) musicNext.disabled = selectedMusicIndex === total - 1;
 
     const track = getSelectedTrack();
+    document.documentElement.dataset.musicPreview = track.id;
     if (musicPosition) {
       musicPosition.textContent = `Disc ${selectedMusicIndex + 1} von ${total}`;
     }
@@ -330,6 +335,10 @@ import { musicTracks } from "../data/music";
       selectActiveMusic();
     } else {
       updateMusicState();
+      if (document.documentElement.dataset.consoleView !== "music") {
+        document.documentElement.dataset.musicPreview =
+          musicState.activeTrackId;
+      }
     }
   });
 
