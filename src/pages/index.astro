@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ContactDialog from "../components/ContactDialog.astro";
+import MusicChannel from "../components/MusicChannel.astro";
 import ProjectHub from "../components/ProjectHub.astro";
 import StartupScreen from "../components/StartupScreen.astro";
 import { projects } from "../data/projects";
@@ -65,7 +66,11 @@ const structuredData = {
           ? storedTheme
           : systemTheme;
       document.documentElement.dataset.consoleView =
-        window.location.hash === "#about" ? "about" : "gallery";
+        window.location.hash === "#about"
+          ? "about"
+          : window.location.hash === "#music"
+            ? "music"
+            : "gallery";
     })();
   </script>
 
@@ -111,6 +116,21 @@ const structuredData = {
         <strong>{siteProfile.name}</strong>
       </button>
     </div>
+
+    <button
+      class="header-music-button"
+      type="button"
+      data-music-channel-open
+      aria-label="Music Channel öffnen"
+      aria-pressed="false"
+      title="Music Channel öffnen"
+    >
+      <span class="header-music-button__motion" aria-hidden="true">
+        <span class="header-music-button__disc">
+          <i></i>
+        </span>
+      </span>
+    </button>
 
     <div class="console-status">
       <div class="console-clock">
@@ -262,6 +282,8 @@ const structuredData = {
           </div>
         </div>
       </section>
+
+      <MusicChannel />
     </div>
   </main>
 
@@ -376,6 +398,9 @@ const structuredData = {
     const fullscreenToggle = document.querySelector<HTMLButtonElement>(
       "[data-fullscreen-toggle]",
     );
+    const musicChannelOpen = document.querySelector<HTMLButtonElement>(
+      "[data-music-channel-open]",
+    );
     const consoleBackButton = document.querySelector<HTMLButtonElement>(
       "[data-console-back]",
     );
@@ -388,12 +413,18 @@ const structuredData = {
     const aboutHeading = document.querySelector<HTMLElement>(
       "[data-about-heading]",
     );
+    const musicPanel = document.querySelector<HTMLElement>(
+      '[data-console-view-panel="music"]',
+    );
+    const musicHeading = document.querySelector<HTMLElement>(
+      "[data-music-heading]",
+    );
     const firstChannel = document.querySelector<HTMLAnchorElement>(
       "[data-channel-link]",
     );
     let viewFocusTimer: number | null = null;
 
-    type ConsoleView = "gallery" | "about";
+    type ConsoleView = "gallery" | "about" | "music";
     type HistoryMode = "none" | "push" | "replace";
 
     const applyConsoleView = (
@@ -402,7 +433,7 @@ const structuredData = {
       focusTarget = false,
     ) => {
       const baseUrl = `${window.location.pathname}${window.location.search}`;
-      const viewUrl = view === "about" ? `${baseUrl}#about` : baseUrl;
+      const viewUrl = view === "gallery" ? baseUrl : `${baseUrl}#${view}`;
 
       if (historyMode === "push") {
         window.history.pushState({ consoleView: view }, "", viewUrl);
@@ -412,10 +443,15 @@ const structuredData = {
 
       document.documentElement.dataset.consoleView = view;
       const galleryIsActive = view === "gallery";
+      const aboutIsActive = view === "about";
+      const musicIsActive = view === "music";
       galleryPanel?.setAttribute("aria-hidden", String(!galleryIsActive));
       galleryPanel?.toggleAttribute("inert", !galleryIsActive);
-      aboutPanel?.setAttribute("aria-hidden", String(galleryIsActive));
-      aboutPanel?.toggleAttribute("inert", galleryIsActive);
+      aboutPanel?.setAttribute("aria-hidden", String(!aboutIsActive));
+      aboutPanel?.toggleAttribute("inert", !aboutIsActive);
+      musicPanel?.setAttribute("aria-hidden", String(!musicIsActive));
+      musicPanel?.toggleAttribute("inert", !musicIsActive);
+      musicChannelOpen?.setAttribute("aria-pressed", String(musicIsActive));
 
       if (consoleBackButton) {
         consoleBackButton.setAttribute("aria-hidden", String(galleryIsActive));
@@ -433,9 +469,12 @@ const structuredData = {
         ).matches;
         viewFocusTimer = window.setTimeout(
           () => {
-            (galleryIsActive ? firstChannel : aboutHeading)?.focus({
-              preventScroll: true,
-            });
+            const target = galleryIsActive
+              ? firstChannel
+              : aboutIsActive
+                ? aboutHeading
+                : musicHeading;
+            target?.focus({ preventScroll: true });
           },
           reducedMotion ? 0 : 440,
         );
@@ -445,15 +484,22 @@ const structuredData = {
     window.addEventListener("console:view-request", (event) => {
       const requestedView = (event as CustomEvent<{ view?: string }>).detail
         ?.view;
-      if (requestedView !== "about") return;
-      if (document.documentElement.dataset.consoleView === "about") return;
-      applyConsoleView("about", "push", true);
+      if (requestedView !== "about" && requestedView !== "music") return;
+      if (document.documentElement.dataset.consoleView === requestedView)
+        return;
+      applyConsoleView(requestedView, "push", true);
+    });
+
+    musicChannelOpen?.addEventListener("click", () => {
+      if (document.documentElement.dataset.consoleView === "music") return;
+      applyConsoleView("music", "push", true);
     });
 
     consoleBackButton?.addEventListener("click", () => {
       if (
-        window.location.hash === "#about" &&
-        window.history.state?.consoleView === "about"
+        (window.location.hash === "#about" ||
+          window.location.hash === "#music") &&
+        window.history.state?.consoleView
       ) {
         window.history.back();
         return;
@@ -462,11 +508,13 @@ const structuredData = {
     });
 
     window.addEventListener("popstate", () => {
-      applyConsoleView(
-        window.location.hash === "#about" ? "about" : "gallery",
-        "none",
-        true,
-      );
+      const view =
+        window.location.hash === "#about"
+          ? "about"
+          : window.location.hash === "#music"
+            ? "music"
+            : "gallery";
+      applyConsoleView(view, "none", true);
     });
 
     const updateConsoleTime = () => {
@@ -505,6 +553,11 @@ const structuredData = {
         // Theme persistence is optional.
       }
       updateThemeLabel();
+      window.dispatchEvent(
+        new CustomEvent("console:theme-changed", {
+          detail: { theme: next },
+        }),
+      );
     });
 
     const updateFullscreenControl = () => {
@@ -547,16 +600,26 @@ const structuredData = {
         storedTheme = null;
       }
       if (!storedTheme) {
-        document.documentElement.dataset.consoleTheme = event.matches
-          ? "dark"
-          : "light";
+        const nextTheme = event.matches ? "dark" : "light";
+        document.documentElement.dataset.consoleTheme = nextTheme;
         updateThemeLabel();
+        window.dispatchEvent(
+          new CustomEvent("console:theme-changed", {
+            detail: { theme: nextTheme },
+          }),
+        );
       }
     });
 
     updateConsoleTime();
     updateThemeLabel();
-    applyConsoleView(window.location.hash === "#about" ? "about" : "gallery");
+    applyConsoleView(
+      window.location.hash === "#about"
+        ? "about"
+        : window.location.hash === "#music"
+          ? "music"
+          : "gallery",
+    );
     window.setInterval(updateConsoleTime, 60_000);
   </script>
 </BaseLayout>

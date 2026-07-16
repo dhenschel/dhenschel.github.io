@@ -1,0 +1,344 @@
+---
+import { musicTracks } from "../data/music";
+---
+
+<section
+  class="console-view music-screen"
+  data-console-view-panel="music"
+  aria-labelledby="music-channel-title"
+  aria-hidden="true"
+  inert
+>
+  <div class="music-channel" data-music-channel>
+    <header class="music-channel__header">
+      <span>Music Channel</span>
+      <h1 id="music-channel-title" tabindex="-1" data-music-heading>
+        Sound Library
+      </h1>
+    </header>
+
+    <div class="music-carousel" aria-label="Hintergrundmusik auswählen">
+      <button
+        class="music-carousel__arrow music-carousel__arrow--previous"
+        type="button"
+        data-music-arrow="previous"
+        aria-label="Vorherige Musik-Disc"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m14.8 4.8-7.2 7.2 7.2 7.2 1.6-1.6-5.6-5.6 5.6-5.6-1.6-1.6Z"
+          ></path>
+        </svg>
+      </button>
+
+      <div class="music-carousel__stage">
+        {
+          musicTracks.map((track) => (
+            <button
+              class="music-disc"
+              type="button"
+              data-music-disc
+              data-track-id={track.id}
+              data-carousel-position="hidden"
+              aria-label={`${track.title} auswählen und anhören`}
+              aria-pressed="false"
+              tabindex="-1"
+              style={`--disc-color: ${track.color}; --disc-color-dark: ${track.colorDark};`}
+            >
+              <span class="music-disc__surface" aria-hidden="true">
+                <span class="music-disc__rings" />
+                <span class="music-disc__label">
+                  <small>{track.label}</small>
+                  <strong>{track.shortTitle}</strong>
+                  <i />
+                </span>
+                <span class="music-disc__hole" />
+              </span>
+              <span class="music-disc__badges" aria-hidden="true">
+                <span data-music-default-badge="light" hidden>
+                  ☀
+                </span>
+                <span data-music-default-badge="dark" hidden>
+                  ☾
+                </span>
+              </span>
+              <span class="visually-hidden" data-music-disc-status />
+            </button>
+          ))
+        }
+      </div>
+
+      <button
+        class="music-carousel__arrow music-carousel__arrow--next"
+        type="button"
+        data-music-arrow="next"
+        aria-label="Nächste Musik-Disc"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m9.2 4.8 7.2 7.2-7.2 7.2-1.6-1.6 5.6-5.6-5.6-5.6 1.6-1.6Z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="music-channel__details" aria-live="polite">
+      <p data-music-position>Disc 1 von {musicTracks.length}</p>
+      <h2 data-music-title>{musicTracks[0].title}</h2>
+      <p data-music-description>{musicTracks[0].description}</p>
+      <strong data-music-playing-status>Aktuelle Hintergrundmusik</strong>
+    </div>
+
+    <div class="music-channel__actions">
+      <button class="music-channel__play" type="button" data-music-play>
+        <span>A</span>
+        <strong data-music-play-label>Anhören</strong>
+      </button>
+      <button type="button" data-music-default="light" aria-pressed="false">
+        <span aria-hidden="true">☀</span>
+        <strong>Als Tag-Standard</strong>
+      </button>
+      <button type="button" data-music-default="dark" aria-pressed="false">
+        <span aria-hidden="true">☾</span>
+        <strong>Als Nacht-Standard</strong>
+      </button>
+    </div>
+
+    <p class="music-channel__hint">
+      <span>← →</span> Disc auswählen <i></i>
+      <span>Enter / Leertaste</span>
+      Anhören
+    </p>
+  </div>
+</section>
+
+<script>
+  import {
+    musicTrackIds,
+    musicTracks,
+    type ConsoleTheme,
+    type MusicTrackId,
+  } from "../data/music";
+
+  const musicChannel = document.querySelector<HTMLElement>(
+    "[data-music-channel]",
+  );
+  const musicDiscs = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("[data-music-disc]"),
+  );
+  const musicPrevious = document.querySelector<HTMLButtonElement>(
+    '[data-music-arrow="previous"]',
+  );
+  const musicNext = document.querySelector<HTMLButtonElement>(
+    '[data-music-arrow="next"]',
+  );
+  const musicPlay =
+    document.querySelector<HTMLButtonElement>("[data-music-play]");
+  const musicPlayLabel = document.querySelector<HTMLElement>(
+    "[data-music-play-label]",
+  );
+  const musicPosition = document.querySelector<HTMLElement>(
+    "[data-music-position]",
+  );
+  const musicTitle = document.querySelector<HTMLElement>("[data-music-title]");
+  const musicDescription = document.querySelector<HTMLElement>(
+    "[data-music-description]",
+  );
+  const musicPlayingStatus = document.querySelector<HTMLElement>(
+    "[data-music-playing-status]",
+  );
+  const musicDefaultButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("[data-music-default]"),
+  );
+  const headerMusicButton = document.querySelector<HTMLButtonElement>(
+    "[data-music-channel-open]",
+  );
+
+  let selectedMusicIndex = 0;
+  let musicState: ConsoleMusicState = {
+    activeTrackId: "home-pulse",
+    defaults: { light: "home-pulse", dark: "blue-hour" },
+    enabled: true,
+    playing: false,
+  };
+
+  const getSelectedTrack = () => musicTracks[selectedMusicIndex];
+
+  const updateMusicState = () => {
+    musicDiscs.forEach((disc) => {
+      const trackId = disc.dataset.trackId as MusicTrackId;
+      const isActive = trackId === musicState.activeTrackId;
+      disc.dataset.activeTrack = String(isActive);
+      disc.setAttribute("aria-pressed", String(isActive));
+      const status = disc.querySelector<HTMLElement>(
+        "[data-music-disc-status]",
+      );
+      if (status) {
+        status.textContent = isActive
+          ? musicState.playing
+            ? "Läuft gerade"
+            : "Ausgewählt"
+          : "";
+      }
+      const dayBadge = disc.querySelector<HTMLElement>(
+        '[data-music-default-badge="light"]',
+      );
+      const nightBadge = disc.querySelector<HTMLElement>(
+        '[data-music-default-badge="dark"]',
+      );
+      if (dayBadge) dayBadge.hidden = musicState.defaults.light !== trackId;
+      if (nightBadge) nightBadge.hidden = musicState.defaults.dark !== trackId;
+    });
+
+    const selectedTrack = getSelectedTrack();
+    const selectedIsActive = selectedTrack.id === musicState.activeTrackId;
+    if (musicPlayLabel) {
+      musicPlayLabel.textContent =
+        selectedIsActive && musicState.playing ? "Läuft gerade" : "Anhören";
+    }
+    musicPlay?.setAttribute(
+      "aria-label",
+      selectedIsActive && musicState.playing
+        ? `${selectedTrack.title} läuft gerade`
+        : `${selectedTrack.title} anhören`,
+    );
+    if (musicPlayingStatus) {
+      musicPlayingStatus.textContent = selectedIsActive
+        ? musicState.playing
+          ? "Läuft gerade"
+          : "Als Hintergrundmusik ausgewählt"
+        : "Zum Anhören A, Enter oder Leertaste drücken";
+    }
+
+    musicDefaultButtons.forEach((button) => {
+      const theme = button.dataset.musicDefault as ConsoleTheme;
+      button.setAttribute(
+        "aria-pressed",
+        String(musicState.defaults[theme] === selectedTrack.id),
+      );
+    });
+
+    if (headerMusicButton) {
+      const activeTrack = musicTracks.find(
+        (track) => track.id === musicState.activeTrackId,
+      );
+      headerMusicButton.title = activeTrack
+        ? `Music Channel öffnen – ${activeTrack.title}`
+        : "Music Channel öffnen";
+      headerMusicButton.setAttribute(
+        "aria-label",
+        activeTrack
+          ? `Music Channel öffnen. Aktuell: ${activeTrack.title}`
+          : "Music Channel öffnen",
+      );
+    }
+  };
+
+  const updateMusicCarousel = (focusDisc = false) => {
+    const total = musicDiscs.length;
+    musicDiscs.forEach((disc, index) => {
+      const forwardDistance = (index - selectedMusicIndex + total) % total;
+      const position =
+        forwardDistance === 0
+          ? "active"
+          : forwardDistance === 1
+            ? "next"
+            : forwardDistance === total - 1
+              ? "previous"
+              : "hidden";
+      disc.dataset.carouselPosition = position;
+      disc.tabIndex = position === "active" ? 0 : -1;
+      disc.setAttribute("aria-hidden", String(position === "hidden"));
+    });
+
+    const track = getSelectedTrack();
+    if (musicPosition) {
+      musicPosition.textContent = `Disc ${selectedMusicIndex + 1} von ${total}`;
+    }
+    if (musicTitle) musicTitle.textContent = track.title;
+    if (musicDescription) musicDescription.textContent = track.description;
+    updateMusicState();
+    if (focusDisc)
+      musicDiscs[selectedMusicIndex]?.focus({ preventScroll: true });
+  };
+
+  const moveMusicSelection = (direction: number, focusDisc = true) => {
+    selectedMusicIndex =
+      (selectedMusicIndex + direction + musicTrackIds.length) %
+      musicTrackIds.length;
+    updateMusicCarousel(focusDisc);
+  };
+
+  const selectActiveMusic = (focusDisc = false) => {
+    const activeIndex = musicTrackIds.indexOf(musicState.activeTrackId);
+    if (activeIndex >= 0) selectedMusicIndex = activeIndex;
+    updateMusicCarousel(focusDisc);
+  };
+
+  const playSelectedMusic = (withKeyboardSound = false) => {
+    const track = getSelectedTrack();
+    if (withKeyboardSound) window.consoleAudio?.play("confirm");
+    window.consoleAudio?.setTrack(track.id);
+  };
+
+  musicPrevious?.addEventListener("click", () => moveMusicSelection(-1));
+  musicNext?.addEventListener("click", () => moveMusicSelection(1));
+  musicPlay?.addEventListener("click", () => playSelectedMusic());
+
+  musicDiscs.forEach((disc, index) => {
+    disc.addEventListener("click", () => {
+      if (index !== selectedMusicIndex) {
+        selectedMusicIndex = index;
+        updateMusicCarousel(true);
+        return;
+      }
+      playSelectedMusic();
+    });
+  });
+
+  musicDefaultButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const theme = button.dataset.musicDefault as ConsoleTheme;
+      window.consoleAudio?.setDefaultTrack(theme, getSelectedTrack().id);
+    });
+  });
+
+  musicChannel?.addEventListener("keydown", (event) => {
+    if (document.documentElement.dataset.consoleView !== "music") return;
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      moveMusicSelection(event.key === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+    if (
+      (event.key === "Enter" || event.key === " ") &&
+      ((event.target as HTMLElement | null)?.closest("[data-music-disc]") ||
+        !(event.target as HTMLElement | null)?.closest("button"))
+    ) {
+      event.preventDefault();
+      playSelectedMusic(true);
+    }
+  });
+
+  window.addEventListener("console:music-state", (event) => {
+    const nextState = (event as CustomEvent<ConsoleMusicState>).detail;
+    const activeTrackChanged =
+      nextState.activeTrackId !== musicState.activeTrackId;
+    musicState = nextState;
+    if (
+      activeTrackChanged &&
+      document.documentElement.dataset.consoleView === "music"
+    ) {
+      selectActiveMusic();
+    } else {
+      updateMusicState();
+    }
+  });
+
+  window.addEventListener("console:view-changed", (event) => {
+    const view = (event as CustomEvent<{ view?: string }>).detail?.view;
+    if (view === "music") selectActiveMusic();
+  });
+
+  const initialMusicState = window.consoleAudio?.getMusicState();
+  if (initialMusicState) musicState = initialMusicState;
+  selectActiveMusic();
+</script>

@@ -1,132 +1,28 @@
+import {
+  defaultMusicByTheme,
+  isConsoleTheme,
+  isMusicTrackId,
+  type ConsoleTheme,
+  type MusicTrackId,
+} from "../data/music";
+import { musicCompositions, type MusicComposition } from "./music-compositions";
+
 const AUDIO_STORAGE_KEY = "dh-console-audio";
+const MUSIC_STORAGE_KEY = "dh-console-music-v1";
 const INTERACTIVE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-type MusicScene = {
-  bass: readonly [number, number];
-  chord: readonly number[];
-  pulsePattern: number;
-};
-
-type MotifNote = readonly [
-  beat: number,
-  scaleDegree: number,
-  duration: number,
-  velocity: number,
-];
-
-type MusicPulse = readonly [beat: number, duration: number, velocity: number];
-
-const MUSIC_TEMPO = 98;
-const MUSIC_BEAT_SECONDS = 60 / MUSIC_TEMPO;
-const MUSIC_BEATS_PER_BAR = 4;
-const MUSIC_BAR_SECONDS = MUSIC_BEAT_SECONDS * MUSIC_BEATS_PER_BAR;
-const MUSIC_LEVEL = 0.108;
 const MUSIC_LOOKAHEAD_MS = 120;
 const MUSIC_SCHEDULE_AHEAD_SECONDS = 0.48;
-
-// An original E-flat-major sound world. Short sixth, ninth and suspended chord
-// impulses create a friendly interface pulse without imitating an existing tune.
-const MUSIC_SCALE = [63, 65, 67, 70, 72, 75, 77] as const;
-const MUSIC_SCENES: readonly MusicScene[] = [
-  { bass: [39, 46], chord: [55, 58, 60, 65], pulsePattern: 0 }, // Eb6/9
-  { bass: [36, 43], chord: [55, 58, 62, 63], pulsePattern: 1 }, // Cm9
-  { bass: [44, 51], chord: [56, 60, 63, 67], pulsePattern: 2 }, // Abmaj9
-  { bass: [46, 53], chord: [58, 60, 63, 67], pulsePattern: 3 }, // Bb13sus
-  { bass: [43, 46], chord: [55, 58, 63, 65], pulsePattern: 1 }, // Eb/G
-  { bass: [41, 48], chord: [56, 60, 63, 67], pulsePattern: 0 }, // Fm9
-  { bass: [46, 53], chord: [58, 60, 63, 65], pulsePattern: 2 }, // Bb7sus
-  { bass: [39, 46], chord: [55, 58, 60, 65], pulsePattern: 3 }, // Eb6/9
-];
-
-// Compact call-and-response gestures replace a continuous lead melody. Their
-// short phrasing and deliberate rests make them feel like part of the menu UI.
-const MUSIC_MOTIFS: readonly (readonly MotifNote[])[] = [
-  [
-    [0.72, 2, 0.22, 0.82],
-    [1.04, 3, 0.18, 0.62],
-    [1.5, 1, 0.32, 0.7],
-  ],
-  [
-    [2.12, 0, 0.24, 0.64],
-    [2.48, 2, 0.19, 0.72],
-    [2.96, 1, 0.28, 0.55],
-  ],
-  [
-    [0.42, 4, 0.18, 0.48],
-    [0.72, 3, 0.18, 0.58],
-    [1.08, 2, 0.25, 0.6],
-  ],
-  [
-    [2.36, 1, 0.21, 0.52],
-    [2.68, 2, 0.18, 0.6],
-    [3.04, 4, 0.24, 0.48],
-  ],
-  [
-    [0.82, 2, 0.25, 0.52],
-    [2.72, 0, 0.28, 0.46],
-  ],
-  [
-    [3.06, 5, 0.12, 0.4],
-    [3.3, 6, 0.17, 0.34],
-  ],
-];
-
-const MUSIC_PULSE_PATTERNS: readonly (readonly MusicPulse[])[] = [
-  [
-    [0, 0.62, 0.88],
-    [1.72, 0.48, 0.5],
-    [3, 0.55, 0.64],
-  ],
-  [
-    [0.48, 0.48, 0.54],
-    [2, 0.62, 0.76],
-    [3.46, 0.36, 0.42],
-  ],
-  [
-    [0, 0.58, 0.72],
-    [2.46, 0.58, 0.66],
-  ],
-  [
-    [0.72, 0.46, 0.48],
-    [1.96, 0.58, 0.68],
-    [3.22, 0.44, 0.5],
-  ],
-];
-
-const MUSIC_BASS_PATTERNS: readonly (readonly MusicPulse[])[] = [
-  [
-    [0, 0.48, 0.82],
-    [2.72, 0.42, 0.54],
-  ],
-  [
-    [0.48, 0.42, 0.54],
-    [2, 0.48, 0.72],
-  ],
-  [
-    [0, 0.45, 0.7],
-    [1.72, 0.34, 0.42],
-    [3.22, 0.4, 0.48],
-  ],
-  [
-    [0.22, 0.4, 0.5],
-    [2.46, 0.48, 0.66],
-  ],
-];
-
-// Four complementary eight-bar arrangements create roughly 80 seconds of
-// structured variation before the same distribution of gestures returns.
-const MUSIC_PHRASES: readonly (readonly (number | null)[])[] = [
-  [0, 1, null, 5, 2, null, 3, 4],
-  [0, null, 1, 4, 2, 3, null, 5],
-  [0, 4, 2, null, 1, null, 3, 5],
-  [0, 1, null, 4, 2, 5, 3, null],
-];
 
 let audioContext: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let musicInput: GainNode | null = null;
 let musicGain: GainNode | null = null;
+let musicDry: GainNode | null = null;
+let musicEcho: DelayNode | null = null;
+let musicEchoFilter: BiquadFilterNode | null = null;
+let musicEchoFeedback: GainNode | null = null;
+let musicEchoWet: GainNode | null = null;
 let effectsGain: GainNode | null = null;
 let musicTimer: number | null = null;
 let musicRunId = 0;
@@ -141,6 +37,68 @@ let musicAbsoluteBar = 0;
 let musicStartVariant = 0;
 let lastHoverAt = 0;
 let lastPointerAt = 0;
+
+type MusicPreferences = {
+  version: 1;
+  defaults: Record<ConsoleTheme, MusicTrackId>;
+};
+
+const getCurrentTheme = (): ConsoleTheme =>
+  document.documentElement.dataset.consoleTheme === "dark" ? "dark" : "light";
+
+const readMusicPreferences = (): MusicPreferences => {
+  const fallback: MusicPreferences = {
+    version: 1,
+    defaults: { ...defaultMusicByTheme },
+  };
+
+  try {
+    const stored = localStorage.getItem(MUSIC_STORAGE_KEY);
+    if (!stored) return fallback;
+    const parsed = JSON.parse(stored) as Partial<MusicPreferences>;
+    const light = parsed.defaults?.light;
+    const dark = parsed.defaults?.dark;
+    return {
+      version: 1,
+      defaults: {
+        light: isMusicTrackId(light) ? light : fallback.defaults.light,
+        dark: isMusicTrackId(dark) ? dark : fallback.defaults.dark,
+      },
+    };
+  } catch {
+    return fallback;
+  }
+};
+
+let musicPreferences = readMusicPreferences();
+let activeTrackId: MusicTrackId = musicPreferences.defaults[getCurrentTheme()];
+
+const getActiveComposition = (): MusicComposition =>
+  musicCompositions[activeTrackId];
+
+const getMusicState = (): ConsoleMusicState => ({
+  activeTrackId,
+  defaults: { ...musicPreferences.defaults },
+  enabled: audioEnabled,
+  playing: musicRunning,
+});
+
+const broadcastMusicState = () => {
+  document.documentElement.dataset.musicTrack = activeTrackId;
+  window.dispatchEvent(
+    new CustomEvent<ConsoleMusicState>("console:music-state", {
+      detail: getMusicState(),
+    }),
+  );
+};
+
+const storeMusicPreferences = () => {
+  try {
+    localStorage.setItem(MUSIC_STORAGE_KEY, JSON.stringify(musicPreferences));
+  } catch {
+    // Music preferences remain available for the current session.
+  }
+};
 
 const readAudioPreference = () => {
   try {
@@ -159,25 +117,27 @@ const createAudioGraph = () => {
 
   audioContext = new window.AudioContext();
   const compressor = audioContext.createDynamicsCompressor();
-  const musicDry = audioContext.createGain();
-  const musicEcho = audioContext.createDelay(1);
-  const musicEchoFilter = audioContext.createBiquadFilter();
-  const musicEchoFeedback = audioContext.createGain();
-  const musicEchoWet = audioContext.createGain();
+  const composition = getActiveComposition();
+  const beatSeconds = 60 / composition.tempo;
+  musicDry = audioContext.createGain();
+  musicEcho = audioContext.createDelay(1);
+  musicEchoFilter = audioContext.createBiquadFilter();
+  musicEchoFeedback = audioContext.createGain();
+  musicEchoWet = audioContext.createGain();
   masterGain = audioContext.createGain();
   musicInput = audioContext.createGain();
   musicGain = audioContext.createGain();
   effectsGain = audioContext.createGain();
 
   masterGain.gain.value = 0.8;
-  musicDry.gain.value = 0.96;
-  musicEcho.delayTime.value = MUSIC_BEAT_SECONDS * 0.75;
+  musicDry.gain.value = composition.echo.dry;
+  musicEcho.delayTime.value = beatSeconds * composition.echo.delayBeats;
   musicEchoFilter.type = "lowpass";
-  musicEchoFilter.frequency.value = 1850;
+  musicEchoFilter.frequency.value = composition.echo.filterFrequency;
   musicEchoFilter.Q.value = 0.35;
-  musicEchoFeedback.gain.value = 0.04;
-  musicEchoWet.gain.value = 0.038;
-  musicGain.gain.value = MUSIC_LEVEL;
+  musicEchoFeedback.gain.value = composition.echo.feedback;
+  musicEchoWet.gain.value = composition.echo.wet;
+  musicGain.gain.value = composition.level;
   effectsGain.gain.value = 0.9;
   compressor.threshold.value = -18;
   compressor.knee.value = 12;
@@ -194,6 +154,39 @@ const createAudioGraph = () => {
   effectsGain.connect(masterGain);
   masterGain.connect(compressor).connect(audioContext.destination);
   return audioContext;
+};
+
+const configureMusicGraph = (
+  context: AudioContext,
+  composition: MusicComposition,
+) => {
+  if (
+    !musicDry ||
+    !musicEcho ||
+    !musicEchoFilter ||
+    !musicEchoFeedback ||
+    !musicEchoWet ||
+    !musicGain
+  ) {
+    return;
+  }
+
+  const now = context.currentTime;
+  const beatSeconds = 60 / composition.tempo;
+  musicDry.gain.setTargetAtTime(composition.echo.dry, now, 0.08);
+  musicEcho.delayTime.setTargetAtTime(
+    beatSeconds * composition.echo.delayBeats,
+    now,
+    0.08,
+  );
+  musicEchoFilter.frequency.setTargetAtTime(
+    composition.echo.filterFrequency,
+    now,
+    0.08,
+  );
+  musicEchoFeedback.gain.setTargetAtTime(composition.echo.feedback, now, 0.08);
+  musicEchoWet.gain.setTargetAtTime(composition.echo.wet, now, 0.08);
+  musicGain.gain.setTargetAtTime(composition.level, now, 0.08);
 };
 
 const getReadyContext = async () => {
@@ -255,13 +248,14 @@ const duckMusicForInterface = (
 ) => {
   if (!musicGain || !musicRunning) return;
   const now = context.currentTime;
+  const musicLevel = getActiveComposition().level;
 
   holdAudioParam(musicGain.gain, now);
   musicGain.gain.exponentialRampToValueAtTime(
-    Math.max(MUSIC_LEVEL * depth, 0.0001),
+    Math.max(musicLevel * depth, 0.0001),
     now + 0.025,
   );
-  musicGain.gain.exponentialRampToValueAtTime(MUSIC_LEVEL, now + release);
+  musicGain.gain.exponentialRampToValueAtTime(musicLevel, now + release);
 };
 
 const playEffect = (effect: ConsoleSoundEffect) => {
@@ -326,164 +320,6 @@ const playTone = (frequency: number, duration: number, volume = 0.06) => {
   });
 };
 
-const midiToFrequency = (note: number) => 440 * 2 ** ((note - 69) / 12);
-
-const scheduleChordPulse = (
-  context: AudioContext,
-  destination: AudioNode,
-  notes: readonly number[],
-  start: number,
-  duration: number,
-  level: number,
-) => {
-  const end = start + Math.max(duration, 0.32);
-  const filter = context.createBiquadFilter();
-  const envelope = context.createGain();
-  const fundamentalMix = context.createGain();
-  const overtoneMix = context.createGain();
-
-  filter.type = "lowpass";
-  filter.Q.value = 0.7;
-  filter.frequency.setValueAtTime(2200, start);
-  filter.frequency.exponentialRampToValueAtTime(920, end);
-  fundamentalMix.gain.value = 0.76;
-  overtoneMix.gain.value = 0.034;
-  envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.014);
-  envelope.gain.exponentialRampToValueAtTime(level * 0.3, start + 0.13);
-  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
-
-  fundamentalMix.connect(filter);
-  overtoneMix.connect(filter);
-  filter.connect(envelope).connect(destination);
-
-  notes.forEach((note, index) => {
-    const frequency = midiToFrequency(note);
-    const detune = (index - (notes.length - 1) / 2) * 0.45;
-    const fundamental = context.createOscillator();
-    const overtone = context.createOscillator();
-
-    fundamental.type = "triangle";
-    fundamental.frequency.value = frequency;
-    fundamental.detune.value = detune;
-    overtone.type = "sine";
-    overtone.frequency.value = frequency * 2;
-    overtone.detune.value = -detune + 1.5;
-    fundamental.connect(fundamentalMix);
-    overtone.connect(overtoneMix);
-    fundamental.start(start);
-    overtone.start(start);
-    fundamental.stop(end + 0.05);
-    overtone.stop(end + 0.05);
-  });
-};
-
-const scheduleMenuBass = (
-  context: AudioContext,
-  destination: AudioNode,
-  note: number,
-  start: number,
-  duration: number,
-  level: number,
-) => {
-  const end = start + Math.max(duration, 0.26);
-  const oscillator = context.createOscillator();
-  const warmth = context.createOscillator();
-  const warmthMix = context.createGain();
-  const filter = context.createBiquadFilter();
-  const envelope = context.createGain();
-  const frequency = midiToFrequency(note);
-
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(frequency * 1.018, start);
-  oscillator.frequency.exponentialRampToValueAtTime(frequency, start + 0.065);
-  warmth.type = "triangle";
-  warmth.frequency.value = frequency * 2;
-  warmthMix.gain.value = 0.07;
-  filter.type = "lowpass";
-  filter.frequency.setValueAtTime(680, start);
-  filter.frequency.exponentialRampToValueAtTime(330, end);
-  filter.Q.value = 0.6;
-  envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.012);
-  envelope.gain.exponentialRampToValueAtTime(level * 0.32, start + 0.12);
-  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
-
-  oscillator.connect(filter);
-  warmth.connect(warmthMix).connect(filter);
-  filter.connect(envelope).connect(destination);
-  oscillator.start(start);
-  warmth.start(start);
-  oscillator.stop(end + 0.04);
-  warmth.stop(end + 0.04);
-};
-
-const scheduleMenuKey = (
-  context: AudioContext,
-  destination: AudioNode,
-  note: number,
-  start: number,
-  duration: number,
-  level: number,
-) => {
-  const end = start + Math.max(duration, 0.28);
-  const fundamental = context.createOscillator();
-  const color = context.createOscillator();
-  const colorMix = context.createGain();
-  const filter = context.createBiquadFilter();
-  const envelope = context.createGain();
-  const frequency = midiToFrequency(note);
-
-  fundamental.type = "sine";
-  fundamental.frequency.value = frequency;
-  color.type = "triangle";
-  color.frequency.value = frequency * 2;
-  color.detune.value = 4;
-  colorMix.gain.value = 0.1;
-  filter.type = "lowpass";
-  filter.frequency.setValueAtTime(3600, start);
-  filter.frequency.exponentialRampToValueAtTime(1500, end);
-  filter.Q.value = 0.72;
-  envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.009);
-  envelope.gain.exponentialRampToValueAtTime(level * 0.22, start + 0.095);
-  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
-
-  fundamental.connect(filter);
-  color.connect(colorMix).connect(filter);
-  filter.connect(envelope).connect(destination);
-  fundamental.start(start);
-  color.start(start);
-  fundamental.stop(end + 0.04);
-  color.stop(end + 0.04);
-};
-
-const scheduleSoftTick = (
-  context: AudioContext,
-  destination: AudioNode,
-  start: number,
-  level: number,
-) => {
-  const end = start + 0.055;
-  const oscillator = context.createOscillator();
-  const filter = context.createBiquadFilter();
-  const envelope = context.createGain();
-
-  oscillator.type = "triangle";
-  oscillator.frequency.setValueAtTime(1480, start);
-  oscillator.frequency.exponentialRampToValueAtTime(860, end);
-  filter.type = "bandpass";
-  filter.frequency.value = 1200;
-  filter.Q.value = 0.9;
-  envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.004);
-  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
-
-  oscillator.connect(filter).connect(envelope).connect(destination);
-  oscillator.start(start);
-  oscillator.stop(end + 0.02);
-};
-
 const scheduleMusicBar = (
   context: AudioContext,
   destination: AudioNode,
@@ -492,66 +328,18 @@ const scheduleMusicBar = (
   phraseIndex: number,
   absoluteBar: number,
 ) => {
-  const scene = MUSIC_SCENES[barIndex];
-  const phrase = MUSIC_PHRASES[phraseIndex];
-  const motifIndex = phrase[barIndex];
-  const breath = 0.98 + Math.sin((absoluteBar + 1) * 1.31) * 0.02;
-  const pulsePattern = MUSIC_PULSE_PATTERNS[scene.pulsePattern];
-  const bassPattern = MUSIC_BASS_PATTERNS[scene.pulsePattern];
-
-  pulsePattern.forEach(([beat, duration, velocity]) => {
-    scheduleChordPulse(
-      context,
-      destination,
-      scene.chord,
-      start + beat * MUSIC_BEAT_SECONDS,
-      duration * MUSIC_BEAT_SECONDS,
-      0.018 * velocity * breath,
-    );
+  const composition = getActiveComposition();
+  const beatSeconds = 60 / composition.tempo;
+  composition.scheduleBar({
+    context,
+    destination,
+    start,
+    barIndex,
+    phraseIndex,
+    absoluteBar,
+    beatSeconds,
+    barSeconds: beatSeconds * 4,
   });
-
-  bassPattern.forEach(([beat, duration, velocity], index) => {
-    scheduleMenuBass(
-      context,
-      destination,
-      scene.bass[index % scene.bass.length],
-      start + beat * MUSIC_BEAT_SECONDS,
-      duration * MUSIC_BEAT_SECONDS,
-      0.031 * velocity * breath,
-    );
-  });
-
-  if (absoluteBar % 4 === 1) {
-    scheduleSoftTick(
-      context,
-      destination,
-      start + 3.48 * MUSIC_BEAT_SECONDS,
-      0.0065 * breath,
-    );
-  } else if (absoluteBar % 4 === 3) {
-    [1.48, 3.48].forEach((beat, index) =>
-      scheduleSoftTick(
-        context,
-        destination,
-        start + beat * MUSIC_BEAT_SECONDS,
-        (index === 0 ? 0.0045 : 0.006) * breath,
-      ),
-    );
-  }
-
-  if (motifIndex === null) return;
-  MUSIC_MOTIFS[motifIndex].forEach(
-    ([beat, scaleDegree, duration, velocity]) => {
-      scheduleMenuKey(
-        context,
-        destination,
-        MUSIC_SCALE[scaleDegree],
-        start + beat * MUSIC_BEAT_SECONDS,
-        duration * MUSIC_BEAT_SECONDS + 0.08,
-        0.038 * velocity * breath,
-      );
-    },
-  );
 };
 
 const scheduleMusicWindow = (runId: number, musicBus: GainNode) => {
@@ -568,6 +356,8 @@ const scheduleMusicWindow = (runId: number, musicBus: GainNode) => {
   }
 
   const scheduleUntil = audioContext.currentTime + MUSIC_SCHEDULE_AHEAD_SECONDS;
+  const composition = getActiveComposition();
+  const barSeconds = (60 / composition.tempo) * 4;
   while (nextMusicBarAt < scheduleUntil) {
     scheduleMusicBar(
       audioContext,
@@ -577,13 +367,13 @@ const scheduleMusicWindow = (runId: number, musicBus: GainNode) => {
       musicPhraseIndex,
       musicAbsoluteBar,
     );
-    nextMusicBarAt += MUSIC_BAR_SECONDS;
+    nextMusicBarAt += barSeconds;
     musicBarIndex += 1;
     musicAbsoluteBar += 1;
 
-    if (musicBarIndex >= MUSIC_SCENES.length) {
+    if (musicBarIndex >= composition.barsPerPhrase) {
       musicBarIndex = 0;
-      musicPhraseIndex = (musicPhraseIndex + 1) % MUSIC_PHRASES.length;
+      musicPhraseIndex = (musicPhraseIndex + 1) % composition.phraseCount;
     }
   }
 
@@ -616,17 +406,23 @@ const startMusic = () => {
     musicBus.connect(musicInput);
     activeMusicBus = musicBus;
     musicRunning = true;
+    const composition = getActiveComposition();
     const now = context.currentTime;
+    configureMusicGraph(context, composition);
     musicGain.gain.cancelScheduledValues(now);
-    musicGain.gain.setValueAtTime(MUSIC_LEVEL, now);
+    musicGain.gain.setValueAtTime(composition.level, now);
     musicBus.gain.setValueAtTime(0.0001, now);
-    musicBus.gain.exponentialRampToValueAtTime(1, now + 1.35);
+    musicBus.gain.exponentialRampToValueAtTime(
+      1,
+      now + composition.fadeInSeconds,
+    );
     musicBarIndex = 0;
-    musicPhraseIndex = musicStartVariant % MUSIC_PHRASES.length;
-    musicStartVariant = (musicStartVariant + 1) % MUSIC_PHRASES.length;
-    musicAbsoluteBar = musicPhraseIndex * MUSIC_SCENES.length;
+    musicPhraseIndex = musicStartVariant % composition.phraseCount;
+    musicStartVariant = (musicStartVariant + 1) % composition.phraseCount;
+    musicAbsoluteBar = musicPhraseIndex * composition.barsPerPhrase;
     nextMusicBarAt = now + 0.08;
     scheduleMusicWindow(runId, musicBus);
+    broadcastMusicState();
   });
 };
 
@@ -640,7 +436,10 @@ const stopMusic = (fadeMs = 240) => {
 
   const musicBus = activeMusicBus;
   activeMusicBus = null;
-  if (!audioContext || !musicBus) return;
+  if (!audioContext || !musicBus) {
+    broadcastMusicState();
+    return;
+  }
   const now = audioContext.currentTime;
   holdAudioParam(musicBus.gain, now);
   musicBus.gain.exponentialRampToValueAtTime(
@@ -648,6 +447,39 @@ const stopMusic = (fadeMs = 240) => {
     now + Math.max(fadeMs / 1000, 0.02),
   );
   window.setTimeout(() => musicBus.disconnect(), Math.max(fadeMs + 320, 600));
+  broadcastMusicState();
+};
+
+const setTrack = (trackId: MusicTrackId) => {
+  if (!isMusicTrackId(trackId)) return;
+  if (activeTrackId === trackId) {
+    if (!musicRunning) startMusic();
+    broadcastMusicState();
+    return;
+  }
+
+  stopMusic(420);
+  activeTrackId = trackId;
+  broadcastMusicState();
+  startMusic();
+};
+
+const setDefaultTrack = (theme: ConsoleTheme, trackId: MusicTrackId) => {
+  if (!isConsoleTheme(theme) || !isMusicTrackId(trackId)) return;
+  musicPreferences = {
+    version: 1,
+    defaults: {
+      ...musicPreferences.defaults,
+      [theme]: trackId,
+    },
+  };
+  storeMusicPreferences();
+  broadcastMusicState();
+};
+
+const applyThemeMusic = (theme: ConsoleTheme) => {
+  if (!isConsoleTheme(theme)) return;
+  setTrack(musicPreferences.defaults[theme]);
 };
 
 const updateSoundControl = () => {
@@ -677,6 +509,7 @@ const setEnabled = (enabled: boolean) => {
   }
 
   updateSoundControl();
+  broadcastMusicState();
   if (!enabled) {
     stopMusic(160);
     return;
@@ -761,10 +594,14 @@ export const initializeConsoleAudio = () => {
     stopMusic,
     setEnabled,
     isEnabled: () => audioEnabled,
+    getMusicState,
+    setTrack,
+    setDefaultTrack,
   };
 
   updateSoundControl();
   bindInterfaceSounds();
+  broadcastMusicState();
 
   document
     .querySelector<HTMLButtonElement>("[data-sound-toggle]")
@@ -773,6 +610,10 @@ export const initializeConsoleAudio = () => {
   window.addEventListener("console:launch-start", () => {
     launchInProgress = true;
     stopMusic(180);
+  });
+  window.addEventListener("console:theme-changed", (event) => {
+    const theme = (event as CustomEvent<{ theme?: string }>).detail?.theme;
+    if (isConsoleTheme(theme)) applyThemeMusic(theme);
   });
   window.addEventListener("pageshow", () => {
     launchInProgress = false;
