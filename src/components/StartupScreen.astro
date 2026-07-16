@@ -28,6 +28,9 @@ const startupProfiles = [
     status: "Noch nicht eingerichtet",
   },
 ];
+const initialProfileIndex = startupProfiles.findIndex(
+  (profile) => profile.id === defaultProfileId,
+);
 ---
 
 <script is:inline>
@@ -83,8 +86,20 @@ const startupProfiles = [
 
       <div class="startup-profile-selector">
         {
-          startupProfiles.map((profile) => {
+          startupProfiles.map((profile, profileIndex) => {
             const isDefault = profile.id === defaultProfileId;
+            const previousIndex =
+              (initialProfileIndex - 1 + startupProfiles.length) %
+              startupProfiles.length;
+            const nextIndex =
+              (initialProfileIndex + 1) % startupProfiles.length;
+            const initialPosition = isDefault
+              ? "active"
+              : profileIndex === previousIndex
+                ? "previous"
+                : profileIndex === nextIndex
+                  ? "next"
+                  : "hidden";
             return (
               <article
                 class:list={[
@@ -98,7 +113,7 @@ const startupProfiles = [
                 data-profile-available={String(profile.available)}
                 data-profile-status={profile.status}
                 data-profile-default={isDefault ? "true" : undefined}
-                data-carousel-position={isDefault ? "active" : "hidden"}
+                data-carousel-position={initialPosition}
                 aria-current={isDefault ? "true" : undefined}
                 aria-label={`${profile.name}: ${profile.status}`}
               >
