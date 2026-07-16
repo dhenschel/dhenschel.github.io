@@ -1,5 +1,33 @@
 ---
 import { siteProfile } from "../data/site";
+
+const defaultProfileId = "dhenschel";
+const startupProfiles = [
+  {
+    id: "guest-one",
+    name: "Gast 01",
+    image: "/profile-guest-placeholder.svg",
+    imageAlt: "Platzhalterbild für Gastprofil 01",
+    available: false,
+    status: "Noch nicht eingerichtet",
+  },
+  {
+    id: defaultProfileId,
+    name: siteProfile.name,
+    image: siteProfile.image,
+    imageAlt: siteProfile.imageAlt,
+    available: true,
+    status: "Hauptprofil",
+  },
+  {
+    id: "guest-two",
+    name: "Gast 02",
+    image: "/profile-guest-placeholder.svg",
+    imageAlt: "Platzhalterbild für Gastprofil 02",
+    available: false,
+    status: "Noch nicht eingerichtet",
+  },
+];
 ---
 
 <script is:inline>
@@ -36,17 +64,51 @@ import { siteProfile } from "../data/site";
 
   <div class="startup-screen__content">
     <p>Profil auswählen</p>
-    <div class="startup-profile" data-startup-profile>
-      <div class="profile-picture profile-picture--boot">
-        <img
-          src={siteProfile.image}
-          alt={siteProfile.imageAlt}
-          width="800"
-          height="800"
-        />
-      </div>
-      <strong>{siteProfile.name}</strong>
+    <div
+      class="startup-profile-selector"
+      role="listbox"
+      aria-label="Verfügbare Profile"
+    >
+      {
+        startupProfiles.map((profile) => {
+          const isDefault = profile.id === defaultProfileId;
+          return (
+            <button
+              class:list={[
+                "startup-profile",
+                { "startup-profile--unavailable": !profile.available },
+              ]}
+              type="button"
+              role="option"
+              data-startup-profile
+              data-profile-id={profile.id}
+              data-profile-name={profile.name}
+              data-profile-available={String(profile.available)}
+              data-profile-status={profile.status}
+              data-profile-default={isDefault ? "true" : undefined}
+              aria-selected={isDefault}
+              aria-label={`${profile.name}: ${profile.status}`}
+              tabindex={isDefault ? 0 : -1}
+            >
+              <span class="profile-picture profile-picture--boot">
+                <img
+                  src={profile.image}
+                  alt={profile.imageAlt}
+                  width="800"
+                  height="800"
+                />
+              </span>
+              <strong>{profile.name}</strong>
+              <small>{profile.status}</small>
+            </button>
+          );
+        })
+      }
     </div>
+
+    <p class="startup-screen__profile-status" data-startup-profile-status>
+      Hauptprofil
+    </p>
 
     <button class="startup-screen__start" type="button" data-start-console>
       <span>A</span> Menü starten
@@ -67,8 +129,11 @@ import { siteProfile } from "../data/site";
   const startConsole = document.querySelector<HTMLButtonElement>(
     "[data-start-console]",
   );
-  const startupProfilePicture = startupScreen?.querySelector<HTMLElement>(
-    ".profile-picture--boot",
+  const startupProfileButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("[data-startup-profile]"),
+  );
+  const startupProfileStatus = document.querySelector<HTMLElement>(
+    "[data-startup-profile-status]",
   );
   const skipStartup = document.querySelector<HTMLButtonElement>(
     "[data-skip-startup]",
@@ -79,11 +144,66 @@ import { siteProfile } from "../data/site";
   const reducedMotionStartup = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
+  const defaultProfileIndex = Math.max(
+    0,
+    startupProfileButtons.findIndex(
+      (profile) => profile.dataset.profileDefault === "true",
+    ),
+  );
+  let selectedStartupProfileIndex = defaultProfileIndex;
+  let startupProfilePicture =
+    startupProfileButtons[defaultProfileIndex]?.querySelector<HTMLElement>(
+      ".profile-picture--boot",
+    ) ?? null;
   let startupTimers: number[] = [];
 
   const clearStartupTimers = () => {
     startupTimers.forEach((timer) => window.clearTimeout(timer));
     startupTimers = [];
+  };
+
+  const selectStartupProfile = (index: number, focusProfile = false) => {
+    if (!startupProfileButtons.length || !startConsole) return;
+
+    const normalizedIndex =
+      ((index % startupProfileButtons.length) + startupProfileButtons.length) %
+      startupProfileButtons.length;
+    const selectedProfile = startupProfileButtons[normalizedIndex];
+    const profileAvailable =
+      selectedProfile.dataset.profileAvailable === "true";
+
+    selectedStartupProfileIndex = normalizedIndex;
+    startupProfileButtons.forEach((profile, profileIndex) => {
+      const isSelected = profileIndex === normalizedIndex;
+      profile.setAttribute("aria-selected", String(isSelected));
+      profile.tabIndex = isSelected ? 0 : -1;
+    });
+
+    startupProfilePicture = selectedProfile.querySelector<HTMLElement>(
+      ".profile-picture--boot",
+    );
+    if (startupScreen) {
+      startupScreen.dataset.activeProfile =
+        selectedProfile.dataset.profileId ?? "unknown";
+    }
+    if (startupProfileStatus) {
+      startupProfileStatus.textContent =
+        selectedProfile.dataset.profileStatus ?? "Profil auswählen";
+    }
+
+    startConsole.disabled = !profileAvailable;
+    startConsole.setAttribute("aria-disabled", String(!profileAvailable));
+    startConsole.setAttribute(
+      "aria-label",
+      profileAvailable
+        ? `Menü mit ${selectedProfile.dataset.profileName ?? "Profil"} starten`
+        : "Dieses Profil ist noch nicht eingerichtet",
+    );
+    startConsole.title = profileAvailable
+      ? "Menü starten"
+      : "Dieses Profil ist noch nicht eingerichtet";
+
+    if (focusProfile) selectedProfile.focus({ preventScroll: true });
   };
 
   const playTone = (frequency: number, duration: number, volume = 0.06) =>
@@ -155,6 +275,7 @@ import { siteProfile } from "../data/site";
   };
 
   const playStartup = (event: MouseEvent) => {
+    if (startConsole?.disabled) return;
     clearStartupTimers();
     setStartupCursorPath(event);
     document.documentElement.dataset.cursorHidden = "true";
@@ -180,12 +301,41 @@ import { siteProfile } from "../data/site";
 
   const showStartupMenu = () => {
     clearStartupTimers();
+    selectStartupProfile(defaultProfileIndex);
     document.documentElement.removeAttribute("data-cursor-hidden");
     document.documentElement.dataset.boot = "ready";
     startupScreen?.setAttribute("aria-hidden", "false");
     if (startupScreen) startupScreen.dataset.phase = "ready";
-    window.setTimeout(() => startConsole?.focus(), 30);
+    window.setTimeout(
+      () =>
+        startupProfileButtons[defaultProfileIndex]?.focus({
+          preventScroll: true,
+        }),
+      30,
+    );
   };
+
+  startupProfileButtons.forEach((profile, profileIndex) => {
+    profile.addEventListener("click", () => selectStartupProfile(profileIndex));
+    profile.addEventListener("keydown", (event) => {
+      let nextIndex: number | null = null;
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        nextIndex = selectedStartupProfileIndex - 1;
+      } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        nextIndex = selectedStartupProfileIndex + 1;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = startupProfileButtons.length - 1;
+      }
+
+      if (nextIndex === null) return;
+      event.preventDefault();
+      selectStartupProfile(nextIndex, true);
+    });
+  });
+
+  selectStartupProfile(defaultProfileIndex);
 
   if (document.documentElement.dataset.boot === "ready") {
     startupScreen?.setAttribute("aria-hidden", "false");
