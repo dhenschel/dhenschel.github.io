@@ -113,9 +113,6 @@ import { musicTracks } from "../data/music";
     type MusicTrackId,
   } from "../data/music";
 
-  const musicChannel = document.querySelector<HTMLElement>(
-    "[data-music-channel]",
-  );
   const musicDiscs = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-music-disc]"),
   );
@@ -298,8 +295,14 @@ import { musicTracks } from "../data/music";
     });
   });
 
-  musicChannel?.addEventListener("keydown", (event) => {
+  document.addEventListener("keydown", (event) => {
     if (document.documentElement.dataset.consoleView !== "music") return;
+    const eventTarget = event.target as HTMLElement | null;
+    if (
+      eventTarget?.matches('input, textarea, select, [contenteditable="true"]')
+    ) {
+      return;
+    }
     if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
       event.preventDefault();
       moveMusicSelection(event.key === "ArrowLeft" ? -1 : 1);
@@ -307,8 +310,8 @@ import { musicTracks } from "../data/music";
     }
     if (
       (event.key === "Enter" || event.key === " ") &&
-      ((event.target as HTMLElement | null)?.closest("[data-music-disc]") ||
-        !(event.target as HTMLElement | null)?.closest("button"))
+      (eventTarget?.closest("[data-music-disc]") ||
+        !eventTarget?.closest("button"))
     ) {
       event.preventDefault();
       playSelectedMusic(true);

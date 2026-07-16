@@ -115,22 +115,22 @@ const structuredData = {
         </span>
         <strong>{siteProfile.name}</strong>
       </button>
-    </div>
 
-    <button
-      class="header-music-button"
-      type="button"
-      data-music-channel-open
-      aria-label="Music Channel öffnen"
-      aria-pressed="false"
-      title="Music Channel öffnen"
-    >
-      <span class="header-music-button__motion" aria-hidden="true">
-        <span class="header-music-button__disc">
-          <i></i>
+      <button
+        class="header-music-button"
+        type="button"
+        data-music-channel-open
+        aria-label="Music Channel öffnen"
+        aria-pressed="false"
+        title="Music Channel öffnen"
+      >
+        <span class="header-music-button__motion" aria-hidden="true">
+          <span class="header-music-button__disc">
+            <i></i>
+          </span>
         </span>
-      </span>
-    </button>
+      </button>
+    </div>
 
     <div class="console-status">
       <div class="console-clock">
@@ -473,7 +473,9 @@ const structuredData = {
               ? firstChannel
               : aboutIsActive
                 ? aboutHeading
-                : musicHeading;
+                : (musicPanel?.querySelector<HTMLButtonElement>(
+                    '[data-music-disc][data-carousel-position="active"]',
+                  ) ?? musicHeading);
             target?.focus({ preventScroll: true });
           },
           reducedMotion ? 0 : 440,
