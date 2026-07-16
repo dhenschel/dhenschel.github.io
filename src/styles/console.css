@@ -2458,7 +2458,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   to {
-    transform: rotate(0deg);
+    transform: rotate(360deg);
   }
 }
 

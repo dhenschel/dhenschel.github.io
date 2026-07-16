@@ -41,7 +41,21 @@ const initialProfileIndex = startupProfiles.findIndex(
     } catch {
       introSeen = true;
     }
-    document.documentElement.dataset.boot = introSeen ? "skip" : "ready";
+
+    const knownHashes = new Set(["#menu", "#gallery", "#about", "#music"]);
+    let initialHash = window.location.hash;
+    if (!knownHashes.has(initialHash)) {
+      initialHash = introSeen ? "#gallery" : "#menu";
+      const baseUrl = `${window.location.pathname}${window.location.search}`;
+      window.history.replaceState(
+        { consoleView: initialHash.slice(1) },
+        "",
+        `${baseUrl}${initialHash}`,
+      );
+    }
+
+    document.documentElement.dataset.boot =
+      initialHash === "#menu" ? "ready" : "skip";
   })();
 </script>
 
@@ -205,6 +219,29 @@ const initialProfileIndex = startupProfiles.findIndex(
       ".profile-picture--boot",
     ) ?? null;
   let startupTimers: number[] = [];
+  type StartupDestination = "gallery" | "about" | "music";
+  type StartupHistoryMode = "none" | "push" | "replace";
+  let startupDestination: StartupDestination =
+    window.location.hash === "#about"
+      ? "about"
+      : window.location.hash === "#music"
+        ? "music"
+        : "gallery";
+
+  const setStartupRoute = (
+    route: "menu" | StartupDestination,
+    historyMode: StartupHistoryMode,
+  ) => {
+    if (historyMode === "none") return;
+    const baseUrl = `${window.location.pathname}${window.location.search}`;
+    const routeUrl = `${baseUrl}#${route}`;
+    const state = { consoleView: route };
+    if (historyMode === "push") {
+      window.history.pushState(state, "", routeUrl);
+    } else {
+      window.history.replaceState(state, "", routeUrl);
+    }
+  };
 
   const clearStartupTimers = () => {
     startupTimers.forEach((timer) => window.clearTimeout(timer));
@@ -339,6 +376,14 @@ const initialProfileIndex = startupProfiles.findIndex(
 
   const finishStartup = () => {
     clearStartupTimers();
+    if (startupDestination === "gallery") {
+      setStartupRoute("gallery", "replace");
+    }
+    window.dispatchEvent(
+      new CustomEvent("console:view-request", {
+        detail: { view: startupDestination, historyMode: "none" },
+      }),
+    );
     document.documentElement.dataset.boot = "done";
     startupScreen?.setAttribute("aria-hidden", "true");
     if (startupScreen) startupScreen.dataset.phase = "done";
@@ -383,8 +428,12 @@ const initialProfileIndex = startupProfiles.findIndex(
     );
   };
 
-  const showStartupMenu = () => {
+  const showStartupMenu = (historyMode: StartupHistoryMode = "push") => {
     clearStartupTimers();
+    startupDestination = "gallery";
+    if (window.location.hash !== "#menu") {
+      setStartupRoute("menu", historyMode);
+    }
     selectStartupProfile(defaultProfileIndex);
     document.documentElement.removeAttribute("data-cursor-hidden");
     document.documentElement.dataset.boot = "ready";
@@ -410,6 +459,22 @@ const initialProfileIndex = startupProfiles.findIndex(
   startConsole?.addEventListener("click", playStartup);
   skipStartup?.addEventListener("click", finishStartup);
   replayStartupButtons.forEach((button) =>
-    button.addEventListener("click", showStartupMenu),
+    button.addEventListener("click", () => showStartupMenu("push")),
   );
+  window.addEventListener("popstate", () => {
+    if (window.location.hash === "#menu") {
+      showStartupMenu("none");
+      return;
+    }
+    if (
+      document.documentElement.dataset.boot === "ready" ||
+      document.documentElement.dataset.boot === "pending"
+    ) {
+      clearStartupTimers();
+      document.documentElement.dataset.boot = "done";
+      startupScreen?.setAttribute("aria-hidden", "true");
+      if (startupScreen) startupScreen.dataset.phase = "done";
+      document.documentElement.removeAttribute("data-cursor-hidden");
+    }
+  });
 </script>

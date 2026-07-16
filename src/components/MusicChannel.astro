@@ -292,6 +292,7 @@ import { musicTracks } from "../data/music";
         const matrix = new DOMMatrixReadOnly(currentTransform);
         currentAngle = (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI;
       }
+      currentAngle = ((currentAngle % 360) + 360) % 360;
       surface.style.setProperty("--music-hover-angle", `${currentAngle}deg`);
       surface.style.animation =
         "music-disc-hover-align 280ms cubic-bezier(0.2, 0.8, 0.25, 1) forwards";

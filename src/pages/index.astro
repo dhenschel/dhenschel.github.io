@@ -433,7 +433,7 @@ const structuredData = {
       focusTarget = false,
     ) => {
       const baseUrl = `${window.location.pathname}${window.location.search}`;
-      const viewUrl = view === "gallery" ? baseUrl : `${baseUrl}#${view}`;
+      const viewUrl = `${baseUrl}#${view}`;
 
       if (historyMode === "push") {
         window.history.pushState({ consoleView: view }, "", viewUrl);
@@ -484,12 +484,22 @@ const structuredData = {
     };
 
     window.addEventListener("console:view-request", (event) => {
-      const requestedView = (event as CustomEvent<{ view?: string }>).detail
-        ?.view;
-      if (requestedView !== "about" && requestedView !== "music") return;
+      const request = (
+        event as CustomEvent<{
+          view?: ConsoleView;
+          historyMode?: HistoryMode;
+        }>
+      ).detail;
+      const requestedView = request?.view;
+      if (
+        requestedView !== "gallery" &&
+        requestedView !== "about" &&
+        requestedView !== "music"
+      )
+        return;
       if (document.documentElement.dataset.consoleView === requestedView)
         return;
-      applyConsoleView(requestedView, "push", true);
+      applyConsoleView(requestedView, request?.historyMode ?? "push", true);
     });
 
     musicChannelOpen?.addEventListener("click", () => {
