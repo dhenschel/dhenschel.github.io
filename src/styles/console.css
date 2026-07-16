@@ -701,7 +701,7 @@ html[data-music-track="signal-garden"] .header-music-button {
   place-items: center;
   border: 1px solid var(--console-line);
   border-radius: 50%;
-  background: rgb(227 240 250 / 44%);
+  background: transparent;
   box-shadow: var(--console-shadow);
   transition:
     background-color 180ms ease,
@@ -741,6 +741,8 @@ html[data-music-track="signal-garden"] .header-music-button {
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 72%),
     0 0.25rem 0.65rem rgb(16 38 62 / 20%);
+  -webkit-mask: radial-gradient(circle, transparent 0 5.2%, #000 5.8%);
+  mask: radial-gradient(circle, transparent 0 5.2%, #000 5.8%);
   animation: header-disc-spin 18s linear infinite;
   will-change: transform;
 }
@@ -749,11 +751,17 @@ html[data-music-track="signal-garden"] .header-music-button {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: repeating-linear-gradient(
-    132deg,
-    transparent 0 0.32rem,
-    rgb(255 255 255 / 17%) 0.34rem 0.39rem
-  );
+  background:
+    radial-gradient(
+      circle at 31% 34%,
+      rgb(255 255 255 / 25%) 0 8%,
+      transparent 9%
+    ),
+    radial-gradient(
+      circle at 68% 66%,
+      rgb(255 255 255 / 16%) 0 12%,
+      transparent 13%
+    );
   -webkit-mask: radial-gradient(
     circle,
     transparent 0 21%,
@@ -801,7 +809,7 @@ html[data-music-track="signal-garden"] .header-music-button {
 
 .header-music-button:hover .header-music-button__motion,
 .header-music-button:focus-visible .header-music-button__motion {
-  background: var(--console-surface-solid);
+  background: transparent;
   box-shadow:
     var(--console-shadow-strong),
     0 0 0 0.28rem var(--console-accent-halo);
@@ -1181,7 +1189,7 @@ html[data-console-view="music"] .music-screen {
 
 .music-carousel__stage {
   position: relative;
-  height: clamp(15rem, 32svh, 20.5rem);
+  height: clamp(21rem, 39svh, 25rem);
   min-width: 0;
   perspective: 70rem;
   transform-style: preserve-3d;
@@ -1239,7 +1247,7 @@ html[data-console-view="music"] .music-screen {
 }
 
 .music-disc {
-  --music-disc-spacing: clamp(10rem, 14vw, 11.5rem);
+  --music-disc-spacing: clamp(16rem, 22vw, 20rem);
   --music-disc-scale: 0.72;
 
   position: absolute;
@@ -1247,7 +1255,7 @@ html[data-console-view="music"] .music-screen {
   top: 50%;
   left: 50%;
   display: grid;
-  width: clamp(12.5rem, 18vw, 15.5rem);
+  width: clamp(18.5rem, 26vw, 22.5rem);
   aspect-ratio: 1;
   padding: 0;
   place-items: center;
@@ -1311,6 +1319,8 @@ html[data-console-view="music"] .music-screen {
     inset 0 0 0 1px rgb(255 255 255 / 86%),
     inset 0 0 1.5rem rgb(126 185 218 / 12%),
     0 0.75rem 1.5rem rgb(22 43 65 / 23%);
+  -webkit-mask: radial-gradient(circle, transparent 0 4.7%, #000 5.2%);
+  mask: radial-gradient(circle, transparent 0 4.7%, #000 5.2%);
   backdrop-filter: blur(0.18rem) saturate(125%);
   transition:
     border-color 220ms ease,
@@ -1347,12 +1357,10 @@ html[data-console-view="music"] .music-screen {
 
 .music-disc__rings {
   position: absolute;
-  inset: 3.5%;
+  inset: 1.4%;
   border: 1px solid rgb(255 255 255 / 55%);
   border-radius: 50%;
-  box-shadow:
-    inset 0 0 0 0.45rem rgb(255 255 255 / 8%),
-    0 0 0 0.12rem rgb(119 196 233 / 12%);
+  box-shadow: 0 0 0 0.08rem rgb(119 196 233 / 10%);
 }
 
 .music-disc__label {
@@ -1360,21 +1368,92 @@ html[data-console-view="music"] .music-screen {
   top: 50%;
   left: 50%;
   display: block;
-  width: 78%;
-  height: 78%;
+  width: 91%;
+  height: 91%;
   border: 1px solid rgb(255 255 255 / 58%);
   border-radius: 50%;
   background:
-    repeating-linear-gradient(
-      132deg,
-      transparent 0 0.72rem,
-      rgb(255 255 255 / 10%) 0.76rem 0.84rem
-    ),
     radial-gradient(circle at 36% 24%, rgb(255 255 255 / 28%), transparent 42%),
     linear-gradient(145deg, var(--disc-color), var(--disc-color-dark));
   box-shadow: inset 0 0 1.3rem rgb(0 0 0 / 12%);
   text-align: center;
   transform: translate(-50%, -50%);
+}
+
+.music-disc[data-track-id="home-pulse"] .music-disc__label {
+  background:
+    radial-gradient(
+      circle at 27% 34%,
+      rgb(255 255 255 / 26%) 0 5%,
+      transparent 5.7%
+    ),
+    radial-gradient(
+      circle at 72% 62%,
+      rgb(255 255 255 / 18%) 0 8%,
+      transparent 8.7%
+    ),
+    radial-gradient(
+      circle at 60% 24%,
+      rgb(255 255 255 / 13%) 0 3.5%,
+      transparent 4.2%
+    ),
+    linear-gradient(145deg, var(--disc-color), var(--disc-color-dark));
+}
+
+.music-disc[data-track-id="blue-hour"] .music-disc__label {
+  background:
+    radial-gradient(
+      circle at 68% 31%,
+      transparent 0 17%,
+      rgb(255 255 255 / 22%) 17.5% 19%,
+      transparent 19.5%
+    ),
+    radial-gradient(
+      circle at 31% 72%,
+      transparent 0 25%,
+      rgb(172 205 255 / 18%) 25.5% 27%,
+      transparent 27.5%
+    ),
+    linear-gradient(155deg, var(--disc-color), var(--disc-color-dark));
+}
+
+.music-disc[data-track-id="soft-orbit"] .music-disc__label {
+  background:
+    radial-gradient(
+      circle at 74% 65%,
+      transparent 0 24%,
+      rgb(255 255 255 / 22%) 24.5% 27%,
+      transparent 27.5% 35%,
+      rgb(255 255 255 / 11%) 35.5% 37%,
+      transparent 37.5%
+    ),
+    radial-gradient(circle at 31% 27%, rgb(199 255 239 / 22%), transparent 24%),
+    linear-gradient(145deg, var(--disc-color), var(--disc-color-dark));
+}
+
+.music-disc[data-track-id="signal-garden"] .music-disc__label {
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 45%,
+      rgb(255 255 255 / 13%) 45.5% 54.5%,
+      transparent 55%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 0 45%,
+      rgb(255 255 255 / 10%) 45.5% 54.5%,
+      transparent 55%
+    ),
+    conic-gradient(
+      from 45deg at 50% 50%,
+      transparent 0 12.5%,
+      rgb(255 255 255 / 9%) 12.5% 25%,
+      transparent 25% 50%,
+      rgb(255 255 255 / 7%) 50% 62.5%,
+      transparent 62.5%
+    ),
+    linear-gradient(145deg, var(--disc-color), var(--disc-color-dark));
 }
 
 .music-disc__label small,
@@ -1407,11 +1486,11 @@ html[data-console-view="music"] .music-screen {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 27%;
-  height: 27%;
+  width: 20%;
+  height: 20%;
   border: 1px solid rgb(255 255 255 / 82%);
   border-radius: 50%;
-  background: rgb(226 242 250 / 56%);
+  background: rgb(226 242 250 / 32%);
   box-shadow:
     inset 0 0 0 0.25rem rgb(255 255 255 / 12%),
     0 0 0 0.12rem rgb(205 235 248 / 32%);
@@ -1424,11 +1503,11 @@ html[data-console-view="music"] .music-screen {
   z-index: 3;
   top: 50%;
   left: 50%;
-  width: 7%;
-  height: 7%;
+  width: 10%;
+  height: 10%;
   border: 1px solid rgb(255 255 255 / 90%);
   border-radius: 50%;
-  background: rgb(203 232 245 / 38%);
+  background: transparent;
   box-shadow: 0 0 0 0.12rem rgb(255 255 255 / 38%);
   transform: translate(-50%, -50%);
 }
@@ -2455,13 +2534,13 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   .music-carousel__stage {
-    height: 14.2rem;
+    height: 20.5rem;
   }
 
   .music-disc {
-    --music-disc-spacing: clamp(9.4rem, 13.5vw, 10.8rem);
+    --music-disc-spacing: clamp(15rem, 22.5vw, 18rem);
 
-    width: clamp(11.5rem, 17vw, 13.5rem);
+    width: clamp(17.5rem, 25vw, 20rem);
   }
 
   .music-channel__details {
@@ -2729,13 +2808,13 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   .music-carousel__stage {
-    height: clamp(12.5rem, 29svh, 15.5rem);
+    height: clamp(15rem, 34svh, 19rem);
   }
 
   .music-disc {
-    --music-disc-spacing: clamp(5.1rem, 22.5vw, 6rem);
+    --music-disc-spacing: clamp(8.4rem, 40vw, 10rem);
 
-    width: clamp(9.3rem, 39vw, 11rem);
+    width: clamp(12rem, 52vw, 14rem);
   }
 
   .music-disc__badges span {
