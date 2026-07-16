@@ -245,7 +245,6 @@ import { musicTracks } from "../data/music";
     if (musicNext) musicNext.disabled = selectedMusicIndex === total - 1;
 
     const track = getSelectedTrack();
-    document.documentElement.dataset.musicPreview = track.id;
     if (musicPosition) {
       musicPosition.textContent = `Disc ${selectedMusicIndex + 1} von ${total}`;
     }
@@ -283,6 +282,27 @@ import { musicTracks } from "../data/music";
   musicPlay?.addEventListener("click", () => playSelectedMusic());
 
   musicDiscs.forEach((disc, index) => {
+    const surface = disc.querySelector<HTMLElement>(".music-disc__surface");
+
+    disc.addEventListener("pointerenter", () => {
+      if (!surface || disc.dataset.activeTrack !== "true") return;
+      const currentTransform = getComputedStyle(surface).transform;
+      let currentAngle = 0;
+      if (currentTransform !== "none") {
+        const matrix = new DOMMatrixReadOnly(currentTransform);
+        currentAngle = (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI;
+      }
+      surface.style.setProperty("--music-hover-angle", `${currentAngle}deg`);
+      surface.style.animation =
+        "music-disc-hover-align 280ms cubic-bezier(0.2, 0.8, 0.25, 1) forwards";
+    });
+
+    disc.addEventListener("pointerleave", () => {
+      if (!surface) return;
+      surface.style.removeProperty("animation");
+      surface.style.removeProperty("--music-hover-angle");
+    });
+
     disc.addEventListener("click", () => {
       if (index !== selectedMusicIndex) {
         selectedMusicIndex = index;
@@ -335,10 +355,6 @@ import { musicTracks } from "../data/music";
       selectActiveMusic();
     } else {
       updateMusicState();
-      if (document.documentElement.dataset.consoleView !== "music") {
-        document.documentElement.dataset.musicPreview =
-          musicState.activeTrackId;
-      }
     }
   });
 

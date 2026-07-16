@@ -682,15 +682,15 @@ html[data-console-view="music"] .console-back-button {
   cursor: pointer;
 }
 
-html[data-music-preview="blue-hour"] .header-music-button {
+html[data-music-track="blue-hour"] .header-music-button {
   --header-disc-accent: #5267c9;
 }
 
-html[data-music-preview="soft-orbit"] .header-music-button {
+html[data-music-track="soft-orbit"] .header-music-button {
   --header-disc-accent: #55ae9f;
 }
 
-html[data-music-preview="signal-garden"] .header-music-button {
+html[data-music-track="signal-garden"] .header-music-button {
   --header-disc-accent: #d99035;
 }
 
@@ -777,7 +777,7 @@ html[data-music-preview="signal-garden"] .header-music-button {
   content: "";
 }
 
-html[data-music-preview="blue-hour"] .header-music-button__disc::before {
+html[data-music-track="blue-hour"] .header-music-button__disc::before {
   background:
     radial-gradient(
       circle at 68% 31%,
@@ -793,7 +793,7 @@ html[data-music-preview="blue-hour"] .header-music-button__disc::before {
     );
 }
 
-html[data-music-preview="soft-orbit"] .header-music-button__disc::before {
+html[data-music-track="soft-orbit"] .header-music-button__disc::before {
   background:
     radial-gradient(
       circle at 74% 65%,
@@ -806,7 +806,7 @@ html[data-music-preview="soft-orbit"] .header-music-button__disc::before {
     radial-gradient(circle at 31% 27%, rgb(199 255 239 / 28%), transparent 24%);
 }
 
-html[data-music-preview="signal-garden"] .header-music-button__disc::before {
+html[data-music-track="signal-garden"] .header-music-button__disc::before {
   background:
     linear-gradient(
       90deg,
@@ -1300,13 +1300,14 @@ html[data-console-view="music"] .music-screen {
 }
 
 .music-disc {
+  --music-disc-bottom-gap: clamp(1.5rem, 3svh, 2rem);
   --music-disc-spacing: clamp(16rem, 22vw, 20rem);
   --music-selected-gap: clamp(6rem, 9vw, 8rem);
   --music-disc-scale: 0.72;
 
   position: absolute;
   z-index: 1;
-  bottom: 0;
+  bottom: var(--music-disc-bottom-gap);
   left: 50%;
   display: grid;
   width: clamp(18.5rem, 26vw, 22.5rem);
@@ -1383,8 +1384,8 @@ html[data-console-view="music"] .music-screen {
   backdrop-filter: blur(0.18rem) saturate(125%);
   transition:
     border-color 220ms ease,
-    box-shadow 220ms ease,
-    transform 180ms ease;
+    box-shadow 220ms ease;
+  transform: rotate(0deg);
 }
 
 .music-disc:hover .music-disc__surface,
@@ -1407,11 +1408,6 @@ html[data-console-view="music"] .music-screen {
     0 0 0 0.3rem var(--console-blue),
     0 0 2rem var(--console-accent-halo);
   animation: music-disc-playing 14s linear infinite;
-  animation-play-state: running;
-}
-
-.music-disc[data-active-track="true"]:hover .music-disc__surface {
-  animation-play-state: paused;
 }
 
 .music-disc__rings {
@@ -1613,6 +1609,7 @@ html[data-console-view="music"] .music-screen {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  transform: translateY(1rem);
 }
 
 .music-channel__details h2 {
@@ -2455,6 +2452,16 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 }
 
+@keyframes music-disc-hover-align {
+  from {
+    transform: rotate(var(--music-hover-angle, 0deg));
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
 @keyframes launch-progress {
   to {
     transform: scaleX(1);
@@ -2871,6 +2878,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   .music-disc {
+    --music-disc-bottom-gap: 1.25rem;
     --music-disc-spacing: clamp(8.4rem, 40vw, 10rem);
     --music-selected-gap: clamp(3.5rem, 16vw, 4rem);
 
@@ -2886,6 +2894,10 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   .music-channel__details {
     min-height: 6.6rem;
     padding: 0 0.5rem;
+  }
+
+  .music-channel__details > p:first-child {
+    transform: translateY(0.75rem);
   }
 
   .music-channel__actions {
