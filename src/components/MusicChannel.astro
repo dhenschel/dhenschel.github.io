@@ -32,17 +32,18 @@ import { musicTracks } from "../data/music";
 
       <div class="music-carousel__stage">
         {
-          musicTracks.map((track) => (
+          musicTracks.map((track, index) => (
             <button
               class="music-disc"
               type="button"
               data-music-disc
               data-track-id={track.id}
-              data-carousel-position="hidden"
+              data-carousel-position={index === 0 ? "active" : "visible"}
+              data-carousel-distance={index}
               aria-label={`${track.title} auswählen und anhören`}
               aria-pressed="false"
-              tabindex="-1"
-              style={`--disc-color: ${track.color}; --disc-color-dark: ${track.colorDark};`}
+              tabindex={index === 0 ? "0" : "-1"}
+              style={`--disc-color: ${track.color}; --disc-color-dark: ${track.colorDark}; --music-disc-index: ${index};`}
             >
               <span class="music-disc__surface" aria-hidden="true">
                 <span class="music-disc__rings" />
@@ -101,12 +102,6 @@ import { musicTracks } from "../data/music";
         <strong>Als Nacht-Standard</strong>
       </button>
     </div>
-
-    <p class="music-channel__hint">
-      <span>← →</span> Disc auswählen <i></i>
-      <span>Enter / Leertaste</span>
-      Anhören
-    </p>
   </div>
 </section>
 
@@ -235,19 +230,18 @@ import { musicTracks } from "../data/music";
   const updateMusicCarousel = (focusDisc = false) => {
     const total = musicDiscs.length;
     musicDiscs.forEach((disc, index) => {
-      const forwardDistance = (index - selectedMusicIndex + total) % total;
-      const position =
-        forwardDistance === 0
-          ? "active"
-          : forwardDistance === 1
-            ? "next"
-            : forwardDistance === total - 1
-              ? "previous"
-              : "hidden";
+      const offset = index - selectedMusicIndex;
+      const distance = Math.abs(offset);
+      const position = offset === 0 ? "active" : "visible";
       disc.dataset.carouselPosition = position;
+      disc.dataset.carouselDistance = String(Math.min(distance, 5));
+      disc.style.setProperty("--music-disc-index", String(offset));
       disc.tabIndex = position === "active" ? 0 : -1;
-      disc.setAttribute("aria-hidden", String(position === "hidden"));
+      disc.removeAttribute("aria-hidden");
     });
+
+    if (musicPrevious) musicPrevious.disabled = selectedMusicIndex === 0;
+    if (musicNext) musicNext.disabled = selectedMusicIndex === total - 1;
 
     const track = getSelectedTrack();
     if (musicPosition) {
@@ -261,9 +255,12 @@ import { musicTracks } from "../data/music";
   };
 
   const moveMusicSelection = (direction: number, focusDisc = true) => {
-    selectedMusicIndex =
-      (selectedMusicIndex + direction + musicTrackIds.length) %
-      musicTrackIds.length;
+    const nextIndex = Math.max(
+      0,
+      Math.min(musicTrackIds.length - 1, selectedMusicIndex + direction),
+    );
+    if (nextIndex === selectedMusicIndex) return;
+    selectedMusicIndex = nextIndex;
     updateMusicCarousel(focusDisc);
   };
 
