@@ -138,6 +138,9 @@ const de: Record<string, string> = {
   "music.track.lounge.label": "Sammlungs-Lounge",
   "music.track.lounge.description":
     "Leichter Lounge-Jazz mit warmem E-Piano, weichem E-Bass, Besen, Vibraphon und einer zurückhaltenden Flöte – entspannt wie das Durchstöbern einer Sammlung.",
+  "music.track.neon.label": "Neon-Lounge",
+  "music.track.neon.description":
+    "Dunkles E-Piano, synkopierter Synth-Bass, ein gedämpfter Beat und weiche Lead-Synths – kühl, elegant und urban mit seltenen saxofonartigen Akzenten.",
   "music.track.orbit.label": "Früher 02",
   "music.track.orbit.description":
     "Der frühere, schwebende Ansatz mit langen Flächen und ruhigen Melodiebögen.",
@@ -354,6 +357,9 @@ const en: Record<string, string> = {
   "music.track.lounge.label": "Collection Lounge",
   "music.track.lounge.description":
     "Light lounge jazz with warm electric piano, soft electric bass, brushes, vibraphone and restrained flute – relaxed like browsing a collection.",
+  "music.track.neon.label": "Neon Lounge",
+  "music.track.neon.description":
+    "Dark electric piano, syncopated synth bass, a muted beat and soft lead synths – cool, elegant and urban with occasional sax-like accents.",
   "music.track.orbit.label": "Legacy 02",
   "music.track.orbit.description":
     "The earlier floating approach with long pads and calm melodic arcs.",
@@ -563,6 +569,9 @@ const fr: Record<string, string> = {
   "music.track.lounge.label": "Salon de collection",
   "music.track.lounge.description":
     "Un jazz lounge léger avec piano électrique chaleureux, basse douce, balais, vibraphone et flûte discrète – comme une collection que l’on parcourt tranquillement.",
+  "music.track.neon.label": "Salon néon",
+  "music.track.neon.description":
+    "Piano électrique sombre, basse synthétique syncopée, rythme feutré et synthés doux – une ambiance froide, élégante et urbaine avec de rares accents proches du saxophone.",
   "music.track.orbit.label": "Archive 02",
   "music.track.orbit.description":
     "L’ancienne approche aérienne avec de longues nappes et des courbes mélodiques calmes.",
@@ -776,6 +785,9 @@ const es: Record<string, string> = {
   "music.track.lounge.label": "Salón de colección",
   "music.track.lounge.description":
     "Jazz lounge ligero con piano eléctrico cálido, bajo suave, escobillas, vibráfono y flauta discreta: relajado como explorar una colección.",
+  "music.track.neon.label": "Salón de neón",
+  "music.track.neon.description":
+    "Piano eléctrico oscuro, bajo sintetizado sincopado, ritmo apagado y sintetizadores suaves: frío, elegante y urbano con escasos matices de saxofón.",
   "music.track.orbit.label": "Archivo 02",
   "music.track.orbit.description":
     "El enfoque flotante anterior con capas largas y arcos melódicos tranquilos.",

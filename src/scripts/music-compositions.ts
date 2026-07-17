@@ -513,6 +513,283 @@ const scheduleSoftFlute = (
   vibrato.stop(end + 0.04);
 };
 
+const scheduleDarkElectricPianoChord = (
+  context: AudioContext,
+  destination: AudioNode,
+  notes: readonly number[],
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.82);
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const bodyMix = context.createGain();
+  const colorMix = context.createGain();
+  const tineMix = context.createGain();
+
+  filter.type = "lowpass";
+  filter.Q.value = 0.92;
+  filter.frequency.setValueAtTime(2650, start);
+  filter.frequency.exponentialRampToValueAtTime(860, end);
+  bodyMix.gain.value = 0.76;
+  colorMix.gain.value = 0.045;
+  tineMix.gain.value = 0.01;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.018);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.31, start + 0.21);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  bodyMix.connect(filter);
+  colorMix.connect(filter);
+  tineMix.connect(filter);
+  filter.connect(envelope).connect(destination);
+
+  notes.forEach((note, index) => {
+    const frequency = midiToFrequency(note);
+    const detune = (index - (notes.length - 1) / 2) * 0.34;
+    const body = context.createOscillator();
+    const color = context.createOscillator();
+    const tine = context.createOscillator();
+
+    body.type = "sine";
+    body.frequency.value = frequency;
+    body.detune.value = detune;
+    color.type = "triangle";
+    color.frequency.value = frequency * 2;
+    color.detune.value = -detune;
+    tine.type = "sine";
+    tine.frequency.value = frequency * 3;
+    tine.detune.value = 1.8;
+    body.connect(bodyMix);
+    color.connect(colorMix);
+    tine.connect(tineMix);
+    body.start(start);
+    color.start(start);
+    tine.start(start);
+    body.stop(end + 0.04);
+    color.stop(end + 0.04);
+    tine.stop(end + 0.04);
+  });
+};
+
+const scheduleNeonBass = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.34);
+  const sub = context.createOscillator();
+  const edge = context.createOscillator();
+  const edgeMix = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  sub.type = "sine";
+  sub.frequency.setValueAtTime(frequency * 1.018, start);
+  sub.frequency.exponentialRampToValueAtTime(frequency, start + 0.075);
+  edge.type = "sawtooth";
+  edge.frequency.value = frequency;
+  edgeMix.gain.value = 0.045;
+  filter.type = "lowpass";
+  filter.Q.value = 1.1;
+  filter.frequency.setValueAtTime(560, start);
+  filter.frequency.exponentialRampToValueAtTime(185, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.016);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.56, start + 0.16);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  sub.connect(filter);
+  edge.connect(edgeMix).connect(filter);
+  filter.connect(envelope).connect(destination);
+  sub.start(start);
+  edge.start(start);
+  sub.stop(end + 0.04);
+  edge.stop(end + 0.04);
+};
+
+const scheduleNeonKick = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  level: number,
+) => {
+  const end = start + 0.19;
+  const oscillator = context.createOscillator();
+  const envelope = context.createGain();
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(112, start);
+  oscillator.frequency.exponentialRampToValueAtTime(48, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.006);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  oscillator.connect(envelope).connect(destination);
+  oscillator.start(start);
+  oscillator.stop(end + 0.02);
+};
+
+const scheduleMutedSnare = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  level: number,
+) => {
+  const duration = 0.11;
+  const end = start + duration;
+  const source = context.createBufferSource();
+  const bandpass = context.createBiquadFilter();
+  const lowpass = context.createBiquadFilter();
+  const envelope = context.createGain();
+
+  source.buffer = getBrushNoiseBuffer(context);
+  bandpass.type = "bandpass";
+  bandpass.frequency.value = 1420;
+  bandpass.Q.value = 0.72;
+  lowpass.type = "lowpass";
+  lowpass.frequency.value = 3600;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.006);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  source
+    .connect(bandpass)
+    .connect(lowpass)
+    .connect(envelope)
+    .connect(destination);
+  const offsetRange = Math.max(0, source.buffer.duration - duration - 0.03);
+  source.start(start, Math.random() * offsetRange);
+  source.stop(end + 0.02);
+};
+
+const scheduleClosedHat = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  level: number,
+) => {
+  const duration = 0.042;
+  const end = start + duration;
+  const source = context.createBufferSource();
+  const highpass = context.createBiquadFilter();
+  const envelope = context.createGain();
+
+  source.buffer = getBrushNoiseBuffer(context);
+  highpass.type = "highpass";
+  highpass.frequency.value = 5400;
+  highpass.Q.value = 0.5;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.003);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  source.connect(highpass).connect(envelope).connect(destination);
+  const offsetRange = Math.max(0, source.buffer.duration - duration - 0.02);
+  source.start(start, Math.random() * offsetRange);
+  source.stop(end + 0.02);
+};
+
+const scheduleSoftLeadSynth = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.52);
+  const fundamental = context.createOscillator();
+  const glow = context.createOscillator();
+  const glowMix = context.createGain();
+  const vibrato = context.createOscillator();
+  const vibratoDepth = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  fundamental.type = "triangle";
+  fundamental.frequency.setValueAtTime(frequency * 0.992, start);
+  fundamental.frequency.exponentialRampToValueAtTime(frequency, start + 0.09);
+  glow.type = "sine";
+  glow.frequency.value = frequency * 2;
+  glowMix.gain.value = 0.065;
+  vibrato.type = "sine";
+  vibrato.frequency.value = 4.25;
+  vibratoDepth.gain.value = 3.8;
+  filter.type = "lowpass";
+  filter.Q.value = 0.76;
+  filter.frequency.setValueAtTime(2200, start);
+  filter.frequency.exponentialRampToValueAtTime(1250, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.075);
+  envelope.gain.setValueAtTime(
+    level * 0.76,
+    Math.max(start + 0.14, end - 0.18),
+  );
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  vibrato.connect(vibratoDepth);
+  vibratoDepth.connect(fundamental.detune);
+  vibratoDepth.connect(glow.detune);
+  fundamental.connect(filter);
+  glow.connect(glowMix).connect(filter);
+  filter.connect(envelope).connect(destination);
+  fundamental.start(start);
+  glow.start(start);
+  vibrato.start(start);
+  fundamental.stop(end + 0.04);
+  glow.stop(end + 0.04);
+  vibrato.stop(end + 0.04);
+};
+
+const scheduleSaxLikeVoice = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.66);
+  const body = context.createOscillator();
+  const reed = context.createOscillator();
+  const reedMix = context.createGain();
+  const vibrato = context.createOscillator();
+  const vibratoDepth = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  body.type = "triangle";
+  body.frequency.setValueAtTime(frequency * 0.985, start);
+  body.frequency.exponentialRampToValueAtTime(frequency, start + 0.11);
+  reed.type = "sawtooth";
+  reed.frequency.value = frequency;
+  reedMix.gain.value = 0.055;
+  vibrato.type = "sine";
+  vibrato.frequency.value = 5.05;
+  vibratoDepth.gain.value = 6.2;
+  filter.type = "lowpass";
+  filter.Q.value = 1.35;
+  filter.frequency.setValueAtTime(2050, start);
+  filter.frequency.exponentialRampToValueAtTime(1450, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.095);
+  envelope.gain.setValueAtTime(level * 0.82, Math.max(start + 0.16, end - 0.2));
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  vibrato.connect(vibratoDepth);
+  vibratoDepth.connect(body.detune);
+  vibratoDepth.connect(reed.detune);
+  body.connect(filter);
+  reed.connect(reedMix).connect(filter);
+  filter.connect(envelope).connect(destination);
+  body.start(start);
+  reed.start(start);
+  vibrato.start(start);
+  body.stop(end + 0.04);
+  reed.stop(end + 0.04);
+  vibrato.stop(end + 0.04);
+};
+
 const schedulePadChord = (
   context: AudioContext,
   destination: AudioNode,
@@ -1189,6 +1466,246 @@ const scheduleLoungeBar = (options: ScheduleBarOptions) => {
   }
 };
 
+const NEON_LEAD_SCALE = [66, 69, 71, 73, 76, 78, 81, 83] as const;
+const NEON_SAX_SCALE = [61, 64, 66, 69, 71, 73, 76] as const;
+const NEON_SCENES: readonly LoungeScene[] = [
+  {
+    bass: [42, 49, 52],
+    chord: [57, 61, 64, 68, 71],
+    compPattern: 0,
+  },
+  {
+    bass: [38, 45, 49],
+    chord: [54, 57, 61, 64, 66],
+    compPattern: 1,
+  },
+  {
+    bass: [35, 42, 45],
+    chord: [50, 54, 57, 61, 64],
+    compPattern: 2,
+  },
+  {
+    bass: [37, 44, 47],
+    chord: [54, 59, 61, 64, 68],
+    compPattern: 3,
+  },
+  {
+    bass: [42, 49, 45],
+    chord: [57, 59, 61, 64, 68, 71],
+    compPattern: 1,
+  },
+  {
+    bass: [40, 47, 51],
+    chord: [56, 59, 63, 66, 68],
+    compPattern: 2,
+  },
+  {
+    bass: [38, 45, 49],
+    chord: [54, 57, 61, 64, 66],
+    compPattern: 0,
+  },
+  {
+    bass: [37, 44, 40],
+    chord: [53, 56, 59, 61, 64],
+    compPattern: 3,
+  },
+];
+const NEON_COMPING: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 0.88, 0.86],
+    [1.67, 0.5, 0.46],
+    [3, 0.68, 0.62],
+  ],
+  [
+    [0.67, 0.58, 0.5],
+    [2, 0.82, 0.78],
+    [3.67, 0.26, 0.32],
+  ],
+  [
+    [0, 0.72, 0.7],
+    [1.34, 0.48, 0.44],
+    [2.67, 0.72, 0.66],
+  ],
+  [
+    [0.34, 0.5, 0.42],
+    [1.67, 0.62, 0.58],
+    [3.34, 0.42, 0.48],
+  ],
+];
+const NEON_BASS: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 0.68, 0.88],
+    [1.67, 0.42, 0.48],
+    [2.5, 0.58, 0.7],
+    [3.67, 0.22, 0.34],
+  ],
+  [
+    [0.34, 0.5, 0.52],
+    [1, 0.62, 0.7],
+    [2.67, 0.58, 0.76],
+    [3.67, 0.22, 0.32],
+  ],
+  [
+    [0, 0.62, 0.78],
+    [1.34, 0.42, 0.46],
+    [2, 0.6, 0.68],
+    [3.34, 0.36, 0.42],
+  ],
+  [
+    [0.67, 0.48, 0.52],
+    [1.67, 0.48, 0.6],
+    [2.67, 0.58, 0.74],
+    [3.67, 0.22, 0.32],
+  ],
+];
+const NEON_LEAD_MOTIFS: readonly (readonly MotifNote[])[] = [
+  [
+    [0.68, 0, 0.44, 0.52],
+    [1.67, 2, 0.5, 0.6],
+    [3, 1, 0.62, 0.48],
+  ],
+  [
+    [1, 3, 0.44, 0.46],
+    [1.67, 4, 0.54, 0.54],
+    [2.67, 2, 0.62, 0.44],
+  ],
+  [
+    [0.34, 1, 0.4, 0.4],
+    [1, 2, 0.44, 0.5],
+    [2, 5, 0.58, 0.46],
+  ],
+  [
+    [0.67, 4, 0.5, 0.42],
+    [2, 3, 0.54, 0.48],
+    [3.34, 1, 0.44, 0.4],
+  ],
+  [
+    [1.34, 6, 0.4, 0.36],
+    [2, 5, 0.46, 0.42],
+    [3, 3, 0.52, 0.38],
+  ],
+];
+const NEON_SAX_MOTIFS: readonly (readonly MotifNote[])[] = [
+  [
+    [1.34, 2, 0.58, 0.48],
+    [2.34, 3, 0.72, 0.44],
+  ],
+  [
+    [0.67, 4, 0.5, 0.4],
+    [1.67, 3, 0.58, 0.46],
+    [3, 1, 0.72, 0.38],
+  ],
+  [
+    [1, 1, 0.62, 0.38],
+    [2, 2, 0.66, 0.44],
+  ],
+  [
+    [0.67, 5, 0.48, 0.34],
+    [1.67, 4, 0.54, 0.4],
+    [2.67, 2, 0.68, 0.36],
+  ],
+];
+const NEON_LEAD_PHRASES: readonly (readonly (number | null)[])[] = [
+  [0, null, 1, null, 2, 4, null, 3],
+  [null, 2, 0, null, 3, null, 1, 4],
+  [1, null, 3, 0, null, 2, 4, null],
+  [0, 4, null, 2, 1, null, 3, null],
+];
+const NEON_SAX_PHRASES: readonly (readonly (number | null)[])[] = [
+  [null, null, null, null, null, null, 0, null],
+  [null, null, 1, null, null, null, null, null],
+  [null, null, null, null, null, 2, null, null],
+  [null, null, null, 3, null, null, null, null],
+];
+
+const scheduleNeonBar = (options: ScheduleBarOptions) => {
+  const {
+    context,
+    destination,
+    start,
+    barIndex,
+    phraseIndex,
+    absoluteBar,
+    beatSeconds,
+  } = options;
+  const scene = NEON_SCENES[barIndex];
+  const leadMotifIndex = NEON_LEAD_PHRASES[phraseIndex][barIndex];
+  const saxMotifIndex = NEON_SAX_PHRASES[phraseIndex][barIndex];
+  const breath = 0.985 + Math.sin((absoluteBar + 1) * 0.91) * 0.015;
+
+  NEON_COMPING[scene.compPattern].forEach(([beat, duration, velocity]) =>
+    scheduleDarkElectricPianoChord(
+      context,
+      destination,
+      scene.chord,
+      start + beat * beatSeconds,
+      duration * beatSeconds + 0.22,
+      0.017 * velocity * breath,
+    ),
+  );
+  NEON_BASS[scene.compPattern].forEach(([beat, duration, velocity], index) =>
+    scheduleNeonBass(
+      context,
+      destination,
+      scene.bass[index % scene.bass.length],
+      start + beat * beatSeconds,
+      duration * beatSeconds + 0.06,
+      0.035 * velocity * breath,
+    ),
+  );
+
+  scheduleNeonKick(context, destination, start, 0.0145 * breath);
+  scheduleNeonKick(
+    context,
+    destination,
+    start + (absoluteBar % 2 === 0 ? 2.5 : 2.67) * beatSeconds,
+    0.009 * breath,
+  );
+  [1, 3].forEach((beat, index) =>
+    scheduleMutedSnare(
+      context,
+      destination,
+      start + beat * beatSeconds,
+      (index === 0 ? 0.0052 : 0.0062) * breath,
+    ),
+  );
+  [0, 0.67, 1, 1.67, 2, 2.67, 3, 3.67].forEach((beat, index) =>
+    scheduleClosedHat(
+      context,
+      destination,
+      start + beat * beatSeconds,
+      (index % 2 === 0 ? 0.00125 : 0.0021) * breath,
+    ),
+  );
+
+  if (leadMotifIndex !== null) {
+    NEON_LEAD_MOTIFS[leadMotifIndex].forEach(
+      ([beat, scaleDegree, duration, velocity]) =>
+        scheduleSoftLeadSynth(
+          context,
+          destination,
+          NEON_LEAD_SCALE[scaleDegree],
+          start + beat * beatSeconds,
+          duration * beatSeconds + 0.28,
+          0.021 * velocity * breath,
+        ),
+    );
+  }
+  if (saxMotifIndex !== null) {
+    NEON_SAX_MOTIFS[saxMotifIndex].forEach(
+      ([beat, scaleDegree, duration, velocity]) =>
+        scheduleSaxLikeVoice(
+          context,
+          destination,
+          NEON_SAX_SCALE[scaleDegree],
+          start + beat * beatSeconds,
+          duration * beatSeconds + 0.18,
+          0.013 * velocity * breath,
+        ),
+    );
+  }
+};
+
 const ORBIT_SCALE = [62, 64, 66, 69, 71, 74, 76] as const;
 const ORBIT_SCENES: readonly OrbitScene[] = [
   { bass: 38, pad: [50, 57, 62, 64, 66, 71] },
@@ -1356,6 +1873,22 @@ export const musicCompositions: Record<MusicTrackId, MusicComposition> = {
       wet: 0.042,
     },
     scheduleBar: scheduleLoungeBar,
+  },
+  "neon-lounge": {
+    id: "neon-lounge",
+    tempo: 106,
+    barsPerPhrase: 8,
+    phraseCount: NEON_LEAD_PHRASES.length,
+    level: 0.132,
+    fadeInSeconds: 1.05,
+    echo: {
+      dry: 0.955,
+      delayBeats: 0.5,
+      feedback: 0.05,
+      filterFrequency: 2050,
+      wet: 0.048,
+    },
+    scheduleBar: scheduleNeonBar,
   },
   "soft-orbit": {
     id: "soft-orbit",

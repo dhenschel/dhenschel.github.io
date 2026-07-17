@@ -2,6 +2,7 @@ export const musicTrackIds = [
   "home-pulse",
   "blue-hour",
   "collection-lounge",
+  "neon-lounge",
   "soft-orbit",
   "signal-garden",
 ] as const;
@@ -12,7 +13,7 @@ export type ConsoleTheme = "light" | "dark";
 
 export type MusicTrack = {
   id: MusicTrackId;
-  translationKey: "home" | "night" | "lounge" | "orbit" | "signal";
+  translationKey: "home" | "night" | "lounge" | "neon" | "orbit" | "signal";
   title: string;
   shortTitle: string;
   description: string;
@@ -68,6 +69,17 @@ export const musicTracks: readonly MusicTrack[] = [
     label: "Collection Jazz",
   },
   {
+    id: "neon-lounge",
+    translationKey: "neon",
+    title: "Neon Lounge",
+    shortTitle: "NEON",
+    description:
+      "Kühler Lounge-Groove mit dunklem E-Piano, Synth-Bass, gedämpftem Beat und urbanen Lead-Farben.",
+    color: "#765fc8",
+    colorDark: "#273b78",
+    label: "After Dark",
+  },
+  {
     id: "soft-orbit",
     translationKey: "orbit",
     title: "Soft Orbit",
@@ -100,18 +112,22 @@ export const defaultMusicByTheme: Record<ConsoleTheme, MusicDiscId> = {
 
 export const shufflePoolStorageKey = "dh-console-shuffle-pool-v1";
 
-const preLoungeMusicTrackIds: readonly MusicTrackId[] = [
-  "home-pulse",
-  "blue-hour",
-  "soft-orbit",
-  "signal-garden",
+const previousCompleteMusicLibraries: readonly (readonly MusicTrackId[])[] = [
+  ["home-pulse", "blue-hour", "soft-orbit", "signal-garden"],
+  [
+    "home-pulse",
+    "blue-hour",
+    "collection-lounge",
+    "soft-orbit",
+    "signal-garden",
+  ],
 ];
 
 export const normalizeShufflePool = (value: unknown): MusicTrackId[] => {
   if (!Array.isArray(value)) return [...musicTrackIds];
   const selected = musicTrackIds.filter((trackId) => value.includes(trackId));
-  const previouslySelectedEverything = preLoungeMusicTrackIds.every((trackId) =>
-    value.includes(trackId),
+  const previouslySelectedEverything = previousCompleteMusicLibraries.some(
+    (library) => library.every((trackId) => value.includes(trackId)),
   );
   if (previouslySelectedEverything) return [...musicTrackIds];
   return selected.length >= 2 ? selected : [...musicTrackIds];

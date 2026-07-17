@@ -16,6 +16,7 @@ type ConsoleMusicTrackId =
   | "home-pulse"
   | "blue-hour"
   | "collection-lounge"
+  | "neon-lounge"
   | "soft-orbit"
   | "signal-garden";
 type ConsoleMusicDiscId = "shuffle" | ConsoleMusicTrackId;
