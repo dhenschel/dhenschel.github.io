@@ -1,8 +1,11 @@
 import {
   defaultMusicByTheme,
   isConsoleTheme,
-  isMusicTrackId,
+  isMusicDiscId,
+  musicTrackIds,
+  shufflePoolStorageKey,
   type ConsoleTheme,
+  type MusicDiscId,
   type MusicTrackId,
 } from "../data/music";
 import { musicCompositions, type MusicComposition } from "./music-compositions";
@@ -14,6 +17,8 @@ const INTERACTIVE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const MUSIC_LOOKAHEAD_MS = 120;
 const MUSIC_SCHEDULE_AHEAD_SECONDS = 0.48;
+const SHUFFLE_MIN_DURATION_MS = 105_000;
+const SHUFFLE_MAX_DURATION_MS = 150_000;
 
 let audioContext: AudioContext | null = null;
 let masterGain: GainNode | null = null;
@@ -26,6 +31,7 @@ let musicEchoFeedback: GainNode | null = null;
 let musicEchoWet: GainNode | null = null;
 let effectsGain: GainNode | null = null;
 let musicTimer: number | null = null;
+let shuffleAdvanceTimer: number | null = null;
 let musicRunId = 0;
 let musicRunning = false;
 let audioUnlocked = false;
@@ -41,7 +47,7 @@ let lastPointerAt = 0;
 
 type MusicPreferences = {
   version: 1;
-  defaults: Record<ConsoleTheme, MusicTrackId>;
+  defaults: Record<ConsoleTheme, MusicDiscId>;
 };
 
 const getCurrentTheme = (): ConsoleTheme =>
@@ -62,8 +68,8 @@ const readMusicPreferences = (): MusicPreferences => {
     return {
       version: 1,
       defaults: {
-        light: isMusicTrackId(light) ? light : fallback.defaults.light,
-        dark: isMusicTrackId(dark) ? dark : fallback.defaults.dark,
+        light: isMusicDiscId(light) ? light : fallback.defaults.light,
+        dark: isMusicDiscId(dark) ? dark : fallback.defaults.dark,
       },
     };
   } catch {
@@ -72,13 +78,50 @@ const readMusicPreferences = (): MusicPreferences => {
 };
 
 let musicPreferences = readMusicPreferences();
-let activeTrackId: MusicTrackId = musicPreferences.defaults[getCurrentTheme()];
+
+const readShufflePool = (): MusicTrackId[] => {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(shufflePoolStorageKey) ?? "null",
+    );
+    if (!Array.isArray(stored)) return [...musicTrackIds];
+    const valid = musicTrackIds.filter((trackId) => stored.includes(trackId));
+    return valid.length >= 2 ? valid : [...musicTrackIds];
+  } catch {
+    return [...musicTrackIds];
+  }
+};
+
+const pickShuffleTrack = (
+  currentTrackId?: MusicTrackId,
+  previousTrackId?: MusicTrackId | null,
+) => {
+  const pool = readShufflePool();
+  let candidates = pool.filter((trackId) => trackId !== currentTrackId);
+  if (candidates.length === 0) candidates = [...pool];
+  if (candidates.length > 1 && previousTrackId) {
+    const withoutPrevious = candidates.filter(
+      (trackId) => trackId !== previousTrackId,
+    );
+    if (withoutPrevious.length > 0) candidates = withoutPrevious;
+  }
+  return (
+    candidates[Math.floor(Math.random() * candidates.length)] ??
+    musicTrackIds[0]
+  );
+};
+
+let playbackMode: MusicDiscId = musicPreferences.defaults[getCurrentTheme()];
+let activeTrackId: MusicTrackId =
+  playbackMode === "shuffle" ? pickShuffleTrack() : playbackMode;
+let previousShuffleTrackId: MusicTrackId | null = null;
 
 const getActiveComposition = (): MusicComposition =>
   musicCompositions[activeTrackId];
 
 const getMusicState = (): ConsoleMusicState => ({
   activeTrackId,
+  playbackMode,
   defaults: { ...musicPreferences.defaults },
   enabled: audioEnabled,
   playing: musicRunning,
@@ -86,6 +129,7 @@ const getMusicState = (): ConsoleMusicState => ({
 
 const broadcastMusicState = () => {
   document.documentElement.dataset.musicTrack = activeTrackId;
+  document.documentElement.dataset.musicMode = playbackMode;
   window.dispatchEvent(
     new CustomEvent<ConsoleMusicState>("console:music-state", {
       detail: getMusicState(),
@@ -397,6 +441,36 @@ const scheduleMusicWindow = (runId: number, musicBus: GainNode) => {
   );
 };
 
+const clearShuffleAdvance = () => {
+  if (shuffleAdvanceTimer === null) return;
+  window.clearTimeout(shuffleAdvanceTimer);
+  shuffleAdvanceTimer = null;
+  delete document.documentElement.dataset.musicShuffleNextAt;
+};
+
+const scheduleShuffleAdvance = () => {
+  clearShuffleAdvance();
+  if (
+    playbackMode !== "shuffle" ||
+    !musicRunning ||
+    !audioEnabled ||
+    launchInProgress ||
+    document.hidden
+  ) {
+    return;
+  }
+  const duration =
+    SHUFFLE_MIN_DURATION_MS +
+    Math.random() * (SHUFFLE_MAX_DURATION_MS - SHUFFLE_MIN_DURATION_MS);
+  document.documentElement.dataset.musicShuffleNextAt = String(
+    Date.now() + duration,
+  );
+  shuffleAdvanceTimer = window.setTimeout(() => {
+    shuffleAdvanceTimer = null;
+    if (playbackMode === "shuffle") setTrack("shuffle");
+  }, duration);
+};
+
 const startMusic = () => {
   if (!audioEnabled || launchInProgress || document.hidden || musicRunning) {
     return;
@@ -437,10 +511,12 @@ const startMusic = () => {
     nextMusicBarAt = now + 0.08;
     scheduleMusicWindow(runId, musicBus);
     broadcastMusicState();
+    scheduleShuffleAdvance();
   });
 };
 
 const stopMusic = (fadeMs = 240) => {
+  clearShuffleAdvance();
   musicRunning = false;
   musicRunId += 1;
   if (musicTimer !== null) {
@@ -464,10 +540,10 @@ const stopMusic = (fadeMs = 240) => {
   broadcastMusicState();
 };
 
-const setTrack = (trackId: MusicTrackId) => {
-  if (!isMusicTrackId(trackId)) return;
+const applyActiveTrack = (trackId: MusicTrackId) => {
   if (activeTrackId === trackId) {
     if (!musicRunning) startMusic();
+    else scheduleShuffleAdvance();
     broadcastMusicState();
     return;
   }
@@ -478,13 +554,29 @@ const setTrack = (trackId: MusicTrackId) => {
   startMusic();
 };
 
-const setDefaultTrack = (theme: ConsoleTheme, trackId: MusicTrackId) => {
-  if (!isConsoleTheme(theme) || !isMusicTrackId(trackId)) return;
+const setTrack = (discId: MusicDiscId) => {
+  if (!isMusicDiscId(discId)) return;
+  if (discId === "shuffle") {
+    const nextTrackId = pickShuffleTrack(activeTrackId, previousShuffleTrackId);
+    previousShuffleTrackId = activeTrackId;
+    playbackMode = "shuffle";
+    applyActiveTrack(nextTrackId);
+    return;
+  }
+
+  playbackMode = discId;
+  previousShuffleTrackId = null;
+  clearShuffleAdvance();
+  applyActiveTrack(discId);
+};
+
+const setDefaultTrack = (theme: ConsoleTheme, discId: MusicDiscId) => {
+  if (!isConsoleTheme(theme) || !isMusicDiscId(discId)) return;
   musicPreferences = {
     version: 1,
     defaults: {
       ...musicPreferences.defaults,
-      [theme]: trackId,
+      [theme]: discId,
     },
   };
   storeMusicPreferences();

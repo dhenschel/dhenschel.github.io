@@ -13,12 +13,14 @@ type ConsoleSoundEffect =
 
 type ConsoleMusicTrackId =
   "home-pulse" | "blue-hour" | "soft-orbit" | "signal-garden";
+type ConsoleMusicDiscId = "shuffle" | ConsoleMusicTrackId;
 
 type ConsoleTheme = "light" | "dark";
 
 interface ConsoleMusicState {
   activeTrackId: ConsoleMusicTrackId;
-  defaults: Record<ConsoleTheme, ConsoleMusicTrackId>;
+  playbackMode: ConsoleMusicDiscId;
+  defaults: Record<ConsoleTheme, ConsoleMusicDiscId>;
   enabled: boolean;
   playing: boolean;
 }
@@ -31,8 +33,8 @@ interface ConsoleAudioController {
   setEnabled: (enabled: boolean) => void;
   isEnabled: () => boolean;
   getMusicState: () => ConsoleMusicState;
-  setTrack: (trackId: ConsoleMusicTrackId) => void;
-  setDefaultTrack: (theme: ConsoleTheme, trackId: ConsoleMusicTrackId) => void;
+  setTrack: (trackId: ConsoleMusicDiscId) => void;
+  setDefaultTrack: (theme: ConsoleTheme, trackId: ConsoleMusicDiscId) => void;
 }
 
 interface Window {

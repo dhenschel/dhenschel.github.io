@@ -26,7 +26,7 @@ export const shuffleDisc = {
   title: "Shuffle",
   shortTitle: "SHUFFLE",
   description:
-    "Wählt bei jedem Start zufällig eine der CDs aus deinem persönlichen Pool.",
+    "Wählt zufällig eine CD aus deinem persönlichen Pool und wechselt nach einer Weile automatisch weiter.",
   color: "#aeb6c1",
   colorDark: "#5d6875",
   label: "Zufall",
@@ -81,14 +81,19 @@ export const musicTracks: readonly MusicTrack[] = [
   },
 ] as const;
 
-export const defaultMusicByTheme: Record<ConsoleTheme, MusicTrackId> = {
+export const defaultMusicByTheme: Record<ConsoleTheme, MusicDiscId> = {
   light: "home-pulse",
   dark: "blue-hour",
 };
 
+export const shufflePoolStorageKey = "dh-console-shuffle-pool-v1";
+
 export const isMusicTrackId = (value: unknown): value is MusicTrackId =>
   typeof value === "string" &&
   (musicTrackIds as readonly string[]).includes(value);
+
+export const isMusicDiscId = (value: unknown): value is MusicDiscId =>
+  value === "shuffle" || isMusicTrackId(value);
 
 export const isConsoleTheme = (value: unknown): value is ConsoleTheme =>
   value === "light" || value === "dark";

@@ -108,7 +108,7 @@ const de: Record<string, string> = {
   "music.shuffle.title": "Shuffle",
   "music.shuffle.label": "Zufall",
   "music.shuffle.description":
-    "Wählt bei jedem Start zufällig eine CD aus deinem persönlichen Pool – direkte Wiederholungen werden nach Möglichkeit vermieden.",
+    "Wählt zufällig aus deinem persönlichen Pool und wechselt nach einer Weile automatisch zur nächsten CD – direkte Wiederholungen werden vermieden.",
   "music.shuffle.play": "Shuffle starten",
   "music.shuffle.again": "Neu mischen",
   "music.shuffle.playAria": "Eine zufällige CD aus dem Shuffle-Pool abspielen",
@@ -117,13 +117,14 @@ const de: Record<string, string> = {
   "music.shuffle.pool": "Pool",
   "music.shuffle.eyebrow": "Zufallsauswahl",
   "music.shuffle.poolTitle": "Shuffle-Pool",
-  "music.shuffle.poolDescription": "Wähle die CDs, die Shuffle verwenden darf.",
+  "music.shuffle.poolDescription":
+    "Wähle mindestens zwei CDs, zwischen denen Shuffle wechseln darf.",
   "music.shuffle.poolClose": "Shuffle-Pool schließen",
   "music.shuffle.poolCount": "{{count}} CDs",
   "music.shuffle.poolCountOne": "{{count}} CD",
   "music.shuffle.poolOpenWithCount":
     "Shuffle-Pool auswählen, aktuell {{count}} CDs",
-  "music.shuffle.poolMinimum": "Mindestens eine CD muss im Pool bleiben.",
+  "music.shuffle.poolMinimum": "Mindestens zwei CDs müssen im Pool bleiben.",
   "music.track.home.label": "Tag-System",
   "music.track.home.description":
     "Leichte Akkordimpulse, freundliche Bass-Bloops und kleine digitale Antworten.",
@@ -316,7 +317,7 @@ const en: Record<string, string> = {
   "music.shuffle.title": "Shuffle",
   "music.shuffle.label": "Random",
   "music.shuffle.description":
-    "Selects a random disc from your personal pool each time it starts, avoiding direct repeats whenever possible.",
+    "Selects from your personal pool and automatically changes to another disc after a while, without direct repeats.",
   "music.shuffle.play": "Start shuffle",
   "music.shuffle.again": "Shuffle again",
   "music.shuffle.playAria": "Play a random disc from the shuffle pool",
@@ -326,13 +327,13 @@ const en: Record<string, string> = {
   "music.shuffle.eyebrow": "Random selection",
   "music.shuffle.poolTitle": "Shuffle pool",
   "music.shuffle.poolDescription":
-    "Choose the discs that Shuffle is allowed to use.",
+    "Choose at least two discs that Shuffle is allowed to switch between.",
   "music.shuffle.poolClose": "Close shuffle pool",
   "music.shuffle.poolCount": "{{count}} discs",
   "music.shuffle.poolCountOne": "{{count}} disc",
   "music.shuffle.poolOpenWithCount":
     "Choose shuffle pool, currently {{count}} discs",
-  "music.shuffle.poolMinimum": "At least one disc must remain in the pool.",
+  "music.shuffle.poolMinimum": "At least two discs must remain in the pool.",
   "music.track.home.label": "Day System",
   "music.track.home.description":
     "Light chord pulses, friendly bass bloops and small digital replies.",
@@ -516,7 +517,7 @@ const fr: Record<string, string> = {
   "music.shuffle.title": "Aléatoire",
   "music.shuffle.label": "Hasard",
   "music.shuffle.description":
-    "Choisit un disque au hasard dans votre sélection à chaque démarrage, en évitant si possible les répétitions directes.",
+    "Choisit un disque dans votre sélection et passe automatiquement à un autre après un moment, sans répétition directe.",
   "music.shuffle.play": "Lancer l’aléatoire",
   "music.shuffle.again": "Relancer",
   "music.shuffle.playAria":
@@ -527,14 +528,14 @@ const fr: Record<string, string> = {
   "music.shuffle.eyebrow": "Choix aléatoire",
   "music.shuffle.poolTitle": "Sélection aléatoire",
   "music.shuffle.poolDescription":
-    "Choisissez les disques que le mode aléatoire peut utiliser.",
+    "Choisissez au moins deux disques entre lesquels le mode aléatoire peut alterner.",
   "music.shuffle.poolClose": "Fermer la sélection aléatoire",
   "music.shuffle.poolCount": "{{count}} disques",
   "music.shuffle.poolCountOne": "{{count}} disque",
   "music.shuffle.poolOpenWithCount":
     "Choisir la sélection aléatoire, actuellement {{count}} disques",
   "music.shuffle.poolMinimum":
-    "Au moins un disque doit rester dans la sélection.",
+    "Au moins deux disques doivent rester dans la sélection.",
   "music.track.home.label": "Système jour",
   "music.track.home.description":
     "Des accords légers, des basses amicales et de petites réponses numériques.",
@@ -721,7 +722,7 @@ const es: Record<string, string> = {
   "music.shuffle.title": "Aleatorio",
   "music.shuffle.label": "Azar",
   "music.shuffle.description":
-    "Selecciona un disco al azar de tu colección cada vez que se inicia y evita repeticiones directas cuando es posible.",
+    "Selecciona un disco de tu colección y cambia automáticamente a otro después de un rato, sin repeticiones directas.",
   "music.shuffle.play": "Iniciar aleatorio",
   "music.shuffle.again": "Mezclar de nuevo",
   "music.shuffle.playAria":
@@ -732,13 +733,14 @@ const es: Record<string, string> = {
   "music.shuffle.eyebrow": "Selección aleatoria",
   "music.shuffle.poolTitle": "Colección aleatoria",
   "music.shuffle.poolDescription":
-    "Elige los discos que puede utilizar el modo aleatorio.",
+    "Elige al menos dos discos entre los que puede alternar el modo aleatorio.",
   "music.shuffle.poolClose": "Cerrar la colección aleatoria",
   "music.shuffle.poolCount": "{{count}} discos",
   "music.shuffle.poolCountOne": "{{count}} disco",
   "music.shuffle.poolOpenWithCount":
     "Elegir colección aleatoria, actualmente {{count}} discos",
-  "music.shuffle.poolMinimum": "Debe quedar al menos un disco en la colección.",
+  "music.shuffle.poolMinimum":
+    "Deben quedar al menos dos discos en la colección.",
   "music.track.home.label": "Sistema diurno",
   "music.track.home.description":
     "Impulsos de acordes ligeros, bajos simpáticos y pequeñas respuestas digitales.",

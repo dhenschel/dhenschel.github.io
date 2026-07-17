@@ -70,22 +70,30 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
                   </small>
                   <strong>{track.shortTitle}</strong>
                   {track.id === "shuffle" && (
-                    <span class="music-disc__question">?</span>
+                    <span class="music-disc__question-pattern">
+                      <span class="music-disc__question-main">?</span>
+                      {Array.from({ length: 8 }, (_, questionIndex) => (
+                        <span
+                          class="music-disc__question-orbit"
+                          style={`--question-angle: ${questionIndex * 45}deg;`}
+                        >
+                          ?
+                        </span>
+                      ))}
+                    </span>
                   )}
                   <i />
                 </span>
                 <span class="music-disc__hole" />
               </span>
-              {track.id !== "shuffle" && (
-                <span class="music-disc__badges" aria-hidden="true">
-                  <span data-music-default-badge="light" hidden>
-                    ☀
-                  </span>
-                  <span data-music-default-badge="dark" hidden>
-                    ☾
-                  </span>
+              <span class="music-disc__badges" aria-hidden="true">
+                <span data-music-default-badge="light" hidden>
+                  ☀
                 </span>
-              )}
+                <span data-music-default-badge="dark" hidden>
+                  ☾
+                </span>
+              </span>
               <span class="visually-hidden" data-music-disc-status />
             </button>
           ))
@@ -191,7 +199,11 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
                 aria-pressed="true"
                 style={`--pool-disc-color: ${track.color}; --pool-disc-color-dark: ${track.colorDark};`}
               >
-                <span aria-hidden="true">
+                <span
+                  class="music-pool-disc"
+                  data-pool-track-id={track.id}
+                  aria-hidden="true"
+                >
                   <i />
                 </span>
                 <strong>{track.title}</strong>
@@ -213,6 +225,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     musicTrackIds,
     musicTracks,
     shuffleDisc,
+    shufflePoolStorageKey,
     type ConsoleTheme,
     type MusicDiscId,
     type MusicTrackId,
@@ -220,7 +233,6 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
   import { t } from "../scripts/i18n";
 
   const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
-  const shufflePoolStorageKey = "dh-console-shuffle-pool-v1";
 
   const musicDiscs = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-music-disc]"),
@@ -277,6 +289,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
   let selectedMusicIndex = 0;
   let musicState: ConsoleMusicState = {
     activeTrackId: "home-pulse",
+    playbackMode: "home-pulse",
     defaults: { light: "home-pulse", dark: "blue-hour" },
     enabled: true,
     playing: false,
@@ -285,9 +298,6 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
   let musicWheelLockedUntil = 0;
   let musicWheelResetTimer: number | null = null;
   let musicDiscActivationLockedUntil = 0;
-  let shuffleIsActive = false;
-  let lastShuffleTrackId: MusicTrackId | null = null;
-
   const loadShufflePool = (): MusicTrackId[] => {
     try {
       const stored = JSON.parse(
@@ -295,7 +305,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
       );
       if (!Array.isArray(stored)) return [...musicTrackIds];
       const valid = musicTrackIds.filter((trackId) => stored.includes(trackId));
-      return valid.length > 0 ? valid : [...musicTrackIds];
+      return valid.length >= 2 ? valid : [...musicTrackIds];
     } catch {
       return [...musicTrackIds];
     }
@@ -350,9 +360,10 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     musicDiscs.forEach((disc) => {
       const discId = disc.dataset.trackId as MusicDiscId;
       const isShuffle = discId === "shuffle";
-      const isActive = shuffleIsActive
-        ? isShuffle
-        : discId === musicState.activeTrackId;
+      const isActive =
+        musicState.playbackMode === "shuffle"
+          ? isShuffle
+          : discId === musicState.activeTrackId;
       disc.dataset.activeTrack = String(isActive);
       disc.setAttribute("aria-pressed", String(isActive));
       if (!isActive) {
@@ -383,12 +394,10 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 
     const selectedDisc = getSelectedDisc();
     const selectedIsShuffle = selectedDisc.id === "shuffle";
-    const selectedIsActive = selectedIsShuffle
-      ? shuffleIsActive
-      : selectedDisc.id === musicState.activeTrackId;
+    const selectedIsActive = selectedDisc.id === musicState.playbackMode;
     if (musicPlayLabel) {
       musicPlayLabel.textContent = selectedIsShuffle
-        ? t(shuffleIsActive ? "music.shuffle.again" : "music.shuffle.play")
+        ? t(selectedIsActive ? "music.shuffle.again" : "music.shuffle.play")
         : selectedIsActive && musicState.playing
           ? t("music.playing")
           : t("music.listen");
@@ -406,7 +415,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
         (track) => track.id === musicState.activeTrackId,
       );
       musicPlayingStatus.textContent = selectedIsShuffle
-        ? shuffleIsActive && activeTrack
+        ? selectedIsActive && activeTrack
           ? t("music.shuffle.playing", { title: activeTrack.title })
           : t("music.shuffle.hint")
         : selectedIsActive
@@ -422,12 +431,10 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 
     musicDefaultButtons.forEach((button) => {
       const theme = button.dataset.musicDefault as ConsoleTheme;
-      button.hidden = selectedIsShuffle;
+      button.hidden = false;
       button.setAttribute(
         "aria-pressed",
-        String(
-          !selectedIsShuffle && musicState.defaults[theme] === selectedDisc.id,
-        ),
+        String(musicState.defaults[theme] === selectedDisc.id),
       );
     });
     if (shufflePoolOpen) {
@@ -512,7 +519,6 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
       Math.min(musicLibraryDiscs.length - 1, selectedMusicIndex + direction),
     );
     if (nextIndex === selectedMusicIndex) return false;
-    if (musicLibraryDiscs[nextIndex]?.id !== "shuffle") shuffleIsActive = false;
     closeShufflePool();
     selectedMusicIndex = nextIndex;
     updateMusicCarousel(focusDisc);
@@ -523,39 +529,15 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 
   const selectActiveMusic = (focusDisc = false) => {
     const activeIndex = musicLibraryDiscs.findIndex(
-      (disc) => disc.id === musicState.activeTrackId,
+      (disc) => disc.id === musicState.playbackMode,
     );
     if (activeIndex >= 0) selectedMusicIndex = activeIndex;
     updateMusicCarousel(focusDisc);
   };
 
-  const pickShuffleTrack = () => {
-    let candidates = shufflePool.filter(
-      (trackId) => trackId !== musicState.activeTrackId,
-    );
-    if (candidates.length === 0) candidates = [...shufflePool];
-    if (candidates.length > 1 && lastShuffleTrackId) {
-      const withoutLast = candidates.filter(
-        (trackId) => trackId !== lastShuffleTrackId,
-      );
-      if (withoutLast.length > 0) candidates = withoutLast;
-    }
-    return candidates[Math.floor(Math.random() * candidates.length)];
-  };
-
   const playSelectedMusic = (withKeyboardSound = false) => {
     const selectedDisc = getSelectedDisc();
     if (withKeyboardSound) window.consoleAudio?.play("confirm");
-    if (selectedDisc.id === "shuffle") {
-      const randomTrackId = pickShuffleTrack();
-      if (!randomTrackId) return;
-      shuffleIsActive = true;
-      lastShuffleTrackId = randomTrackId;
-      window.consoleAudio?.setTrack(randomTrackId);
-      updateMusicState();
-      return;
-    }
-    shuffleIsActive = false;
     window.consoleAudio?.setTrack(selectedDisc.id);
   };
 
@@ -602,7 +584,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     option.addEventListener("click", () => {
       const trackId = option.dataset.shuffleOption as MusicTrackId;
       const isIncluded = shufflePool.includes(trackId);
-      if (isIncluded && shufflePool.length === 1) {
+      if (isIncluded && shufflePool.length === 2) {
         updateShufflePoolUi(t("music.shuffle.poolMinimum"));
         window.consoleAudio?.play("boundary");
         return;
@@ -700,9 +682,6 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     disc.addEventListener("click", (event) => {
       if (index !== selectedMusicIndex) {
         event.stopPropagation();
-        if (musicLibraryDiscs[index]?.id !== "shuffle") {
-          shuffleIsActive = false;
-        }
         closeShufflePool();
         selectedMusicIndex = index;
         musicDiscActivationLockedUntil = performance.now() + 520;
@@ -719,7 +698,6 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     button.addEventListener("click", () => {
       const theme = button.dataset.musicDefault as ConsoleTheme;
       const selectedDisc = getSelectedDisc();
-      if (selectedDisc.id === "shuffle") return;
       window.consoleAudio?.setDefaultTrack(theme, selectedDisc.id);
     });
   });
@@ -750,13 +728,12 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 
   window.addEventListener("console:music-state", (event) => {
     const nextState = (event as CustomEvent<ConsoleMusicState>).detail;
-    const activeTrackChanged =
-      nextState.activeTrackId !== musicState.activeTrackId;
+    const playbackModeChanged =
+      nextState.playbackMode !== musicState.playbackMode;
     musicState = nextState;
     if (
-      activeTrackChanged &&
-      document.documentElement.dataset.consoleView === "music" &&
-      !(shuffleIsActive && getSelectedDisc().id === "shuffle")
+      playbackModeChanged &&
+      document.documentElement.dataset.consoleView === "music"
     ) {
       selectActiveMusic();
     } else {
@@ -769,7 +746,6 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     if (view === "music") {
       selectActiveMusic();
     } else {
-      shuffleIsActive = false;
       closeShufflePool();
     }
   });
@@ -779,10 +755,6 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     updateMusicCarousel();
   });
   window.addEventListener("console:input-mode-changed", updateMusicState);
-  window.addEventListener("console:theme-changed", () => {
-    shuffleIsActive = false;
-  });
-
   const initialMusicState = window.consoleAudio?.getMusicState();
   if (initialMusicState) musicState = initialMusicState;
   updateShufflePoolUi();
