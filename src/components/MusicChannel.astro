@@ -162,7 +162,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
           <i></i><i></i><i></i>
         </span>
         <strong data-i18n="music.shuffle.pool">Pool</strong>
-        <small data-shuffle-pool-count>4 CDs</small>
+        <small data-shuffle-pool-count>{musicTracks.length} CDs</small>
       </button>
     </div>
 
@@ -215,7 +215,9 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
           }
         </div>
         <footer>
-          <span data-shuffle-pool-status aria-live="polite">4 CDs im Pool</span>
+          <span data-shuffle-pool-status aria-live="polite"
+            >{musicTracks.length} CDs im Pool</span
+          >
         </footer>
       </div>
     </dialog>
@@ -226,6 +228,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
   import {
     musicTrackIds,
     musicTracks,
+    normalizeShufflePool,
     shuffleDisc,
     shufflePoolStorageKey,
     type ConsoleTheme,
@@ -305,9 +308,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
       const stored = JSON.parse(
         localStorage.getItem(shufflePoolStorageKey) ?? "null",
       );
-      if (!Array.isArray(stored)) return [...musicTrackIds];
-      const valid = musicTrackIds.filter((trackId) => stored.includes(trackId));
-      return valid.length >= 2 ? valid : [...musicTrackIds];
+      return normalizeShufflePool(stored);
     } catch {
       return [...musicTrackIds];
     }

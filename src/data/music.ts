@@ -1,6 +1,7 @@
 export const musicTrackIds = [
   "home-pulse",
   "blue-hour",
+  "collection-lounge",
   "soft-orbit",
   "signal-garden",
 ] as const;
@@ -11,7 +12,7 @@ export type ConsoleTheme = "light" | "dark";
 
 export type MusicTrack = {
   id: MusicTrackId;
-  translationKey: "home" | "night" | "orbit" | "signal";
+  translationKey: "home" | "night" | "lounge" | "orbit" | "signal";
   title: string;
   shortTitle: string;
   description: string;
@@ -56,6 +57,17 @@ export const musicTracks: readonly MusicTrack[] = [
     label: "Night System",
   },
   {
+    id: "collection-lounge",
+    translationKey: "lounge",
+    title: "Collection Lounge",
+    shortTitle: "LOUNGE",
+    description:
+      "Leichter Lounge-Jazz mit warmem E-Piano, weichem Bass, Besen, Vibraphon und zurückhaltender Flöte.",
+    color: "#c77778",
+    colorDark: "#74435d",
+    label: "Collection Jazz",
+  },
+  {
     id: "soft-orbit",
     translationKey: "orbit",
     title: "Soft Orbit",
@@ -87,6 +99,23 @@ export const defaultMusicByTheme: Record<ConsoleTheme, MusicDiscId> = {
 };
 
 export const shufflePoolStorageKey = "dh-console-shuffle-pool-v1";
+
+const preLoungeMusicTrackIds: readonly MusicTrackId[] = [
+  "home-pulse",
+  "blue-hour",
+  "soft-orbit",
+  "signal-garden",
+];
+
+export const normalizeShufflePool = (value: unknown): MusicTrackId[] => {
+  if (!Array.isArray(value)) return [...musicTrackIds];
+  const selected = musicTrackIds.filter((trackId) => value.includes(trackId));
+  const previouslySelectedEverything = preLoungeMusicTrackIds.every((trackId) =>
+    value.includes(trackId),
+  );
+  if (previouslySelectedEverything) return [...musicTrackIds];
+  return selected.length >= 2 ? selected : [...musicTrackIds];
+};
 
 export const isMusicTrackId = (value: unknown): value is MusicTrackId =>
   typeof value === "string" &&

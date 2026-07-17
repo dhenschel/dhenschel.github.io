@@ -135,6 +135,9 @@ const de: Record<string, string> = {
   "music.track.night.label": "Nacht-System",
   "music.track.night.description":
     "Gedämpfte Keys, ein ruhiger tiefer Puls und zurückhaltende Motive für den Dark Mode.",
+  "music.track.lounge.label": "Sammlungs-Lounge",
+  "music.track.lounge.description":
+    "Leichter Lounge-Jazz mit warmem E-Piano, weichem E-Bass, Besen, Vibraphon und einer zurückhaltenden Flöte – entspannt wie das Durchstöbern einer Sammlung.",
   "music.track.orbit.label": "Früher 02",
   "music.track.orbit.description":
     "Der frühere, schwebende Ansatz mit langen Flächen und ruhigen Melodiebögen.",
@@ -348,6 +351,9 @@ const en: Record<string, string> = {
   "music.track.night.label": "Night System",
   "music.track.night.description":
     "Muted keys, a calm low pulse and restrained motifs for Dark Mode.",
+  "music.track.lounge.label": "Collection Lounge",
+  "music.track.lounge.description":
+    "Light lounge jazz with warm electric piano, soft electric bass, brushes, vibraphone and restrained flute – relaxed like browsing a collection.",
   "music.track.orbit.label": "Legacy 02",
   "music.track.orbit.description":
     "The earlier floating approach with long pads and calm melodic arcs.",
@@ -554,6 +560,9 @@ const fr: Record<string, string> = {
   "music.track.night.label": "Système nuit",
   "music.track.night.description":
     "Des touches feutrées, une pulsation grave calme et des motifs discrets pour le mode sombre.",
+  "music.track.lounge.label": "Salon de collection",
+  "music.track.lounge.description":
+    "Un jazz lounge léger avec piano électrique chaleureux, basse douce, balais, vibraphone et flûte discrète – comme une collection que l’on parcourt tranquillement.",
   "music.track.orbit.label": "Archive 02",
   "music.track.orbit.description":
     "L’ancienne approche aérienne avec de longues nappes et des courbes mélodiques calmes.",
@@ -764,6 +773,9 @@ const es: Record<string, string> = {
   "music.track.night.label": "Sistema nocturno",
   "music.track.night.description":
     "Teclas suaves, un pulso grave tranquilo y motivos discretos para el modo oscuro.",
+  "music.track.lounge.label": "Salón de colección",
+  "music.track.lounge.description":
+    "Jazz lounge ligero con piano eléctrico cálido, bajo suave, escobillas, vibráfono y flauta discreta: relajado como explorar una colección.",
   "music.track.orbit.label": "Archivo 02",
   "music.track.orbit.description":
     "El enfoque flotante anterior con capas largas y arcos melódicos tranquilos.",

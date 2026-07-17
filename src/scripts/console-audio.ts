@@ -3,6 +3,7 @@ import {
   isConsoleTheme,
   isMusicDiscId,
   musicTrackIds,
+  normalizeShufflePool,
   shufflePoolStorageKey,
   type ConsoleTheme,
   type MusicDiscId,
@@ -85,9 +86,7 @@ const readShufflePool = (): MusicTrackId[] => {
     const stored = JSON.parse(
       localStorage.getItem(shufflePoolStorageKey) ?? "null",
     );
-    if (!Array.isArray(stored)) return [...musicTrackIds];
-    const valid = musicTrackIds.filter((trackId) => stored.includes(trackId));
-    return valid.length >= 2 ? valid : [...musicTrackIds];
+    return normalizeShufflePool(stored);
   } catch {
     return [...musicTrackIds];
   }

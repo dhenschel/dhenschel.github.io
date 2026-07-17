@@ -11,6 +11,12 @@ type OrbitScene = {
   pad: readonly number[];
 };
 
+type LoungeScene = {
+  bass: readonly [number, number, number];
+  chord: readonly number[];
+  compPattern: number;
+};
+
 type MotifNote = readonly [
   beat: number,
   scaleDegree: number,
@@ -239,6 +245,272 @@ const scheduleSoftTick = (
   oscillator.connect(filter).connect(envelope).connect(destination);
   oscillator.start(start);
   oscillator.stop(end + 0.02);
+};
+
+const scheduleElectricPianoChord = (
+  context: AudioContext,
+  destination: AudioNode,
+  notes: readonly number[],
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 1.05);
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const fundamentalMix = context.createGain();
+  const warmthMix = context.createGain();
+  const tineMix = context.createGain();
+
+  filter.type = "lowpass";
+  filter.Q.value = 0.58;
+  filter.frequency.setValueAtTime(4300, start);
+  filter.frequency.exponentialRampToValueAtTime(1750, end);
+  fundamentalMix.gain.value = 0.7;
+  warmthMix.gain.value = 0.07;
+  tineMix.gain.value = 0.018;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.014);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.38, start + 0.24);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  fundamentalMix.connect(filter);
+  warmthMix.connect(filter);
+  tineMix.connect(filter);
+  filter.connect(envelope).connect(destination);
+
+  notes.forEach((note, index) => {
+    const frequency = midiToFrequency(note);
+    const detune = (index - (notes.length - 1) / 2) * 0.38;
+    const fundamental = context.createOscillator();
+    const warmth = context.createOscillator();
+    const tine = context.createOscillator();
+
+    fundamental.type = "sine";
+    fundamental.frequency.value = frequency;
+    fundamental.detune.value = detune;
+    warmth.type = "triangle";
+    warmth.frequency.value = frequency * 2;
+    warmth.detune.value = -detune;
+    tine.type = "sine";
+    tine.frequency.value = frequency * 3;
+    tine.detune.value = 2.5 - detune;
+    fundamental.connect(fundamentalMix);
+    warmth.connect(warmthMix);
+    tine.connect(tineMix);
+    fundamental.start(start);
+    warmth.start(start);
+    tine.start(start);
+    fundamental.stop(end + 0.04);
+    warmth.stop(end + 0.04);
+    tine.stop(end + 0.04);
+  });
+};
+
+const scheduleElectricBass = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.42);
+  const fundamental = context.createOscillator();
+  const fingerTone = context.createOscillator();
+  const fingerMix = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  fundamental.type = "sine";
+  fundamental.frequency.setValueAtTime(frequency * 1.012, start);
+  fundamental.frequency.exponentialRampToValueAtTime(frequency, start + 0.08);
+  fingerTone.type = "triangle";
+  fingerTone.frequency.value = frequency * 2;
+  fingerMix.gain.value = 0.055;
+  filter.type = "lowpass";
+  filter.Q.value = 0.55;
+  filter.frequency.setValueAtTime(720, start);
+  filter.frequency.exponentialRampToValueAtTime(290, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.018);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.52, start + 0.2);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  fundamental.connect(filter);
+  fingerTone.connect(fingerMix).connect(filter);
+  filter.connect(envelope).connect(destination);
+  fundamental.start(start);
+  fingerTone.start(start);
+  fundamental.stop(end + 0.04);
+  fingerTone.stop(end + 0.04);
+};
+
+const brushNoiseBuffers = new WeakMap<AudioContext, AudioBuffer>();
+
+const getBrushNoiseBuffer = (context: AudioContext) => {
+  const cached = brushNoiseBuffers.get(context);
+  if (cached) return cached;
+  const duration = 1.2;
+  const length = Math.max(1, Math.ceil(context.sampleRate * duration));
+  const buffer = context.createBuffer(1, length, context.sampleRate);
+  const channel = buffer.getChannelData(0);
+  for (let index = 0; index < length; index += 1) {
+    channel[index] = Math.random() * 2 - 1;
+  }
+  brushNoiseBuffers.set(context, buffer);
+  return buffer;
+};
+
+const scheduleBrushSweep = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + duration;
+  const source = context.createBufferSource();
+  const highpass = context.createBiquadFilter();
+  const bandpass = context.createBiquadFilter();
+  const envelope = context.createGain();
+
+  source.buffer = getBrushNoiseBuffer(context);
+  highpass.type = "highpass";
+  highpass.frequency.value = 820;
+  bandpass.type = "bandpass";
+  bandpass.frequency.setValueAtTime(2900, start);
+  bandpass.frequency.exponentialRampToValueAtTime(1850, end);
+  bandpass.Q.value = 0.5;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.022);
+  envelope.gain.exponentialRampToValueAtTime(
+    level * 0.36,
+    start + duration * 0.46,
+  );
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  source
+    .connect(highpass)
+    .connect(bandpass)
+    .connect(envelope)
+    .connect(destination);
+  const offsetRange = Math.max(0, source.buffer.duration - duration - 0.04);
+  source.start(start, Math.random() * offsetRange);
+  source.stop(end + 0.03);
+};
+
+const scheduleSoftKick = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  level: number,
+) => {
+  const end = start + 0.16;
+  const oscillator = context.createOscillator();
+  const envelope = context.createGain();
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(92, start);
+  oscillator.frequency.exponentialRampToValueAtTime(54, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.008);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  oscillator.connect(envelope).connect(destination);
+  oscillator.start(start);
+  oscillator.stop(end + 0.02);
+};
+
+const scheduleVibraphone = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 1.15);
+  const fundamental = context.createOscillator();
+  const overtone = context.createOscillator();
+  const overtoneMix = context.createGain();
+  const tremolo = context.createGain();
+  const tremoloOscillator = context.createOscillator();
+  const tremoloDepth = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  fundamental.type = "sine";
+  fundamental.frequency.value = frequency;
+  overtone.type = "sine";
+  overtone.frequency.value = frequency * 4;
+  overtoneMix.gain.value = 0.095;
+  tremolo.gain.value = 0.84;
+  tremoloOscillator.type = "sine";
+  tremoloOscillator.frequency.value = 5.15;
+  tremoloDepth.gain.value = 0.16;
+  filter.type = "lowpass";
+  filter.frequency.value = 5100;
+  filter.Q.value = 0.42;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.012);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.44, start + 0.38);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  fundamental.connect(tremolo);
+  overtone.connect(overtoneMix).connect(tremolo);
+  tremoloOscillator.connect(tremoloDepth).connect(tremolo.gain);
+  tremolo.connect(filter).connect(envelope).connect(destination);
+  fundamental.start(start);
+  overtone.start(start);
+  tremoloOscillator.start(start);
+  fundamental.stop(end + 0.04);
+  overtone.stop(end + 0.04);
+  tremoloOscillator.stop(end + 0.04);
+};
+
+const scheduleSoftFlute = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.68);
+  const fundamental = context.createOscillator();
+  const air = context.createOscillator();
+  const airMix = context.createGain();
+  const vibrato = context.createOscillator();
+  const vibratoDepth = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  fundamental.type = "sine";
+  fundamental.frequency.value = frequency;
+  air.type = "triangle";
+  air.frequency.value = frequency * 2;
+  airMix.gain.value = 0.028;
+  vibrato.type = "sine";
+  vibrato.frequency.value = 4.65;
+  vibratoDepth.gain.value = 5.5;
+  filter.type = "lowpass";
+  filter.Q.value = 0.4;
+  filter.frequency.value = 2750;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.13);
+  envelope.gain.setValueAtTime(level * 0.88, Math.max(start + 0.2, end - 0.22));
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  vibrato.connect(vibratoDepth);
+  vibratoDepth.connect(fundamental.detune);
+  vibratoDepth.connect(air.detune);
+  fundamental.connect(filter);
+  air.connect(airMix).connect(filter);
+  filter.connect(envelope).connect(destination);
+  fundamental.start(start);
+  air.start(start);
+  vibrato.start(start);
+  fundamental.stop(end + 0.04);
+  air.stop(end + 0.04);
+  vibrato.stop(end + 0.04);
 };
 
 const schedulePadChord = (
@@ -679,6 +951,244 @@ const scheduleNightBar = (options: ScheduleBarOptions) => {
   );
 };
 
+const LOUNGE_VIBE_SCALE = [67, 69, 71, 72, 74, 76, 77, 79, 81] as const;
+const LOUNGE_FLUTE_SCALE = [72, 74, 76, 77, 79, 81, 83, 84] as const;
+const LOUNGE_SCENES: readonly LoungeScene[] = [
+  {
+    bass: [36, 43, 47],
+    chord: [52, 55, 59, 62, 64],
+    compPattern: 0,
+  },
+  {
+    bass: [45, 52, 55],
+    chord: [55, 59, 61, 64, 66],
+    compPattern: 1,
+  },
+  {
+    bass: [38, 45, 48],
+    chord: [53, 57, 60, 64, 67],
+    compPattern: 2,
+  },
+  {
+    bass: [43, 50, 52],
+    chord: [53, 57, 59, 64, 69],
+    compPattern: 3,
+  },
+  {
+    bass: [40, 47, 50],
+    chord: [55, 59, 62, 66, 69],
+    compPattern: 1,
+  },
+  {
+    bass: [45, 52, 55],
+    chord: [55, 59, 61, 64, 66],
+    compPattern: 2,
+  },
+  {
+    bass: [38, 45, 48],
+    chord: [53, 57, 60, 64, 67],
+    compPattern: 0,
+  },
+  {
+    bass: [43, 50, 47],
+    chord: [53, 57, 59, 64, 69],
+    compPattern: 3,
+  },
+];
+const LOUNGE_COMPING: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 1.35, 0.9],
+    [2.67, 0.82, 0.5],
+  ],
+  [
+    [0.67, 0.68, 0.46],
+    [2, 0.94, 0.74],
+    [3.67, 0.3, 0.32],
+  ],
+  [
+    [0, 0.88, 0.7],
+    [1.67, 0.62, 0.46],
+    [3, 0.76, 0.58],
+  ],
+  [
+    [0.34, 0.68, 0.44],
+    [2.34, 0.9, 0.72],
+  ],
+];
+const LOUNGE_BASS: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 0.9, 0.84],
+    [2, 0.62, 0.52],
+    [3.34, 0.34, 0.34],
+  ],
+  [
+    [0.34, 0.62, 0.5],
+    [1.67, 0.76, 0.7],
+    [3.34, 0.34, 0.36],
+  ],
+  [
+    [0, 0.82, 0.74],
+    [2.67, 0.62, 0.56],
+    [3.67, 0.25, 0.28],
+  ],
+  [
+    [0.67, 0.58, 0.46],
+    [2, 0.78, 0.72],
+    [3.33, 0.34, 0.34],
+  ],
+];
+const LOUNGE_VIBE_MOTIFS: readonly (readonly MotifNote[])[] = [
+  [
+    [0.68, 2, 0.54, 0.7],
+    [1.66, 4, 0.62, 0.58],
+    [3, 3, 0.78, 0.5],
+  ],
+  [
+    [1.34, 1, 0.5, 0.5],
+    [2.32, 2, 0.56, 0.62],
+    [3.34, 5, 0.52, 0.46],
+  ],
+  [
+    [0.34, 4, 0.48, 0.48],
+    [1, 3, 0.48, 0.56],
+    [2.67, 1, 0.82, 0.52],
+  ],
+  [
+    [0.66, 0, 0.54, 0.46],
+    [2, 2, 0.62, 0.56],
+    [3, 3, 0.7, 0.5],
+  ],
+  [
+    [1.68, 6, 0.48, 0.4],
+    [2.34, 5, 0.52, 0.48],
+    [3.34, 3, 0.54, 0.4],
+  ],
+];
+const LOUNGE_FLUTE_MOTIFS: readonly (readonly MotifNote[])[] = [
+  [
+    [1.66, 2, 0.62, 0.54],
+    [2.66, 3, 0.76, 0.48],
+  ],
+  [
+    [0.68, 4, 0.58, 0.44],
+    [1.66, 3, 0.58, 0.48],
+    [2.66, 1, 0.88, 0.42],
+  ],
+  [
+    [1, 1, 0.68, 0.4],
+    [2, 2, 0.62, 0.46],
+  ],
+  [
+    [0.66, 5, 0.54, 0.36],
+    [1.66, 4, 0.62, 0.42],
+    [3, 2, 0.76, 0.38],
+  ],
+];
+const LOUNGE_VIBE_PHRASES: readonly (readonly (number | null)[])[] = [
+  [0, null, 1, 4, 2, null, 3, null],
+  [0, 3, null, 1, null, 4, 2, null],
+  [null, 1, 3, null, 0, 4, null, 2],
+  [2, null, 0, 4, null, 3, 1, null],
+];
+const LOUNGE_FLUTE_PHRASES: readonly (readonly (number | null)[])[] = [
+  [null, null, null, 0, null, null, null, 1],
+  [null, null, 2, null, null, null, 0, null],
+  [null, 1, null, null, null, 2, null, null],
+  [null, null, null, 3, null, null, 1, null],
+];
+
+const scheduleLoungeBar = (options: ScheduleBarOptions) => {
+  const {
+    context,
+    destination,
+    start,
+    barIndex,
+    phraseIndex,
+    absoluteBar,
+    beatSeconds,
+  } = options;
+  const scene = LOUNGE_SCENES[barIndex];
+  const vibeMotifIndex = LOUNGE_VIBE_PHRASES[phraseIndex][barIndex];
+  const fluteMotifIndex = LOUNGE_FLUTE_PHRASES[phraseIndex][barIndex];
+  const breath = 0.98 + Math.sin((absoluteBar + 1) * 1.07) * 0.02;
+
+  LOUNGE_COMPING[scene.compPattern].forEach(([beat, duration, velocity]) =>
+    scheduleElectricPianoChord(
+      context,
+      destination,
+      scene.chord,
+      start + beat * beatSeconds,
+      duration * beatSeconds + 0.36,
+      0.0185 * velocity * breath,
+    ),
+  );
+  LOUNGE_BASS[scene.compPattern].forEach(([beat, duration, velocity], index) =>
+    scheduleElectricBass(
+      context,
+      destination,
+      scene.bass[index % scene.bass.length],
+      start + beat * beatSeconds,
+      duration * beatSeconds + 0.08,
+      0.032 * velocity * breath,
+    ),
+  );
+
+  [1, 3].forEach((beat, index) =>
+    scheduleBrushSweep(
+      context,
+      destination,
+      start + beat * beatSeconds,
+      (index === 0 ? 0.29 : 0.36) * beatSeconds,
+      (index === 0 ? 0.0062 : 0.0072) * breath,
+    ),
+  );
+  [0.67, 2.67].forEach((beat) =>
+    scheduleBrushSweep(
+      context,
+      destination,
+      start + beat * beatSeconds,
+      0.15 * beatSeconds,
+      0.0024 * breath,
+    ),
+  );
+  scheduleSoftKick(context, destination, start, 0.0125 * breath);
+  if (absoluteBar % 2 === 0) {
+    scheduleSoftKick(
+      context,
+      destination,
+      start + 2 * beatSeconds,
+      0.007 * breath,
+    );
+  }
+
+  if (vibeMotifIndex !== null) {
+    LOUNGE_VIBE_MOTIFS[vibeMotifIndex].forEach(
+      ([beat, scaleDegree, duration, velocity]) =>
+        scheduleVibraphone(
+          context,
+          destination,
+          LOUNGE_VIBE_SCALE[scaleDegree],
+          start + beat * beatSeconds,
+          duration * beatSeconds + 0.55,
+          0.025 * velocity * breath,
+        ),
+    );
+  }
+  if (fluteMotifIndex !== null) {
+    LOUNGE_FLUTE_MOTIFS[fluteMotifIndex].forEach(
+      ([beat, scaleDegree, duration, velocity]) =>
+        scheduleSoftFlute(
+          context,
+          destination,
+          LOUNGE_FLUTE_SCALE[scaleDegree],
+          start + beat * beatSeconds,
+          duration * beatSeconds + 0.16,
+          0.018 * velocity * breath,
+        ),
+    );
+  }
+};
+
 const ORBIT_SCALE = [62, 64, 66, 69, 71, 74, 76] as const;
 const ORBIT_SCENES: readonly OrbitScene[] = [
   { bass: 38, pad: [50, 57, 62, 64, 66, 71] },
@@ -830,6 +1340,22 @@ export const musicCompositions: Record<MusicTrackId, MusicComposition> = {
       wet: 0.03,
     },
     scheduleBar: scheduleNightBar,
+  },
+  "collection-lounge": {
+    id: "collection-lounge",
+    tempo: 94,
+    barsPerPhrase: 8,
+    phraseCount: LOUNGE_VIBE_PHRASES.length,
+    level: 0.126,
+    fadeInSeconds: 1.1,
+    echo: {
+      dry: 0.96,
+      delayBeats: 0.75,
+      feedback: 0.045,
+      filterFrequency: 2450,
+      wet: 0.042,
+    },
+    scheduleBar: scheduleLoungeBar,
   },
   "soft-orbit": {
     id: "soft-orbit",

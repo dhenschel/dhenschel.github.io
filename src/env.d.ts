@@ -13,7 +13,11 @@ type ConsoleSoundEffect =
   | "error";
 
 type ConsoleMusicTrackId =
-  "home-pulse" | "blue-hour" | "soft-orbit" | "signal-garden";
+  | "home-pulse"
+  | "blue-hour"
+  | "collection-lounge"
+  | "soft-orbit"
+  | "signal-garden";
 type ConsoleMusicDiscId = "shuffle" | ConsoleMusicTrackId;
 
 type ConsoleTheme = "light" | "dark";

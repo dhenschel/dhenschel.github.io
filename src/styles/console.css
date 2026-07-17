@@ -996,6 +996,10 @@ html[data-music-track="blue-hour"] .header-music-button {
   --header-disc-accent: #5267c9;
 }
 
+html[data-music-track="collection-lounge"] .header-music-button {
+  --header-disc-accent: #c77778;
+}
+
 html[data-music-track="soft-orbit"] .header-music-button {
   --header-disc-accent: #55ae9f;
 }
@@ -1101,6 +1105,22 @@ html[data-music-track="blue-hour"] .header-music-button__disc::before {
       rgb(172 205 255 / 24%) 26% 29%,
       transparent 30%
     );
+}
+
+html[data-music-track="collection-lounge"] .header-music-button__disc::before {
+  background:
+    radial-gradient(
+      circle at 67% 36%,
+      transparent 0 20%,
+      rgb(255 225 173 / 34%) 21% 24%,
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 34% 68%,
+      rgb(255 227 183 / 34%) 0 5%,
+      transparent 6%
+    ),
+    radial-gradient(circle at 30% 27%, rgb(255 255 255 / 22%), transparent 22%);
 }
 
 html[data-music-track="soft-orbit"] .header-music-button__disc::before {
@@ -1808,6 +1828,25 @@ html[data-console-view="music"] .music-screen {
     linear-gradient(155deg, var(--disc-color), var(--disc-color-dark));
 }
 
+.music-disc[data-track-id="collection-lounge"] .music-disc__label {
+  background:
+    radial-gradient(
+      circle at 68% 35%,
+      transparent 0 18%,
+      rgb(255 226 175 / 25%) 18.5% 20.5%,
+      transparent 21% 28%,
+      rgb(255 255 255 / 10%) 28.5% 30%,
+      transparent 30.5%
+    ),
+    radial-gradient(
+      circle at 30% 70%,
+      rgb(255 229 188 / 29%) 0 3.5%,
+      transparent 4.2%
+    ),
+    radial-gradient(circle at 24% 31%, rgb(255 255 255 / 25%), transparent 23%),
+    linear-gradient(145deg, var(--disc-color), var(--disc-color-dark));
+}
+
 .music-disc[data-track-id="soft-orbit"] .music-disc__label {
   background:
     radial-gradient(
@@ -2382,6 +2421,23 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
       transparent 29%
     ),
     linear-gradient(155deg, var(--pool-disc-color), var(--pool-disc-color-dark));
+}
+
+.music-pool-disc[data-pool-track-id="collection-lounge"] > i {
+  background:
+    radial-gradient(
+      circle at 68% 35%,
+      transparent 0 18%,
+      rgb(255 226 175 / 32%) 19% 22%,
+      transparent 23%
+    ),
+    radial-gradient(
+      circle at 30% 70%,
+      rgb(255 229 188 / 38%) 0 5%,
+      transparent 6%
+    ),
+    radial-gradient(circle at 24% 31%, rgb(255 255 255 / 28%), transparent 23%),
+    linear-gradient(145deg, var(--pool-disc-color), var(--pool-disc-color-dark));
 }
 
 .music-pool-disc[data-pool-track-id="soft-orbit"] > i {
