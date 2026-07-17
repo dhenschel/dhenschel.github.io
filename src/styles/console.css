@@ -204,7 +204,7 @@ html[data-boot="skip"] .startup-screen {
 .startup-screen__language {
   position: absolute;
   z-index: 6;
-  top: 2.05rem;
+  top: 1.65rem;
   left: 6.15rem;
 }
 
@@ -582,13 +582,12 @@ html[data-boot="skip"] .startup-screen {
 
 .console-identity > .language-switcher {
   align-self: flex-start;
-  margin-top: 0.8rem;
+  margin-top: 0.15rem;
 }
 
 .console-identity > .language-switcher .language-switcher__toggle {
-  min-width: 3.15rem;
-  height: 2.55rem;
-  padding-inline: 0.64rem;
+  width: 4rem;
+  height: 4rem;
 }
 
 .console-online b {
@@ -2716,17 +2715,12 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   .console-identity > .language-switcher {
-    margin-top: 0.55rem;
+    margin-top: 0;
   }
 
   .console-identity > .language-switcher .language-switcher__toggle {
-    min-width: 2.55rem;
-    height: 2.35rem;
-    padding-inline: 0.48rem;
-  }
-
-  .console-identity > .language-switcher .language-switcher__toggle svg {
-    display: none;
+    width: 3.5rem;
+    height: 3.5rem;
   }
 
   .console-back-button {
