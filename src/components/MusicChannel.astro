@@ -70,17 +70,19 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
                   </small>
                   <strong>{track.shortTitle}</strong>
                   {track.id === "shuffle" && (
-                    <span class="music-disc__question-pattern">
-                      <span class="music-disc__question-main">?</span>
-                      {Array.from({ length: 8 }, (_, questionIndex) => (
-                        <span
-                          class="music-disc__question-orbit"
-                          style={`--question-angle: ${questionIndex * 45}deg;`}
-                        >
-                          ?
-                        </span>
+                    <svg
+                      class="music-disc__question-pattern"
+                      viewBox="0 0 100 100"
+                      aria-hidden="true"
+                    >
+                      {Array.from({ length: 6 }, (_, questionIndex) => (
+                        <path
+                          d="M50 42v-3.5c0-4.8 2.2-6.5 6.1-9.2 4-2.8 6-5.7 6-9.4 0-6.8-5.2-11.2-12.5-11.2-7.4 0-12.2 4.1-13.7 10.3"
+                          transform={`rotate(${questionIndex * 60} 50 50)`}
+                          style={`--question-opacity: ${[0.92, 0.7, 0.5, 0.4, 0.5, 0.7][questionIndex]};`}
+                        />
                       ))}
-                    </span>
+                    </svg>
                   )}
                   <i />
                 </span>

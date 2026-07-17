@@ -5,6 +5,7 @@ type ConsoleSoundEffect =
   | "focus"
   | "navigate"
   | "boundary"
+  | "empty"
   | "confirm"
   | "back"
   | "toggle"

@@ -1862,37 +1862,21 @@ html[data-console-view="music"] .music-screen {
 .music-disc__question-pattern {
   position: absolute;
   z-index: 1;
-  inset: 0;
-  color: rgb(255 255 255 / 88%);
-  font-style: normal;
-  text-shadow: 0 0.35rem 1rem rgb(29 38 48 / 28%);
+  inset: 4%;
+  width: 92%;
+  height: 92%;
+  overflow: visible;
+  fill: none;
   pointer-events: none;
 }
 
-.music-disc__question-main {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  font-size: clamp(6.25rem, 9vw, 8rem);
-  font-weight: 880;
-  letter-spacing: -0.1em;
-  line-height: 1;
-  transform: translate(-50%, -72%);
-}
-
-.music-disc__question-orbit {
-  --question-radius: clamp(5.35rem, 7.6vw, 6.65rem);
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  font-size: clamp(0.9rem, 1.4vw, 1.25rem);
-  font-weight: 840;
-  line-height: 1;
-  opacity: 0.66;
-  transform: translate(-50%, -50%) rotate(var(--question-angle))
-    translateY(calc(-1 * var(--question-radius)))
-    rotate(calc(-1 * var(--question-angle)));
+.music-disc__question-pattern path {
+  opacity: var(--question-opacity);
+  stroke: rgb(255 255 255 / 88%);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4.2;
+  filter: drop-shadow(0 0.35rem 0.5rem rgb(29 38 48 / 22%));
 }
 
 .music-disc[data-track-id="shuffle"] .music-disc__label small,

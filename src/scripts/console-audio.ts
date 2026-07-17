@@ -312,15 +312,20 @@ const playEffect = (effect: ConsoleSoundEffect) => {
 
     if (effect !== "hover") {
       const isNavigationEffect =
-        effect === "focus" || effect === "navigate" || effect === "boundary";
+        effect === "focus" ||
+        effect === "navigate" ||
+        effect === "boundary" ||
+        effect === "empty";
       const depth =
         effect === "launch"
           ? 0.36
-          : effect === "boundary"
-            ? 0.93
-            : isNavigationEffect
-              ? 0.82
-              : 0.68;
+          : effect === "empty"
+            ? 0.98
+            : effect === "boundary"
+              ? 0.93
+              : isNavigationEffect
+                ? 0.82
+                : 0.68;
       const release = effect === "launch" ? 0.42 : 0.24;
       duckMusicForInterface(context, depth, release);
     }
@@ -340,6 +345,11 @@ const playEffect = (effect: ConsoleSoundEffect) => {
 
     if (effect === "boundary") {
       scheduleEffectTone(context, 355, 315, 0.105, 0.017, 0, "sine");
+      return;
+    }
+
+    if (effect === "empty") {
+      scheduleEffectTone(context, 305, 286, 0.075, 0.008, 0, "sine");
       return;
     }
 

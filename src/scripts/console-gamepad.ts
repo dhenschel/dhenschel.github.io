@@ -874,8 +874,8 @@ const activateCurrentTarget = (gamepad: Gamepad) => {
     target = document.querySelector<HTMLButtonElement>("[data-start-console]");
   }
   if (!target) {
-    window.consoleAudio?.play("error");
-    vibrate(gamepad, 0.1);
+    window.consoleAudio?.play("empty");
+    vibrate(gamepad, 0.035);
     return;
   }
   target.focus({ preventScroll: true });

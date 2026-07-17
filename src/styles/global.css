@@ -274,6 +274,113 @@
 }
 
 @layer components {
+  .portrait-orientation-guard {
+    position: fixed;
+    z-index: 2147483647;
+    inset: 0;
+    display: none;
+    min-height: 100dvh;
+    align-content: center;
+    justify-items: center;
+    padding: max(2rem, env(safe-area-inset-top))
+      max(1.5rem, env(safe-area-inset-right))
+      max(2rem, env(safe-area-inset-bottom))
+      max(1.5rem, env(safe-area-inset-left));
+    color: #eef7ff;
+    background:
+      radial-gradient(
+        circle at 50% 42%,
+        rgb(53 142 217 / 22%),
+        transparent 32%
+      ),
+      linear-gradient(160deg, #15385d, #0b2441 58%, #071a31);
+    font-family: "Aptos", "Segoe UI", Arial, sans-serif;
+    text-align: center;
+  }
+
+  .portrait-orientation-guard::before,
+  .portrait-orientation-guard::after {
+    position: absolute;
+    width: 10rem;
+    height: 10rem;
+    border: 1px solid rgb(126 198 244 / 13%);
+    border-radius: 50%;
+    content: "";
+  }
+
+  .portrait-orientation-guard::before {
+    top: -4rem;
+    left: -3rem;
+  }
+
+  .portrait-orientation-guard::after {
+    right: -4rem;
+    bottom: -5rem;
+    width: 13rem;
+    height: 13rem;
+  }
+
+  .portrait-orientation-guard__device {
+    position: relative;
+    width: 3.6rem;
+    height: 6.2rem;
+    margin-bottom: 2.2rem;
+    border: 0.2rem solid currentcolor;
+    border-radius: 0.75rem;
+    box-shadow:
+      inset 0 0 0 0.16rem rgb(255 255 255 / 7%),
+      0 1rem 2.5rem rgb(0 10 27 / 30%);
+    animation: portrait-device-turn 2.8s cubic-bezier(0.22, 0.8, 0.24, 1)
+      infinite;
+  }
+
+  .portrait-orientation-guard__device::before {
+    position: absolute;
+    top: 0.36rem;
+    left: 50%;
+    width: 1rem;
+    height: 0.16rem;
+    border-radius: 999px;
+    background: currentcolor;
+    content: "";
+    opacity: 0.7;
+    transform: translateX(-50%);
+  }
+
+  .portrait-orientation-guard__device span {
+    position: absolute;
+    right: 0.42rem;
+    bottom: 0.42rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: #42d995;
+    box-shadow: 0 0 0.8rem rgb(66 217 149 / 80%);
+  }
+
+  .portrait-orientation-guard > p:first-of-type {
+    color: #70c8ff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .portrait-orientation-guard h1 {
+    max-width: 18rem;
+    margin: 0.35rem 0 0.6rem;
+    font-size: clamp(2rem, 9vw, 2.9rem);
+    letter-spacing: -0.05em;
+    line-height: 0.98;
+  }
+
+  .portrait-orientation-guard > p:last-child {
+    max-width: 20rem;
+    color: rgb(224 239 251 / 72%);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
   .site-header {
     position: absolute;
     z-index: 10;
@@ -2717,6 +2824,23 @@
     display: none !important;
   }
 
+  @media (orientation: portrait) and (max-width: 600px) {
+    html,
+    body {
+      height: 100%;
+      overflow: hidden !important;
+      overscroll-behavior: none;
+    }
+
+    .portrait-orientation-guard {
+      display: grid;
+    }
+
+    .gamepad-pointer {
+      display: none !important;
+    }
+  }
+
   @media (max-width: 1100px) {
     .hero {
       grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.65fr);
@@ -3079,5 +3203,19 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
     }
+  }
+}
+
+@keyframes portrait-device-turn {
+  0%,
+  20% {
+    transform: rotate(0deg);
+  }
+  48%,
+  78% {
+    transform: rotate(90deg);
+  }
+  100% {
+    transform: rotate(0deg);
   }
 }

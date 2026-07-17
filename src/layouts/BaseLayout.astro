@@ -87,6 +87,23 @@ const socialImageUrl = new URL(image, baseUrl);
     <a class="skip-link" href="#main-content" data-i18n="common.skipContent"
       >Zum Inhalt springen</a
     >
+    <aside
+      class="portrait-orientation-guard"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="portrait-guard-title"
+    >
+      <div class="portrait-orientation-guard__device" aria-hidden="true">
+        <span></span>
+      </div>
+      <p data-i18n="orientation.eyebrow">Querformat erforderlich</p>
+      <h1 id="portrait-guard-title" data-i18n="orientation.title">
+        Bitte drehe dein Gerät
+      </h1>
+      <p data-i18n="orientation.description">
+        Diese Konsole ist für das Querformat gestaltet.
+      </p>
+    </aside>
     <slot />
   </body>
 </html>
