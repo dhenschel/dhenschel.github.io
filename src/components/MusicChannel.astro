@@ -364,10 +364,12 @@ import { musicTracks } from "../data/music";
       surface.style.removeProperty("--music-hover-angle");
     });
 
-    disc.addEventListener("click", () => {
+    disc.addEventListener("click", (event) => {
       if (index !== selectedMusicIndex) {
+        event.stopPropagation();
         selectedMusicIndex = index;
         updateMusicCarousel(true);
+        window.consoleAudio?.play("focus");
         return;
       }
       playSelectedMusic();

@@ -820,7 +820,7 @@ export const musicCompositions: Record<MusicTrackId, MusicComposition> = {
     tempo: 90,
     barsPerPhrase: 8,
     phraseCount: NIGHT_PHRASES.length,
-    level: 0.121,
+    level: 0.138,
     fadeInSeconds: 1.05,
     echo: {
       dry: 0.97,
