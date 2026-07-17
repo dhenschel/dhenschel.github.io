@@ -588,11 +588,15 @@
     background: var(--console-focus, rgb(111 255 215 / 12%));
   }
 
-  .language-switcher__menu button span {
-    color: var(--console-blue, var(--mint));
-    font-size: 0.65rem;
-    font-weight: 850;
-    letter-spacing: 0.07em;
+  .language-switcher__option-flag {
+    display: block;
+    width: 1.65rem;
+    height: 1.1rem;
+    border: 1px solid rgb(255 255 255 / 48%);
+    border-radius: 0.22rem;
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 9%),
+      0 0.12rem 0.3rem rgb(0 0 0 / 20%);
   }
 
   .language-switcher__menu button strong {

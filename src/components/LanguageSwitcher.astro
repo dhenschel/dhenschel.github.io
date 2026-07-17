@@ -35,16 +35,28 @@ const { placement = "console" } = Astro.props;
     data-i18n-aria="language.label"
   >
     <button type="button" role="menuitemradio" data-language-option="de">
-      <span>DE</span><strong>Deutsch</strong><i aria-hidden="true">✓</i>
+      <span
+        class="language-switcher__option-flag language-switcher__flag-de"
+        aria-hidden="true"></span>
+      <strong>Deutsch</strong><i aria-hidden="true">✓</i>
     </button>
     <button type="button" role="menuitemradio" data-language-option="en">
-      <span>EN</span><strong>English</strong><i aria-hidden="true">✓</i>
+      <span
+        class="language-switcher__option-flag language-switcher__flag-en"
+        aria-hidden="true"></span>
+      <strong>English</strong><i aria-hidden="true">✓</i>
     </button>
     <button type="button" role="menuitemradio" data-language-option="fr">
-      <span>FR</span><strong>Français</strong><i aria-hidden="true">✓</i>
+      <span
+        class="language-switcher__option-flag language-switcher__flag-fr"
+        aria-hidden="true"></span>
+      <strong>Français</strong><i aria-hidden="true">✓</i>
     </button>
     <button type="button" role="menuitemradio" data-language-option="es">
-      <span>ES</span><strong>Español</strong><i aria-hidden="true">✓</i>
+      <span
+        class="language-switcher__option-flag language-switcher__flag-es"
+        aria-hidden="true"></span>
+      <strong>Español</strong><i aria-hidden="true">✓</i>
     </button>
   </div>
 </div>
