@@ -501,7 +501,15 @@ const initialProfileIndex = startupProfiles.findIndex(
 
   previousProfile?.addEventListener("click", () => rotateStartupProfiles(-1));
   nextProfile?.addEventListener("click", () => rotateStartupProfiles(1));
-  startupScreen?.addEventListener("keydown", (event) => {
+  document.addEventListener("keydown", (event) => {
+    if (
+      !startupScreen ||
+      startupScreen.dataset.phase !== "ready" ||
+      startupScreen.getAttribute("aria-hidden") === "true"
+    ) {
+      return;
+    }
+
     const eventTarget = event.target as HTMLElement | null;
     if (eventTarget?.closest("[data-language-switcher]")) return;
 
