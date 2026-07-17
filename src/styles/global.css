@@ -90,6 +90,82 @@
     cursor: none !important;
   }
 
+  html[data-input-mode="gamepad"],
+  html[data-input-mode="gamepad"] body,
+  html[data-input-mode="gamepad"] body * {
+    cursor: none !important;
+  }
+
+  .gamepad-pointer {
+    position: fixed;
+    z-index: 2147483647;
+    top: 0;
+    left: 0;
+    width: 3.4rem;
+    height: 3.4rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 110ms ease;
+    visibility: hidden;
+    will-change: transform;
+  }
+
+  .gamepad-pointer img {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0.22rem 0.3rem rgb(3 20 43 / 35%));
+    transform-origin: 28% 8%;
+    transition: transform 110ms ease;
+  }
+
+  .gamepad-pointer__pulse {
+    position: absolute;
+    z-index: 1;
+    top: -0.2rem;
+    left: -0.2rem;
+    width: 1.65rem;
+    height: 1.65rem;
+    border: 0.14rem solid rgb(71 169 255 / 72%);
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0.35);
+  }
+
+  html[data-input-mode="gamepad"][data-gamepad-connected="true"]:not(
+      [data-cursor-hidden="true"]
+    )
+    .gamepad-pointer {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .gamepad-pointer[data-clicking="true"] img {
+    transform: scale(0.84) rotate(-5deg);
+  }
+
+  .gamepad-pointer[data-clicking="true"] .gamepad-pointer__pulse {
+    animation: gamepad-pointer-click 180ms ease-out;
+  }
+
+  .gamepad-pointer-target {
+    outline: 3px solid var(--console-focus, rgb(36 136 255 / 42%)) !important;
+    outline-offset: 0.25rem;
+  }
+
+  @keyframes gamepad-pointer-click {
+    0% {
+      opacity: 0.85;
+      transform: scale(0.35);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.7);
+    }
+  }
+
   ::selection {
     color: var(--ink);
     background: var(--mint);

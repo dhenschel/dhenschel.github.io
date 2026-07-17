@@ -112,10 +112,15 @@ import { musicTracks } from "../data/music";
 
     <div class="music-channel__actions">
       <button class="music-channel__play" type="button" data-music-play>
-        <span class="console-keycaps" aria-hidden="true">
-          <kbd>↵</kbd>
-          <b>/</b>
-          <kbd>␣</kbd>
+        <span class="console-input-prompt" aria-hidden="true">
+          <span class="console-keycaps console-input-prompt__keyboard">
+            <kbd>↵</kbd>
+            <b>/</b>
+            <kbd>␣</kbd>
+          </span>
+          <span class="console-gamepad-key console-input-prompt__gamepad"
+            >A</span
+          >
         </span>
         <strong data-music-play-label data-i18n="music.listen">Anhören</strong>
       </button>
@@ -250,7 +255,11 @@ import { musicTracks } from "../data/music";
         ? musicState.playing
           ? t("music.playing")
           : t("music.selectedBackground")
-        : t("music.playHint");
+        : t(
+            document.documentElement.dataset.inputMode === "gamepad"
+              ? "music.playHintGamepad"
+              : "music.playHint",
+          );
     }
 
     musicDefaultButtons.forEach((button) => {
@@ -491,6 +500,7 @@ import { musicTracks } from "../data/music";
   window.addEventListener("console:language-changed", () =>
     updateMusicCarousel(),
   );
+  window.addEventListener("console:input-mode-changed", updateMusicState);
 
   const initialMusicState = window.consoleAudio?.getMusicState();
   if (initialMusicState) musicState = initialMusicState;

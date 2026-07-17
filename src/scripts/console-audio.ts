@@ -531,8 +531,17 @@ const bindInterfaceSounds = () => {
   document
     .querySelectorAll<HTMLElement>(INTERACTIVE_SELECTOR)
     .forEach((item) => {
-      item.addEventListener("pointerenter", () => playEffect("hover"));
+      item.addEventListener("pointerenter", () => {
+        if (document.documentElement.dataset.gamepadNavigating === "true")
+          return;
+        playEffect("hover");
+      });
       item.addEventListener("focus", () => {
+        if (
+          document.documentElement.dataset.inputMode === "gamepad" &&
+          item.classList.contains("gamepad-pointer-target")
+        )
+          return;
         if (performance.now() - lastPointerAt > 180) playEffect("focus");
       });
     });

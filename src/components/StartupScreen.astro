@@ -192,10 +192,13 @@ const initialProfileIndex = startupProfiles.findIndex(
     </p>
 
     <button class="startup-screen__start" type="button" data-start-console>
-      <span class="console-keycaps" aria-hidden="true">
-        <kbd>↵</kbd>
-        <b>/</b>
-        <kbd>␣</kbd>
+      <span class="console-input-prompt" aria-hidden="true">
+        <span class="console-keycaps console-input-prompt__keyboard">
+          <kbd>↵</kbd>
+          <b>/</b>
+          <kbd>␣</kbd>
+        </span>
+        <span class="console-gamepad-key console-input-prompt__gamepad">A</span>
       </span>
       <i data-i18n="startup.start">Menü starten</i>
     </button>

@@ -84,6 +84,35 @@ html[data-console-theme] body {
   background: var(--console-bg-deep);
 }
 
+.channel-card.gamepad-pointer-target {
+  position: relative;
+  z-index: 5;
+  outline: none !important;
+}
+
+.channel-card.gamepad-pointer-target .channel-card__screen {
+  border-color: var(--console-blue);
+  box-shadow:
+    var(--console-shadow-strong),
+    0 0 0 0.22rem var(--console-accent-halo);
+  transform: scale(1.075);
+}
+
+.channel-card.gamepad-pointer-target .channel-card__screen img {
+  transform: scale(1.075);
+}
+
+.music-disc.gamepad-pointer-target {
+  outline: none !important;
+}
+
+.music-disc.gamepad-pointer-target .music-disc__surface {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 86%),
+    var(--console-shadow-strong),
+    0 0 0 0.24rem var(--console-accent-halo);
+}
+
 html[data-boot="ready"],
 html[data-boot="pending"],
 html[data-launching="true"] {
@@ -1695,6 +1724,50 @@ html[data-console-view="music"] .music-screen {
   font-weight: 800;
 }
 
+.startup-screen__start .console-input-prompt,
+.music-channel__actions button .console-input-prompt {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  align-items: center;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.console-input-prompt__gamepad {
+  display: none !important;
+}
+
+html[data-input-mode="gamepad"] .console-input-prompt__keyboard {
+  display: none !important;
+}
+
+html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
+  display: grid !important;
+}
+
+.startup-screen__start .console-gamepad-key,
+.music-channel__actions button .console-gamepad-key {
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 0.13rem solid currentcolor;
+  border-radius: 50%;
+  color: #fff;
+  background: rgb(255 255 255 / 14%);
+  box-shadow: inset 0 0 0 0.12rem rgb(255 255 255 / 16%);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.startup-screen__start:disabled .console-gamepad-key {
+  color: var(--console-muted);
+  background: transparent;
+}
+
 .startup-screen__start .console-keycaps,
 .music-channel__actions button .console-keycaps {
   display: inline-flex;
@@ -2181,6 +2254,7 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   background: var(--console-surface-solid);
   box-shadow: 0 2.5rem 7rem rgb(16 32 52 / 35%);
   font-family: var(--console-font);
+  overflow: visible;
 }
 
 .contact-dialog::backdrop {
