@@ -7,6 +7,7 @@ const INTERACTIVE_SELECTOR = [
   '[contenteditable="true"]',
   '[tabindex]:not([tabindex="-1"])',
   '[role="menuitemradio"]',
+  '[data-startup-profile][data-carousel-position="active"]',
 ].join(",");
 
 const DEAD_ZONE = 0.2;
@@ -151,6 +152,13 @@ const setInputMode = (mode: InputMode) => {
 };
 
 const leaveGamepadMode = (nativeX?: number, nativeY?: number) => {
+  const focused = document.activeElement;
+  if (
+    focused instanceof HTMLElement &&
+    !focused.matches('input, textarea, select, [contenteditable="true"]')
+  ) {
+    focused.blur();
+  }
   gamepadNavigationMethod = "pointer";
   const nativeTarget =
     typeof nativeX === "number" && typeof nativeY === "number"
@@ -229,6 +237,20 @@ const flashPointerClick = () => {
     pointerElement?.removeAttribute("data-clicking");
     pointerClickTimer = null;
   }, 180);
+};
+
+const dispatchControllerClick = (element: HTMLElement) => {
+  element.dispatchEvent(
+    new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      detail: 1,
+      button: 0,
+      clientX: pointerX,
+      clientY: pointerY,
+    }),
+  );
 };
 
 const focusAndPointTo = (
@@ -825,22 +847,8 @@ const activateCurrentTarget = (gamepad: Gamepad) => {
   let target = pointerTarget && isVisible(pointerTarget) ? pointerTarget : null;
   if (!target && activeElement && isVisible(activeElement))
     target = activeElement;
-  if (
-    getReadyStartup() &&
-    target?.matches(
-      "[data-startup-profile], [data-profile-previous], [data-profile-next]",
-    )
-  ) {
+  if (getReadyStartup() && target?.matches("[data-startup-profile]")) {
     target = document.querySelector<HTMLButtonElement>("[data-start-console]");
-  }
-  if (
-    root.dataset.consoleView === "music" &&
-    gamepadNavigationMethod === "structured" &&
-    (!target || target.matches("[data-music-arrow], [data-music-disc]"))
-  ) {
-    target = document.querySelector<HTMLButtonElement>(
-      '[data-music-disc][data-carousel-position="active"]',
-    );
   }
   if (!target && getReadyStartup()) {
     target = document.querySelector<HTMLButtonElement>("[data-start-console]");
@@ -853,7 +861,7 @@ const activateCurrentTarget = (gamepad: Gamepad) => {
   target.focus({ preventScroll: true });
   flashPointerClick();
   vibrate(gamepad);
-  target.click();
+  dispatchControllerClick(target);
 };
 
 const closeLanguageSwitcher = () => {
@@ -1113,6 +1121,12 @@ export const initializeConsoleGamepad = () => {
   window.addEventListener("gamepaddisconnected", () => updateConnectionState());
   window.addEventListener("resize", () => {
     setPointerPosition(pointerX, pointerY);
+  });
+  window.addEventListener("console:view-changed", (event) => {
+    const view = (event as CustomEvent<{ view?: string }>).detail?.view;
+    if (view !== "music" || root.dataset.inputMode !== "gamepad") return;
+    gamepadNavigationMethod = "structured";
+    pointToCurrentCarouselItem();
   });
   window.addEventListener("pagehide", () => {
     if (animationFrame) window.cancelAnimationFrame(animationFrame);

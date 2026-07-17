@@ -489,11 +489,19 @@ const structuredData = {
 
       if (viewFocusTimer !== null) window.clearTimeout(viewFocusTimer);
       if (focusTarget) {
+        const requestedWithGamepad =
+          document.documentElement.dataset.inputMode === "gamepad";
         const reducedMotion = window.matchMedia(
           "(prefers-reduced-motion: reduce)",
         ).matches;
         viewFocusTimer = window.setTimeout(
           () => {
+            if (
+              requestedWithGamepad &&
+              document.documentElement.dataset.inputMode !== "gamepad"
+            ) {
+              return;
+            }
             const target = galleryIsActive
               ? firstChannel
               : aboutIsActive
