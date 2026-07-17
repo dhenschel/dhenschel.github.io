@@ -187,6 +187,9 @@ html[data-launching="true"] {
   width: 42rem;
   height: 42rem;
   border: 4rem solid var(--console-orbit);
+  animation: startup-orbit-drift-upper 19s cubic-bezier(0.45, 0, 0.55, 1)
+    infinite alternate;
+  will-change: transform, opacity;
 }
 
 .startup-screen::after {
@@ -195,6 +198,9 @@ html[data-launching="true"] {
   width: 48rem;
   height: 48rem;
   border: 5rem solid var(--console-orbit-accent);
+  animation: startup-orbit-drift-lower 24s cubic-bezier(0.45, 0, 0.55, 1) -7s
+    infinite alternate;
+  will-change: transform, opacity;
 }
 
 html[data-boot="ready"] .startup-screen,
@@ -696,6 +702,10 @@ html[data-console-view="music"] .console-back-button {
 
 .console-profile-button:focus-visible {
   outline: none;
+}
+
+.console-profile-button.gamepad-pointer-target {
+  outline: none !important;
 }
 
 .header-music-button {
@@ -2668,6 +2678,40 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 }
 
+@keyframes startup-orbit-drift-upper {
+  0% {
+    opacity: 0.58;
+    transform: translate3d(-2.5%, -1.5%, 0) rotate(-5deg) scale(0.97);
+  }
+
+  48% {
+    opacity: 0.82;
+    transform: translate3d(1.5%, 2.5%, 0) rotate(1deg) scale(1.035);
+  }
+
+  100% {
+    opacity: 0.66;
+    transform: translate3d(4%, -1%, 0) rotate(5deg) scale(1.08);
+  }
+}
+
+@keyframes startup-orbit-drift-lower {
+  0% {
+    opacity: 0.52;
+    transform: translate3d(3%, 1.5%, 0) rotate(4deg) scale(1.04);
+  }
+
+  52% {
+    opacity: 0.76;
+    transform: translate3d(-1%, -2.5%, 0) rotate(-2deg) scale(0.98);
+  }
+
+  100% {
+    opacity: 0.6;
+    transform: translate3d(-4%, 1%, 0) rotate(-6deg) scale(1.07);
+  }
+}
+
 @keyframes console-orbit-upper {
   0% {
     opacity: 0.6;
@@ -3179,7 +3223,9 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 
   .console-background::before,
   .console-background::after,
-  .console-background span {
+  .console-background span,
+  .startup-screen::before,
+  .startup-screen::after {
     animation: none !important;
   }
 
