@@ -228,80 +228,66 @@ html[data-boot="skip"] .startup-screen {
   pointer-events: none;
 }
 
-.startup-screen__tile {
+.startup-screen__ring {
   position: absolute;
-  width: var(--startup-tile-width, 9rem);
-  height: var(--startup-tile-height, 7rem);
-  border: 1px solid var(--console-line);
-  border-radius: 1.7rem;
-  background: linear-gradient(
-    145deg,
-    var(--console-glass-sheen),
-    transparent 68%
-  );
-  box-shadow:
-    inset 0 1px 0 var(--console-glass-sheen),
-    0 1.2rem 3rem rgb(7 44 86 / 5%);
-  opacity: 0.32;
-  animation: startup-tile-float var(--startup-tile-duration, 14s) ease-in-out
-    var(--startup-tile-delay, 0s) infinite alternate;
-  backdrop-filter: blur(0.35rem);
+  width: var(--startup-ring-size, 5rem);
+  height: var(--startup-ring-size, 5rem);
+  border: var(--startup-ring-width, 0.48rem) solid
+    var(--startup-ring-color, var(--console-orbit));
+  border-radius: 50%;
+  opacity: 0.38;
+  animation: startup-ring-drift var(--startup-ring-duration, 14s) ease-in-out
+    var(--startup-ring-delay, 0s) infinite alternate;
   will-change: transform, opacity;
 }
 
-.startup-screen__tile--one {
-  --startup-tile-width: 10rem;
-  --startup-tile-height: 7.2rem;
-  --startup-tile-x: 3.8rem;
-  --startup-tile-y: 2.2rem;
-  --startup-tile-rotate: -11deg;
-  --startup-tile-rotate-end: -3deg;
-  --startup-tile-duration: 13s;
+.startup-screen__ring--one {
+  --startup-ring-size: 5.2rem;
+  --startup-ring-width: 0.52rem;
+  --startup-ring-x: 3.8rem;
+  --startup-ring-y: 2.2rem;
+  --startup-ring-duration: 12s;
 
-  top: 13%;
+  top: 16%;
+  left: 13%;
+}
+
+.startup-screen__ring--two {
+  --startup-ring-size: 6.6rem;
+  --startup-ring-width: 0.62rem;
+  --startup-ring-color: var(--console-orbit-accent);
+  --startup-ring-x: -2.8rem;
+  --startup-ring-y: 3.4rem;
+  --startup-ring-duration: 16s;
+  --startup-ring-delay: -5s;
+
+  top: 19%;
+  right: 13%;
+}
+
+.startup-screen__ring--three {
+  --startup-ring-size: 4.4rem;
+  --startup-ring-width: 0.42rem;
+  --startup-ring-color: var(--console-orbit-accent);
+  --startup-ring-x: 3rem;
+  --startup-ring-y: -3.2rem;
+  --startup-ring-duration: 18s;
+  --startup-ring-delay: -9s;
+
+  bottom: 17%;
   left: 11%;
 }
 
-.startup-screen__tile--two {
-  --startup-tile-width: 7.5rem;
-  --startup-tile-height: 7.5rem;
-  --startup-tile-x: -2.8rem;
-  --startup-tile-y: 3.4rem;
-  --startup-tile-rotate: 9deg;
-  --startup-tile-rotate-end: 1deg;
-  --startup-tile-duration: 16s;
-  --startup-tile-delay: -5s;
+.startup-screen__ring--four {
+  --startup-ring-size: 7.4rem;
+  --startup-ring-width: 0.68rem;
+  --startup-ring-x: -3.6rem;
+  --startup-ring-y: -2.5rem;
+  --startup-ring-duration: 15s;
+  --startup-ring-delay: -2s;
 
-  top: 16%;
-  right: 14%;
-}
-
-.startup-screen__tile--three {
-  --startup-tile-width: 13rem;
-  --startup-tile-height: 8rem;
-  --startup-tile-x: 3rem;
-  --startup-tile-y: -3.2rem;
-  --startup-tile-rotate: 7deg;
-  --startup-tile-rotate-end: 14deg;
-  --startup-tile-duration: 18s;
-  --startup-tile-delay: -9s;
-
-  bottom: 12%;
-  left: 7%;
-}
-
-.startup-screen__tile--four {
-  --startup-tile-width: 9.5rem;
-  --startup-tile-height: 10.5rem;
-  --startup-tile-x: -3.6rem;
-  --startup-tile-y: -2.5rem;
-  --startup-tile-rotate: -7deg;
-  --startup-tile-rotate-end: 2deg;
-  --startup-tile-duration: 15s;
-  --startup-tile-delay: -2s;
-
-  right: 9%;
-  bottom: 10%;
+  right: 10%;
+  bottom: 14%;
 }
 
 .startup-screen__spark {
@@ -371,6 +357,94 @@ html[data-boot="skip"] .startup-screen {
 
   top: 10%;
   left: 45%;
+}
+
+.console-input-mode-indicator {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  display: inline-flex;
+  min-height: 2.55rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.38rem 0.85rem;
+  border: 1px solid var(--console-line);
+  border-radius: 999px;
+  color: var(--console-muted);
+  background: var(--console-surface);
+  box-shadow: var(--console-shadow);
+  font-family: var(--console-font);
+  font-size: 0.72rem;
+  pointer-events: none;
+  backdrop-filter: blur(1rem) saturate(125%);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.console-input-mode-indicator--menu {
+  top: 1.8rem;
+  transform: translateX(-50%);
+}
+
+.console-input-mode-indicator--header {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.console-input-mode-indicator__icon {
+  display: inline-flex;
+  width: 1.55rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  color: var(--console-blue);
+}
+
+.console-input-mode-indicator__icon svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.console-input-mode-indicator__label {
+  font: inherit;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.console-input-mode-indicator__icon--gamepad,
+.console-input-mode-indicator__label--gamepad {
+  display: none;
+}
+
+html[data-input-mode="gamepad"] .console-input-mode-indicator {
+  color: var(--console-text);
+  border-color: var(--console-accent-halo);
+  box-shadow:
+    var(--console-shadow),
+    0 0 0 0.16rem var(--console-accent-halo);
+}
+
+html[data-input-mode="gamepad"] .console-input-mode-indicator__icon--keyboard,
+html[data-input-mode="gamepad"] .console-input-mode-indicator__label--keyboard {
+  display: none;
+}
+
+html[data-input-mode="gamepad"] .console-input-mode-indicator__icon--gamepad {
+  display: inline-flex;
+}
+
+html[data-input-mode="gamepad"] .console-input-mode-indicator__label--gamepad {
+  display: inline;
 }
 
 .startup-screen__brand {
@@ -2861,25 +2935,25 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 }
 
-@keyframes startup-tile-float {
+@keyframes startup-ring-drift {
   0% {
-    opacity: 0.18;
-    transform: translate3d(0, 0, 0) rotate(var(--startup-tile-rotate, 0deg))
-      scale(0.96);
+    opacity: 0.2;
+    transform: translate3d(0, 0, 0) scale(0.82);
   }
 
   52% {
-    opacity: 0.42;
+    opacity: 0.5;
+    transform: translate3d(0.7rem, -0.55rem, 0) scale(1.06);
   }
 
   100% {
-    opacity: 0.28;
+    opacity: 0.3;
     transform: translate3d(
-        var(--startup-tile-x, 2rem),
-        var(--startup-tile-y, -2rem),
+        var(--startup-ring-x, 2rem),
+        var(--startup-ring-y, -2rem),
         0
       )
-      rotate(var(--startup-tile-rotate-end, 5deg)) scale(1.05);
+      scale(0.94);
   }
 }
 
@@ -3057,6 +3131,16 @@ html[data-console-theme="dark"] .theme-toggle__moon {
 }
 
 @media (max-width: 980px) {
+  .console-input-mode-indicator {
+    width: 2.65rem;
+    min-height: 2.65rem;
+    padding: 0;
+  }
+
+  .console-input-mode-indicator__label {
+    display: none !important;
+  }
+
   .home-screen {
     width: min(calc(100% - 1.5rem), 60rem);
   }
@@ -3211,6 +3295,10 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   .startup-screen__skip {
     top: 1rem;
     right: 1rem;
+  }
+
+  .console-input-mode-indicator--menu {
+    top: 1.28rem;
   }
 
   .startup-screen__content {

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ContactDialog from "../components/ContactDialog.astro";
+import InputModeIndicator from "../components/InputModeIndicator.astro";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import MusicChannel from "../components/MusicChannel.astro";
 import ProjectHub from "../components/ProjectHub.astro";
@@ -142,6 +143,8 @@ const structuredData = {
         </span>
       </button>
     </div>
+
+    <InputModeIndicator placement="header" />
 
     <div class="console-status">
       <div class="console-clock">

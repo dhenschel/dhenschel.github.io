@@ -1,5 +1,6 @@
 ---
 import { siteProfile } from "../data/site";
+import InputModeIndicator from "./InputModeIndicator.astro";
 import LanguageSwitcher from "./LanguageSwitcher.astro";
 
 const defaultProfileId = "dhenschel";
@@ -84,16 +85,18 @@ const initialProfileIndex = startupProfiles.findIndex(
   aria-hidden="true"
 >
   <div class="startup-screen__ambient" aria-hidden="true">
-    <span class="startup-screen__tile startup-screen__tile--one"></span>
-    <span class="startup-screen__tile startup-screen__tile--two"></span>
-    <span class="startup-screen__tile startup-screen__tile--three"></span>
-    <span class="startup-screen__tile startup-screen__tile--four"></span>
+    <span class="startup-screen__ring startup-screen__ring--one"></span>
+    <span class="startup-screen__ring startup-screen__ring--two"></span>
+    <span class="startup-screen__ring startup-screen__ring--three"></span>
+    <span class="startup-screen__ring startup-screen__ring--four"></span>
     <span class="startup-screen__spark startup-screen__spark--one"></span>
     <span class="startup-screen__spark startup-screen__spark--two"></span>
     <span class="startup-screen__spark startup-screen__spark--three"></span>
     <span class="startup-screen__spark startup-screen__spark--four"></span>
     <span class="startup-screen__spark startup-screen__spark--five"></span>
   </div>
+
+  <InputModeIndicator placement="menu" />
 
   <button
     class="startup-screen__skip"
