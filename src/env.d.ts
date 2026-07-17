@@ -17,6 +17,7 @@ type ConsoleMusicTrackId =
   | "blue-hour"
   | "collection-lounge"
   | "neon-lounge"
+  | "metro-drift"
   | "soft-orbit"
   | "signal-garden";
 type ConsoleMusicDiscId = "shuffle" | ConsoleMusicTrackId;

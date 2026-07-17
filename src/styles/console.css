@@ -1004,6 +1004,10 @@ html[data-music-track="neon-lounge"] .header-music-button {
   --header-disc-accent: #765fc8;
 }
 
+html[data-music-track="metro-drift"] .header-music-button {
+  --header-disc-accent: #49a6b3;
+}
+
 html[data-music-track="soft-orbit"] .header-music-button {
   --header-disc-accent: #55ae9f;
 }
@@ -1142,6 +1146,25 @@ html[data-music-track="neon-lounge"] .header-music-button__disc::before {
       transparent 17%
     ),
     radial-gradient(circle at 27% 28%, rgb(255 255 255 / 20%), transparent 22%);
+}
+
+html[data-music-track="metro-drift"] .header-music-button__disc::before {
+  background:
+    radial-gradient(
+      ellipse at 72% 31%,
+      rgb(128 235 235 / 34%) 0 9%,
+      transparent 29%
+    ),
+    radial-gradient(
+      ellipse at 28% 72%,
+      rgb(255 175 153 / 29%) 0 8%,
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 70% 73%,
+      rgb(255 255 255 / 26%) 0 3.5%,
+      transparent 4.5%
+    );
 }
 
 html[data-music-track="soft-orbit"] .header-music-button__disc::before {
@@ -1888,6 +1911,27 @@ html[data-console-view="music"] .music-screen {
     linear-gradient(145deg, var(--disc-color), var(--disc-color-dark));
 }
 
+.music-disc[data-track-id="metro-drift"] .music-disc__label {
+  background:
+    radial-gradient(
+      ellipse at 72% 30%,
+      rgb(128 235 235 / 26%) 0 9%,
+      transparent 31%
+    ),
+    radial-gradient(
+      ellipse at 27% 72%,
+      rgb(255 175 153 / 24%) 0 8%,
+      transparent 33%
+    ),
+    radial-gradient(
+      circle at 71% 73%,
+      rgb(255 255 255 / 23%) 0 3.5%,
+      transparent 4.5%
+    ),
+    radial-gradient(circle at 24% 27%, rgb(206 255 251 / 18%), transparent 22%),
+    linear-gradient(145deg, var(--disc-color), var(--disc-color-dark));
+}
+
 .music-disc[data-track-id="soft-orbit"] .music-disc__label {
   background:
     radial-gradient(
@@ -2496,6 +2540,27 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
       transparent 18%
     ),
     radial-gradient(circle at 24% 27%, rgb(194 219 255 / 26%), transparent 22%),
+    linear-gradient(145deg, var(--pool-disc-color), var(--pool-disc-color-dark));
+}
+
+.music-pool-disc[data-pool-track-id="metro-drift"] > i {
+  background:
+    radial-gradient(
+      ellipse at 72% 30%,
+      rgb(128 235 235 / 34%) 0 9%,
+      transparent 31%
+    ),
+    radial-gradient(
+      ellipse at 27% 72%,
+      rgb(255 175 153 / 31%) 0 8%,
+      transparent 33%
+    ),
+    radial-gradient(
+      circle at 71% 73%,
+      rgb(255 255 255 / 30%) 0 4%,
+      transparent 5%
+    ),
+    radial-gradient(circle at 24% 27%, rgb(206 255 251 / 24%), transparent 22%),
     linear-gradient(145deg, var(--pool-disc-color), var(--pool-disc-color-dark));
 }
 

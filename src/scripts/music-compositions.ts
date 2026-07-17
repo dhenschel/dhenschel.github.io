@@ -17,6 +17,12 @@ type LoungeScene = {
   compPattern: number;
 };
 
+type DriftScene = {
+  bass: readonly number[];
+  chord: readonly number[];
+  groovePattern: number;
+};
+
 type MotifNote = readonly [
   beat: number,
   scaleDegree: number,
@@ -788,6 +794,121 @@ const scheduleSaxLikeVoice = (
   body.stop(end + 0.04);
   reed.stop(end + 0.04);
   vibrato.stop(end + 0.04);
+};
+
+const scheduleDriftSubBass = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.38);
+  const sub = context.createOscillator();
+  const warmth = context.createOscillator();
+  const warmthMix = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  sub.type = "sine";
+  sub.frequency.setValueAtTime(frequency * 1.014, start);
+  sub.frequency.exponentialRampToValueAtTime(frequency, start + 0.065);
+  warmth.type = "triangle";
+  warmth.frequency.value = frequency * 2;
+  warmthMix.gain.value = 0.022;
+  filter.type = "lowpass";
+  filter.Q.value = 0.82;
+  filter.frequency.setValueAtTime(310, start);
+  filter.frequency.exponentialRampToValueAtTime(125, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.018);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.64, start + 0.18);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  sub.connect(filter);
+  warmth.connect(warmthMix).connect(filter);
+  filter.connect(envelope).connect(destination);
+  sub.start(start);
+  warmth.start(start);
+  sub.stop(end + 0.04);
+  warmth.stop(end + 0.04);
+};
+
+const scheduleAtmosphericTexture = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  duration: number,
+  level: number,
+  centerFrequency: number,
+) => {
+  const end = start + Math.max(duration, 0.72);
+  const source = context.createBufferSource();
+  const bandpass = context.createBiquadFilter();
+  const lowpass = context.createBiquadFilter();
+  const envelope = context.createGain();
+
+  source.buffer = getBrushNoiseBuffer(context);
+  source.loop = true;
+  source.loopEnd = source.buffer.duration;
+  source.playbackRate.value = 0.84;
+  bandpass.type = "bandpass";
+  bandpass.Q.value = 0.42;
+  bandpass.frequency.setValueAtTime(centerFrequency * 0.74, start);
+  bandpass.frequency.exponentialRampToValueAtTime(centerFrequency * 1.18, end);
+  lowpass.type = "lowpass";
+  lowpass.frequency.value = 3300;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + duration * 0.3);
+  envelope.gain.setValueAtTime(level * 0.86, start + duration * 0.62);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  source
+    .connect(bandpass)
+    .connect(lowpass)
+    .connect(envelope)
+    .connect(destination);
+  source.start(start, Math.random() * source.buffer.duration);
+  source.stop(end + 0.03);
+};
+
+const scheduleDriftSynthMotif = (
+  context: AudioContext,
+  destination: AudioNode,
+  note: number,
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.3);
+  const body = context.createOscillator();
+  const shimmer = context.createOscillator();
+  const shimmerMix = context.createGain();
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
+
+  body.type = "triangle";
+  body.frequency.setValueAtTime(frequency * 0.994, start);
+  body.frequency.exponentialRampToValueAtTime(frequency, start + 0.055);
+  shimmer.type = "sine";
+  shimmer.frequency.value = frequency * 2;
+  shimmerMix.gain.value = 0.075;
+  filter.type = "lowpass";
+  filter.Q.value = 1.18;
+  filter.frequency.setValueAtTime(2850, start);
+  filter.frequency.exponentialRampToValueAtTime(920, end);
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.016);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.28, start + 0.11);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  body.connect(filter);
+  shimmer.connect(shimmerMix).connect(filter);
+  filter.connect(envelope).connect(destination);
+  body.start(start);
+  shimmer.start(start);
+  body.stop(end + 0.04);
+  shimmer.stop(end + 0.04);
 };
 
 const schedulePadChord = (
@@ -1706,6 +1827,231 @@ const scheduleNeonBar = (options: ScheduleBarOptions) => {
   }
 };
 
+const DRIFT_SCALE = [62, 65, 67, 69, 72, 74, 77, 79] as const;
+const DRIFT_SCENES: readonly DriftScene[] = [
+  {
+    bass: [38, 45, 48, 36],
+    chord: [50, 53, 57, 60, 64],
+    groovePattern: 0,
+  },
+  {
+    bass: [34, 41, 45, 33],
+    chord: [46, 50, 53, 57, 60],
+    groovePattern: 1,
+  },
+  {
+    bass: [33, 40, 45, 36],
+    chord: [45, 48, 52, 55, 60],
+    groovePattern: 2,
+  },
+  {
+    bass: [36, 43, 47, 38],
+    chord: [48, 52, 55, 59, 62],
+    groovePattern: 3,
+  },
+  {
+    bass: [38, 45, 41, 36],
+    chord: [50, 53, 57, 60, 64],
+    groovePattern: 2,
+  },
+  {
+    bass: [31, 38, 41, 34],
+    chord: [43, 46, 50, 53, 57],
+    groovePattern: 1,
+  },
+  {
+    bass: [34, 41, 45, 38],
+    chord: [46, 50, 53, 57, 60],
+    groovePattern: 0,
+  },
+  {
+    bass: [33, 40, 43, 37],
+    chord: [45, 50, 52, 55, 61],
+    groovePattern: 3,
+  },
+];
+const DRIFT_RHODES: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 1.08, 0.82],
+    [1.75, 0.58, 0.46],
+    [3, 0.72, 0.62],
+  ],
+  [
+    [0.5, 0.72, 0.5],
+    [2, 0.94, 0.76],
+    [3.5, 0.3, 0.34],
+  ],
+  [
+    [0, 0.82, 0.68],
+    [1.5, 0.56, 0.44],
+    [2.75, 0.88, 0.7],
+  ],
+  [
+    [0.25, 0.68, 0.42],
+    [1.75, 0.76, 0.6],
+    [3.25, 0.5, 0.48],
+  ],
+];
+const DRIFT_BASS: readonly (readonly MusicPulse[])[] = [
+  [
+    [0, 0.72, 0.9],
+    [1.75, 0.44, 0.52],
+    [2.5, 0.62, 0.72],
+    [3.5, 0.32, 0.38],
+  ],
+  [
+    [0, 0.54, 0.82],
+    [0.75, 0.42, 0.46],
+    [2.25, 0.68, 0.76],
+    [3.5, 0.28, 0.4],
+  ],
+  [
+    [0, 0.68, 0.86],
+    [1.5, 0.48, 0.5],
+    [2.75, 0.62, 0.74],
+    [3.5, 0.28, 0.36],
+  ],
+  [
+    [0, 0.62, 0.84],
+    [0.75, 0.4, 0.44],
+    [2, 0.58, 0.7],
+    [3.25, 0.44, 0.5],
+  ],
+];
+const DRIFT_KICKS: readonly (readonly number[])[] = [
+  [0, 1.75, 2.5],
+  [0, 0.75, 2.25, 3.5],
+  [0, 1.5, 2.75],
+  [0, 0.75, 2, 3.25],
+];
+const DRIFT_SYNTH_MOTIFS: readonly (readonly MotifNote[])[] = [
+  [
+    [0.75, 0, 0.28, 0.52],
+    [1.25, 2, 0.24, 0.44],
+    [2.75, 1, 0.34, 0.48],
+  ],
+  [
+    [1.5, 3, 0.26, 0.46],
+    [2, 4, 0.3, 0.56],
+    [3.25, 2, 0.28, 0.4],
+  ],
+  [
+    [0.5, 1, 0.24, 0.4],
+    [1, 2, 0.28, 0.5],
+    [2.5, 5, 0.32, 0.44],
+  ],
+  [
+    [0.75, 4, 0.3, 0.42],
+    [2.25, 3, 0.34, 0.48],
+    [3.5, 1, 0.24, 0.38],
+  ],
+  [
+    [1.25, 6, 0.22, 0.34],
+    [1.75, 5, 0.26, 0.42],
+    [2.75, 3, 0.3, 0.38],
+  ],
+];
+const DRIFT_SYNTH_PHRASES: readonly (readonly (number | null)[])[] = [
+  [0, null, 1, 4, 2, null, 3, null],
+  [null, 2, 0, null, 3, 4, null, 1],
+  [1, null, 3, 0, null, 2, 4, null],
+  [0, 4, null, 2, 1, null, 3, null],
+];
+
+const scheduleDriftBar = (options: ScheduleBarOptions) => {
+  const {
+    context,
+    destination,
+    start,
+    barIndex,
+    phraseIndex,
+    absoluteBar,
+    beatSeconds,
+  } = options;
+  const scene = DRIFT_SCENES[barIndex];
+  const synthMotifIndex = DRIFT_SYNTH_PHRASES[phraseIndex][barIndex];
+  const breath = 0.98 + Math.sin((absoluteBar + 1) * 1.13) * 0.02;
+
+  DRIFT_RHODES[scene.groovePattern].forEach(([beat, duration, velocity]) =>
+    scheduleElectricPianoChord(
+      context,
+      destination,
+      scene.chord,
+      start + beat * beatSeconds,
+      duration * beatSeconds + 0.3,
+      0.0155 * velocity * breath,
+    ),
+  );
+  DRIFT_BASS[scene.groovePattern].forEach(([beat, duration, velocity], index) =>
+    scheduleDriftSubBass(
+      context,
+      destination,
+      scene.bass[index % scene.bass.length],
+      start + beat * beatSeconds,
+      duration * beatSeconds + 0.08,
+      0.036 * velocity * breath,
+    ),
+  );
+
+  DRIFT_KICKS[scene.groovePattern].forEach((beat, index) =>
+    scheduleNeonKick(
+      context,
+      destination,
+      start + beat * beatSeconds,
+      (index === 0 ? 0.0135 : 0.0085) * breath,
+    ),
+  );
+  [1, 3].forEach((beat, index) =>
+    scheduleMutedSnare(
+      context,
+      destination,
+      start + beat * beatSeconds,
+      (index === 0 ? 0.0045 : 0.0055) * breath,
+    ),
+  );
+  if (scene.groovePattern === 1 || scene.groovePattern === 3) {
+    scheduleMutedSnare(
+      context,
+      destination,
+      start + 2.75 * beatSeconds,
+      0.0022 * breath,
+    );
+  }
+  [0, 0.55, 1, 1.55, 2, 2.55, 3, 3.55].forEach((beat, index) =>
+    scheduleClosedHat(
+      context,
+      destination,
+      start + beat * beatSeconds,
+      (index % 2 === 0 ? 0.00105 : 0.0018) * breath,
+    ),
+  );
+
+  if ([0, 2, 5, 7].includes(barIndex)) {
+    const textureBeat = barIndex % 2 === 0 ? 2.35 : 0.35;
+    scheduleAtmosphericTexture(
+      context,
+      destination,
+      start + textureBeat * beatSeconds,
+      1.25 * beatSeconds,
+      0.0028 * breath,
+      980 + ((absoluteBar + phraseIndex) % 4) * 210,
+    );
+  }
+  if (synthMotifIndex !== null) {
+    DRIFT_SYNTH_MOTIFS[synthMotifIndex].forEach(
+      ([beat, scaleDegree, duration, velocity]) =>
+        scheduleDriftSynthMotif(
+          context,
+          destination,
+          DRIFT_SCALE[scaleDegree],
+          start + beat * beatSeconds,
+          duration * beatSeconds + 0.18,
+          0.022 * velocity * breath,
+        ),
+    );
+  }
+};
+
 const ORBIT_SCALE = [62, 64, 66, 69, 71, 74, 76] as const;
 const ORBIT_SCENES: readonly OrbitScene[] = [
   { bass: 38, pad: [50, 57, 62, 64, 66, 71] },
@@ -1889,6 +2235,22 @@ export const musicCompositions: Record<MusicTrackId, MusicComposition> = {
       wet: 0.048,
     },
     scheduleBar: scheduleNeonBar,
+  },
+  "metro-drift": {
+    id: "metro-drift",
+    tempo: 108,
+    barsPerPhrase: 8,
+    phraseCount: DRIFT_SYNTH_PHRASES.length,
+    level: 0.128,
+    fadeInSeconds: 1,
+    echo: {
+      dry: 0.958,
+      delayBeats: 0.75,
+      feedback: 0.055,
+      filterFrequency: 2250,
+      wet: 0.052,
+    },
+    scheduleBar: scheduleDriftBar,
   },
   "soft-orbit": {
     id: "soft-orbit",

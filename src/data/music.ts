@@ -3,6 +3,7 @@ export const musicTrackIds = [
   "blue-hour",
   "collection-lounge",
   "neon-lounge",
+  "metro-drift",
   "soft-orbit",
   "signal-garden",
 ] as const;
@@ -13,7 +14,8 @@ export type ConsoleTheme = "light" | "dark";
 
 export type MusicTrack = {
   id: MusicTrackId;
-  translationKey: "home" | "night" | "lounge" | "neon" | "orbit" | "signal";
+  translationKey:
+    "home" | "night" | "lounge" | "neon" | "drift" | "orbit" | "signal";
   title: string;
   shortTitle: string;
   description: string;
@@ -60,24 +62,35 @@ export const musicTracks: readonly MusicTrack[] = [
   {
     id: "collection-lounge",
     translationKey: "lounge",
-    title: "Collection Lounge",
-    shortTitle: "LOUNGE",
+    title: "Velvet Shelf",
+    shortTitle: "VELVET",
     description:
       "Leichter Lounge-Jazz mit warmem E-Piano, weichem Bass, Besen, Vibraphon und zurückhaltender Flöte.",
     color: "#c77778",
     colorDark: "#74435d",
-    label: "Collection Jazz",
+    label: "Soft Focus",
   },
   {
     id: "neon-lounge",
     translationKey: "neon",
-    title: "Neon Lounge",
-    shortTitle: "NEON",
+    title: "Midnight Relay",
+    shortTitle: "RELAY",
     description:
       "Kühler Lounge-Groove mit dunklem E-Piano, Synth-Bass, gedämpftem Beat und urbanen Lead-Farben.",
     color: "#765fc8",
     colorDark: "#273b78",
     label: "After Dark",
+  },
+  {
+    id: "metro-drift",
+    translationKey: "drift",
+    title: "Metro Drift",
+    shortTitle: "DRIFT",
+    description:
+      "Rhodes, ein weicher Breakbeat, Subbass, atmosphärische Texturen und kurze Synth-Motive für entspanntes urbanes Browsen.",
+    color: "#49a6b3",
+    colorDark: "#20576d",
+    label: "City Loop",
   },
   {
     id: "soft-orbit",
@@ -118,6 +131,14 @@ const previousCompleteMusicLibraries: readonly (readonly MusicTrackId[])[] = [
     "home-pulse",
     "blue-hour",
     "collection-lounge",
+    "soft-orbit",
+    "signal-garden",
+  ],
+  [
+    "home-pulse",
+    "blue-hour",
+    "collection-lounge",
+    "neon-lounge",
     "soft-orbit",
     "signal-garden",
   ],
