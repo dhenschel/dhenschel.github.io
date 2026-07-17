@@ -21,6 +21,7 @@ import { musicTracks } from "../data/music";
       class="music-carousel"
       aria-label="Hintergrundmusik auswählen"
       data-i18n-aria="music.choose"
+      data-music-carousel
     >
       <button
         class="music-carousel__arrow music-carousel__arrow--previous"
@@ -138,6 +139,9 @@ import { musicTracks } from "../data/music";
   const musicDiscs = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-music-disc]"),
   );
+  const musicCarousel = document.querySelector<HTMLElement>(
+    "[data-music-carousel]",
+  );
   const musicPrevious = document.querySelector<HTMLButtonElement>(
     '[data-music-arrow="previous"]',
   );
@@ -173,6 +177,9 @@ import { musicTracks } from "../data/music";
     enabled: true,
     playing: false,
   };
+  let musicWheelDelta = 0;
+  let musicWheelLockedUntil = 0;
+  let musicWheelResetTimer: number | null = null;
 
   const getSelectedTrack = () => musicTracks[selectedMusicIndex];
   const getTrackDescription = (index = selectedMusicIndex) => {
@@ -310,10 +317,13 @@ import { musicTracks } from "../data/music";
       0,
       Math.min(musicTrackIds.length - 1, selectedMusicIndex + direction),
     );
-    if (nextIndex === selectedMusicIndex) return;
+    if (nextIndex === selectedMusicIndex) return false;
     selectedMusicIndex = nextIndex;
     updateMusicCarousel(focusDisc);
+    return true;
   };
+
+  const playMusicNavigationSound = () => window.consoleAudio?.play("navigate");
 
   const selectActiveMusic = (focusDisc = false) => {
     const activeIndex = musicTrackIds.indexOf(musicState.activeTrackId);
@@ -327,9 +337,57 @@ import { musicTracks } from "../data/music";
     window.consoleAudio?.setTrack(track.id);
   };
 
-  musicPrevious?.addEventListener("click", () => moveMusicSelection(-1));
-  musicNext?.addEventListener("click", () => moveMusicSelection(1));
+  musicPrevious?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const moved = moveMusicSelection(-1);
+    if (moved && event.detail > 0) playMusicNavigationSound();
+  });
+  musicNext?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const moved = moveMusicSelection(1);
+    if (moved && event.detail > 0) playMusicNavigationSound();
+  });
   musicPlay?.addEventListener("click", () => playSelectedMusic());
+
+  musicCarousel?.addEventListener(
+    "wheel",
+    (event) => {
+      if (document.documentElement.dataset.consoleView !== "music") return;
+      const rawDelta =
+        Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+          ? event.deltaY
+          : event.deltaX;
+      if (rawDelta === 0) return;
+
+      event.preventDefault();
+      const now = performance.now();
+      if (now < musicWheelLockedUntil) return;
+
+      const direction = Math.sign(rawDelta);
+      if (musicWheelDelta !== 0 && Math.sign(musicWheelDelta) !== direction) {
+        musicWheelDelta = 0;
+      }
+      const deltaMultiplier =
+        event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 120 : 1;
+      musicWheelDelta += rawDelta * deltaMultiplier;
+
+      if (musicWheelResetTimer !== null) {
+        window.clearTimeout(musicWheelResetTimer);
+      }
+      musicWheelResetTimer = window.setTimeout(() => {
+        musicWheelDelta = 0;
+        musicWheelResetTimer = null;
+      }, 180);
+
+      if (Math.abs(musicWheelDelta) < 36) return;
+      const moved = moveMusicSelection(direction, false);
+      musicWheelDelta = 0;
+      if (!moved) return;
+      musicWheelLockedUntil = now + 280;
+      playMusicNavigationSound();
+    },
+    { passive: false },
+  );
 
   musicDiscs.forEach((disc, index) => {
     const surface = disc.querySelector<HTMLElement>(".music-disc__surface");
@@ -369,7 +427,7 @@ import { musicTracks } from "../data/music";
         event.stopPropagation();
         selectedMusicIndex = index;
         updateMusicCarousel(true);
-        window.consoleAudio?.play("focus");
+        if (event.detail > 0) playMusicNavigationSound();
         return;
       }
       playSelectedMusic();

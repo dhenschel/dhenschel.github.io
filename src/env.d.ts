@@ -1,7 +1,14 @@
 /// <reference types="astro/client" />
 
 type ConsoleSoundEffect =
-  "hover" | "focus" | "confirm" | "back" | "toggle" | "launch" | "error";
+  | "hover"
+  | "focus"
+  | "navigate"
+  | "confirm"
+  | "back"
+  | "toggle"
+  | "launch"
+  | "error";
 
 type ConsoleMusicTrackId =
   "home-pulse" | "blue-hour" | "soft-orbit" | "signal-garden";
