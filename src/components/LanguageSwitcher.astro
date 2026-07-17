@@ -20,10 +20,26 @@ const { placement = "console" } = Astro.props;
     aria-label="Sprache auswählen"
   >
     <span class="language-switcher__flag" aria-hidden="true">
-      <i class="language-switcher__flag-de"></i>
-      <i class="language-switcher__flag-en"></i>
-      <i class="language-switcher__flag-fr"></i>
-      <i class="language-switcher__flag-es"></i>
+      <img
+        class="language-switcher__flag-image language-switcher__flag-de"
+        src="/flags/de.svg"
+        alt=""
+      />
+      <img
+        class="language-switcher__flag-image language-switcher__flag-en"
+        src="/flags/gb.svg"
+        alt=""
+      />
+      <img
+        class="language-switcher__flag-image language-switcher__flag-fr"
+        src="/flags/fr.svg"
+        alt=""
+      />
+      <img
+        class="language-switcher__flag-image language-switcher__flag-es"
+        src="/flags/es.svg"
+        alt=""
+      />
     </span>
     <strong class="language-switcher__current" data-language-current>DE</strong>
   </button>
@@ -35,27 +51,39 @@ const { placement = "console" } = Astro.props;
     data-i18n-aria="language.label"
   >
     <button type="button" role="menuitemradio" data-language-option="de">
-      <span
-        class="language-switcher__option-flag language-switcher__flag-de"
-        aria-hidden="true"></span>
+      <img
+        class="language-switcher__option-flag"
+        src="/flags/de.svg"
+        alt=""
+        aria-hidden="true"
+      />
       <strong>Deutsch</strong><i aria-hidden="true">✓</i>
     </button>
     <button type="button" role="menuitemradio" data-language-option="en">
-      <span
-        class="language-switcher__option-flag language-switcher__flag-en"
-        aria-hidden="true"></span>
+      <img
+        class="language-switcher__option-flag"
+        src="/flags/gb.svg"
+        alt=""
+        aria-hidden="true"
+      />
       <strong>English</strong><i aria-hidden="true">✓</i>
     </button>
     <button type="button" role="menuitemradio" data-language-option="fr">
-      <span
-        class="language-switcher__option-flag language-switcher__flag-fr"
-        aria-hidden="true"></span>
+      <img
+        class="language-switcher__option-flag"
+        src="/flags/fr.svg"
+        alt=""
+        aria-hidden="true"
+      />
       <strong>Français</strong><i aria-hidden="true">✓</i>
     </button>
     <button type="button" role="menuitemradio" data-language-option="es">
-      <span
-        class="language-switcher__option-flag language-switcher__flag-es"
-        aria-hidden="true"></span>
+      <img
+        class="language-switcher__option-flag"
+        src="/flags/es.svg"
+        alt=""
+        aria-hidden="true"
+      />
       <strong>Español</strong><i aria-hidden="true">✓</i>
     </button>
   </div>
