@@ -6,6 +6,7 @@ export const musicTrackIds = [
 ] as const;
 
 export type MusicTrackId = (typeof musicTrackIds)[number];
+export type MusicDiscId = "shuffle" | MusicTrackId;
 export type ConsoleTheme = "light" | "dark";
 
 export type MusicTrack = {
@@ -18,6 +19,17 @@ export type MusicTrack = {
   colorDark: string;
   label: string;
   legacy?: boolean;
+};
+
+export const shuffleDisc = {
+  id: "shuffle" as const,
+  title: "Shuffle",
+  shortTitle: "SHUFFLE",
+  description:
+    "Wählt bei jedem Start zufällig eine der CDs aus deinem persönlichen Pool.",
+  color: "#aeb6c1",
+  colorDark: "#5d6875",
+  label: "Zufall",
 };
 
 export const musicTracks: readonly MusicTrack[] = [

@@ -1,5 +1,7 @@
 ---
-import { musicTracks } from "../data/music";
+import { musicTracks, shuffleDisc } from "../data/music";
+
+const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 ---
 
 <section
@@ -38,12 +40,13 @@ import { musicTracks } from "../data/music";
 
       <div class="music-carousel__stage">
         {
-          musicTracks.map((track, index) => (
+          musicLibraryDiscs.map((track, index) => (
             <button
               class="music-disc"
               type="button"
               data-music-disc
               data-track-id={track.id}
+              data-shuffle-disc={track.id === "shuffle" ? "true" : undefined}
               data-carousel-position={index === 0 ? "active" : "visible"}
               data-carousel-distance={index}
               aria-label={`${track.title} auswählen und anhören`}
@@ -57,23 +60,32 @@ import { musicTracks } from "../data/music";
                 <span class="music-disc__rings" />
                 <span class="music-disc__label">
                   <small
-                    data-i18n={`music.track.${track.translationKey}.label`}
+                    data-i18n={
+                      track.id === "shuffle"
+                        ? "music.shuffle.label"
+                        : `music.track.${track.translationKey}.label`
+                    }
                   >
                     {track.label}
                   </small>
                   <strong>{track.shortTitle}</strong>
+                  {track.id === "shuffle" && (
+                    <span class="music-disc__question">?</span>
+                  )}
                   <i />
                 </span>
                 <span class="music-disc__hole" />
               </span>
-              <span class="music-disc__badges" aria-hidden="true">
-                <span data-music-default-badge="light" hidden>
-                  ☀
+              {track.id !== "shuffle" && (
+                <span class="music-disc__badges" aria-hidden="true">
+                  <span data-music-default-badge="light" hidden>
+                    ☀
+                  </span>
+                  <span data-music-default-badge="dark" hidden>
+                    ☾
+                  </span>
                 </span>
-                <span data-music-default-badge="dark" hidden>
-                  ☾
-                </span>
-              </span>
+              )}
               <span class="visually-hidden" data-music-disc-status />
             </button>
           ))
@@ -96,14 +108,11 @@ import { musicTracks } from "../data/music";
 
     <div class="music-channel__details" aria-live="polite">
       <p data-music-position>
-        Disc 1 von {musicTracks.length}
+        Disc 1 von {musicLibraryDiscs.length}
       </p>
-      <h2 data-music-title>{musicTracks[0].title}</h2>
-      <p
-        data-music-description
-        data-i18n={`music.track.${musicTracks[0].translationKey}.description`}
-      >
-        {musicTracks[0].description}
+      <h2 data-music-title>{shuffleDisc.title}</h2>
+      <p data-music-description data-i18n="music.shuffle.description">
+        {shuffleDisc.description}
       </p>
       <strong data-music-playing-status data-i18n="music.current"
         >Aktuelle Hintergrundmusik</strong
@@ -132,7 +141,70 @@ import { musicTracks } from "../data/music";
         <span aria-hidden="true">☾</span>
         <strong data-i18n="music.nightDefault">Als Nacht-Standard</strong>
       </button>
+      <button
+        type="button"
+        data-shuffle-pool-open
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        hidden
+      >
+        <span class="music-shuffle-pool-icon" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <strong data-i18n="music.shuffle.pool">Pool</strong>
+        <small data-shuffle-pool-count>4 CDs</small>
+      </button>
     </div>
+
+    <dialog
+      class="music-shuffle-dialog"
+      data-shuffle-dialog
+      aria-labelledby="shuffle-pool-title"
+    >
+      <div class="music-shuffle-dialog__panel">
+        <header>
+          <div>
+            <small data-i18n="music.shuffle.eyebrow">Zufallsauswahl</small>
+            <h2 id="shuffle-pool-title" data-i18n="music.shuffle.poolTitle">
+              Shuffle-Pool
+            </h2>
+          </div>
+          <button
+            type="button"
+            data-shuffle-pool-close
+            data-dialog-close
+            aria-label="Shuffle-Pool schließen"
+            data-i18n-aria="music.shuffle.poolClose"
+          >
+            ×
+          </button>
+        </header>
+        <p data-i18n="music.shuffle.poolDescription">
+          Wähle die CDs, die Shuffle verwenden darf.
+        </p>
+        <div class="music-shuffle-dialog__options">
+          {
+            musicTracks.map((track) => (
+              <button
+                type="button"
+                data-shuffle-option={track.id}
+                aria-pressed="true"
+                style={`--pool-disc-color: ${track.color}; --pool-disc-color-dark: ${track.colorDark};`}
+              >
+                <span aria-hidden="true">
+                  <i />
+                </span>
+                <strong>{track.title}</strong>
+                <b aria-hidden="true">✓</b>
+              </button>
+            ))
+          }
+        </div>
+        <footer>
+          <span data-shuffle-pool-status aria-live="polite">4 CDs im Pool</span>
+        </footer>
+      </div>
+    </dialog>
   </div>
 </section>
 
@@ -140,10 +212,15 @@ import { musicTracks } from "../data/music";
   import {
     musicTrackIds,
     musicTracks,
+    shuffleDisc,
     type ConsoleTheme,
+    type MusicDiscId,
     type MusicTrackId,
   } from "../data/music";
   import { t } from "../scripts/i18n";
+
+  const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
+  const shufflePoolStorageKey = "dh-console-shuffle-pool-v1";
 
   const musicDiscs = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-music-disc]"),
@@ -175,6 +252,24 @@ import { musicTracks } from "../data/music";
   const musicDefaultButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-music-default]"),
   );
+  const shufflePoolOpen = document.querySelector<HTMLButtonElement>(
+    "[data-shuffle-pool-open]",
+  );
+  const shufflePoolCount = document.querySelector<HTMLElement>(
+    "[data-shuffle-pool-count]",
+  );
+  const shuffleDialog = document.querySelector<HTMLDialogElement>(
+    "[data-shuffle-dialog]",
+  );
+  const shufflePoolClose = document.querySelector<HTMLButtonElement>(
+    "[data-shuffle-pool-close]",
+  );
+  const shufflePoolStatus = document.querySelector<HTMLElement>(
+    "[data-shuffle-pool-status]",
+  );
+  const shuffleOptions = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("[data-shuffle-option]"),
+  );
   const headerMusicButton = document.querySelector<HTMLButtonElement>(
     "[data-music-channel-open]",
   );
@@ -189,11 +284,31 @@ import { musicTracks } from "../data/music";
   let musicWheelDelta = 0;
   let musicWheelLockedUntil = 0;
   let musicWheelResetTimer: number | null = null;
+  let musicDiscActivationLockedUntil = 0;
+  let shuffleIsActive = false;
+  let lastShuffleTrackId: MusicTrackId | null = null;
 
-  const getSelectedTrack = () => musicTracks[selectedMusicIndex];
-  const getTrackDescription = (index = selectedMusicIndex) => {
-    const track = musicTracks[index];
-    return t(`music.track.${track.translationKey}.description`);
+  const loadShufflePool = (): MusicTrackId[] => {
+    try {
+      const stored = JSON.parse(
+        localStorage.getItem(shufflePoolStorageKey) ?? "null",
+      );
+      if (!Array.isArray(stored)) return [...musicTrackIds];
+      const valid = musicTrackIds.filter((trackId) => stored.includes(trackId));
+      return valid.length > 0 ? valid : [...musicTrackIds];
+    } catch {
+      return [...musicTrackIds];
+    }
+  };
+
+  let shufflePool = loadShufflePool();
+
+  const getSelectedDisc = () => musicLibraryDiscs[selectedMusicIndex];
+  const getDiscDescription = (index = selectedMusicIndex) => {
+    const disc = musicLibraryDiscs[index];
+    return disc.id === "shuffle"
+      ? t("music.shuffle.description")
+      : t(`music.track.${disc.translationKey}.description`);
   };
 
   const getDiscRotation = (surface: HTMLElement) => {
@@ -204,10 +319,40 @@ import { musicTracks } from "../data/music";
     return ((currentAngle % 360) + 360) % 360;
   };
 
+  const getShufflePoolCountText = () =>
+    t(
+      shufflePool.length === 1
+        ? "music.shuffle.poolCountOne"
+        : "music.shuffle.poolCount",
+      { count: shufflePool.length },
+    );
+
+  const updateShufflePoolUi = (announcement?: string) => {
+    const countText = getShufflePoolCountText();
+    if (shufflePoolCount) shufflePoolCount.textContent = countText;
+    if (shufflePoolStatus) {
+      shufflePoolStatus.textContent = announcement ?? countText;
+    }
+    shufflePoolOpen?.setAttribute(
+      "aria-label",
+      t("music.shuffle.poolOpenWithCount", { count: shufflePool.length }),
+    );
+    shuffleOptions.forEach((option) => {
+      const trackId = option.dataset.shuffleOption as MusicTrackId;
+      option.setAttribute(
+        "aria-pressed",
+        String(shufflePool.includes(trackId)),
+      );
+    });
+  };
+
   const updateMusicState = () => {
     musicDiscs.forEach((disc) => {
-      const trackId = disc.dataset.trackId as MusicTrackId;
-      const isActive = trackId === musicState.activeTrackId;
+      const discId = disc.dataset.trackId as MusicDiscId;
+      const isShuffle = discId === "shuffle";
+      const isActive = shuffleIsActive
+        ? isShuffle
+        : discId === musicState.activeTrackId;
       disc.dataset.activeTrack = String(isActive);
       disc.setAttribute("aria-pressed", String(isActive));
       if (!isActive) {
@@ -232,43 +377,66 @@ import { musicTracks } from "../data/music";
       const nightBadge = disc.querySelector<HTMLElement>(
         '[data-music-default-badge="dark"]',
       );
-      if (dayBadge) dayBadge.hidden = musicState.defaults.light !== trackId;
-      if (nightBadge) nightBadge.hidden = musicState.defaults.dark !== trackId;
+      if (dayBadge) dayBadge.hidden = musicState.defaults.light !== discId;
+      if (nightBadge) nightBadge.hidden = musicState.defaults.dark !== discId;
     });
 
-    const selectedTrack = getSelectedTrack();
-    const selectedIsActive = selectedTrack.id === musicState.activeTrackId;
+    const selectedDisc = getSelectedDisc();
+    const selectedIsShuffle = selectedDisc.id === "shuffle";
+    const selectedIsActive = selectedIsShuffle
+      ? shuffleIsActive
+      : selectedDisc.id === musicState.activeTrackId;
     if (musicPlayLabel) {
-      musicPlayLabel.textContent =
-        selectedIsActive && musicState.playing
+      musicPlayLabel.textContent = selectedIsShuffle
+        ? t(shuffleIsActive ? "music.shuffle.again" : "music.shuffle.play")
+        : selectedIsActive && musicState.playing
           ? t("music.playing")
           : t("music.listen");
     }
     musicPlay?.setAttribute(
       "aria-label",
-      selectedIsActive && musicState.playing
-        ? t("music.playingTrack", { title: selectedTrack.title })
-        : t("music.listenTrack", { title: selectedTrack.title }),
+      selectedIsShuffle
+        ? t("music.shuffle.playAria")
+        : selectedIsActive && musicState.playing
+          ? t("music.playingTrack", { title: selectedDisc.title })
+          : t("music.listenTrack", { title: selectedDisc.title }),
     );
     if (musicPlayingStatus) {
-      musicPlayingStatus.textContent = selectedIsActive
-        ? musicState.playing
-          ? t("music.playing")
-          : t("music.selectedBackground")
-        : t(
-            document.documentElement.dataset.inputMode === "gamepad"
-              ? "music.playHintGamepad"
-              : "music.playHint",
-          );
+      const activeTrack = musicTracks.find(
+        (track) => track.id === musicState.activeTrackId,
+      );
+      musicPlayingStatus.textContent = selectedIsShuffle
+        ? shuffleIsActive && activeTrack
+          ? t("music.shuffle.playing", { title: activeTrack.title })
+          : t("music.shuffle.hint")
+        : selectedIsActive
+          ? musicState.playing
+            ? t("music.playing")
+            : t("music.selectedBackground")
+          : t(
+              document.documentElement.dataset.inputMode === "gamepad"
+                ? "music.playHintGamepad"
+                : "music.playHint",
+            );
     }
 
     musicDefaultButtons.forEach((button) => {
       const theme = button.dataset.musicDefault as ConsoleTheme;
+      button.hidden = selectedIsShuffle;
       button.setAttribute(
         "aria-pressed",
-        String(musicState.defaults[theme] === selectedTrack.id),
+        String(
+          !selectedIsShuffle && musicState.defaults[theme] === selectedDisc.id,
+        ),
       );
     });
+    if (shufflePoolOpen) {
+      shufflePoolOpen.hidden = !selectedIsShuffle;
+      shufflePoolOpen.setAttribute(
+        "aria-expanded",
+        String(Boolean(shuffleDialog?.open)),
+      );
+    }
 
     if (headerMusicButton) {
       const activeTrack = musicTracks.find(
@@ -311,26 +479,41 @@ import { musicTracks } from "../data/music";
     if (musicPrevious) musicPrevious.disabled = selectedMusicIndex === 0;
     if (musicNext) musicNext.disabled = selectedMusicIndex === total - 1;
 
-    const track = getSelectedTrack();
+    const selectedDisc = getSelectedDisc();
     if (musicPosition) {
       musicPosition.textContent = t("music.position", {
         current: selectedMusicIndex + 1,
         total,
       });
     }
-    if (musicTitle) musicTitle.textContent = track.title;
-    if (musicDescription) musicDescription.textContent = getTrackDescription();
+    if (musicTitle) {
+      musicTitle.textContent =
+        selectedDisc.id === "shuffle"
+          ? t("music.shuffle.title")
+          : selectedDisc.title;
+    }
+    if (musicDescription) musicDescription.textContent = getDiscDescription();
     updateMusicState();
     if (focusDisc)
       musicDiscs[selectedMusicIndex]?.focus({ preventScroll: true });
   };
 
+  const closeShufflePool = (restoreFocus = false) => {
+    if (!shuffleDialog?.open) return;
+    shuffleDialog.close();
+    if (shufflePoolOpen) shufflePoolOpen.disabled = false;
+    shufflePoolOpen?.setAttribute("aria-expanded", "false");
+    if (restoreFocus) shufflePoolOpen?.focus({ preventScroll: true });
+  };
+
   const moveMusicSelection = (direction: number, focusDisc = true) => {
     const nextIndex = Math.max(
       0,
-      Math.min(musicTrackIds.length - 1, selectedMusicIndex + direction),
+      Math.min(musicLibraryDiscs.length - 1, selectedMusicIndex + direction),
     );
     if (nextIndex === selectedMusicIndex) return false;
+    if (musicLibraryDiscs[nextIndex]?.id !== "shuffle") shuffleIsActive = false;
+    closeShufflePool();
     selectedMusicIndex = nextIndex;
     updateMusicCarousel(focusDisc);
     return true;
@@ -339,15 +522,41 @@ import { musicTracks } from "../data/music";
   const playMusicNavigationSound = () => window.consoleAudio?.play("navigate");
 
   const selectActiveMusic = (focusDisc = false) => {
-    const activeIndex = musicTrackIds.indexOf(musicState.activeTrackId);
+    const activeIndex = musicLibraryDiscs.findIndex(
+      (disc) => disc.id === musicState.activeTrackId,
+    );
     if (activeIndex >= 0) selectedMusicIndex = activeIndex;
     updateMusicCarousel(focusDisc);
   };
 
+  const pickShuffleTrack = () => {
+    let candidates = shufflePool.filter(
+      (trackId) => trackId !== musicState.activeTrackId,
+    );
+    if (candidates.length === 0) candidates = [...shufflePool];
+    if (candidates.length > 1 && lastShuffleTrackId) {
+      const withoutLast = candidates.filter(
+        (trackId) => trackId !== lastShuffleTrackId,
+      );
+      if (withoutLast.length > 0) candidates = withoutLast;
+    }
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  };
+
   const playSelectedMusic = (withKeyboardSound = false) => {
-    const track = getSelectedTrack();
+    const selectedDisc = getSelectedDisc();
     if (withKeyboardSound) window.consoleAudio?.play("confirm");
-    window.consoleAudio?.setTrack(track.id);
+    if (selectedDisc.id === "shuffle") {
+      const randomTrackId = pickShuffleTrack();
+      if (!randomTrackId) return;
+      shuffleIsActive = true;
+      lastShuffleTrackId = randomTrackId;
+      window.consoleAudio?.setTrack(randomTrackId);
+      updateMusicState();
+      return;
+    }
+    shuffleIsActive = false;
+    window.consoleAudio?.setTrack(selectedDisc.id);
   };
 
   musicPrevious?.addEventListener("click", (event) => {
@@ -361,6 +570,59 @@ import { musicTracks } from "../data/music";
     if (moved && event.detail > 0) playMusicNavigationSound();
   });
   musicPlay?.addEventListener("click", () => playSelectedMusic());
+
+  shufflePoolOpen?.addEventListener("click", () => {
+    if (!shuffleDialog) return;
+    updateShufflePoolUi();
+    shuffleDialog.showModal();
+    shufflePoolOpen.disabled = true;
+    shufflePoolOpen.setAttribute("aria-expanded", "true");
+    window.requestAnimationFrame(() => {
+      const selectedOption = shuffleOptions.find(
+        (option) => option.getAttribute("aria-pressed") === "true",
+      );
+      selectedOption?.focus({ preventScroll: true });
+    });
+  });
+
+  shufflePoolClose?.addEventListener("click", () => closeShufflePool(true));
+  shuffleDialog?.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeShufflePool(true);
+  });
+  shuffleDialog?.addEventListener("click", (event) => {
+    if (event.target === shuffleDialog) closeShufflePool(true);
+  });
+  shuffleDialog?.addEventListener("close", () => {
+    if (shufflePoolOpen) shufflePoolOpen.disabled = false;
+    shufflePoolOpen?.setAttribute("aria-expanded", "false");
+  });
+
+  shuffleOptions.forEach((option) => {
+    option.addEventListener("click", () => {
+      const trackId = option.dataset.shuffleOption as MusicTrackId;
+      const isIncluded = shufflePool.includes(trackId);
+      if (isIncluded && shufflePool.length === 1) {
+        updateShufflePoolUi(t("music.shuffle.poolMinimum"));
+        window.consoleAudio?.play("boundary");
+        return;
+      }
+      shufflePool = isIncluded
+        ? shufflePool.filter((id) => id !== trackId)
+        : musicTrackIds.filter(
+            (id) => id === trackId || shufflePool.includes(id),
+          );
+      try {
+        localStorage.setItem(
+          shufflePoolStorageKey,
+          JSON.stringify(shufflePool),
+        );
+      } catch {
+        // The pool remains usable for the current session.
+      }
+      updateShufflePoolUi();
+    });
+  });
 
   musicCarousel?.addEventListener(
     "wheel",
@@ -438,11 +700,17 @@ import { musicTracks } from "../data/music";
     disc.addEventListener("click", (event) => {
       if (index !== selectedMusicIndex) {
         event.stopPropagation();
+        if (musicLibraryDiscs[index]?.id !== "shuffle") {
+          shuffleIsActive = false;
+        }
+        closeShufflePool();
         selectedMusicIndex = index;
+        musicDiscActivationLockedUntil = performance.now() + 520;
         updateMusicCarousel(true);
         if (event.detail > 0) playMusicNavigationSound();
         return;
       }
+      if (performance.now() < musicDiscActivationLockedUntil) return;
       playSelectedMusic();
     });
   });
@@ -450,12 +718,15 @@ import { musicTracks } from "../data/music";
   musicDefaultButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const theme = button.dataset.musicDefault as ConsoleTheme;
-      window.consoleAudio?.setDefaultTrack(theme, getSelectedTrack().id);
+      const selectedDisc = getSelectedDisc();
+      if (selectedDisc.id === "shuffle") return;
+      window.consoleAudio?.setDefaultTrack(theme, selectedDisc.id);
     });
   });
 
   document.addEventListener("keydown", (event) => {
     if (document.documentElement.dataset.consoleView !== "music") return;
+    if (shuffleDialog?.open) return;
     const eventTarget = event.target as HTMLElement | null;
     if (
       eventTarget?.matches('input, textarea, select, [contenteditable="true"]')
@@ -484,7 +755,8 @@ import { musicTracks } from "../data/music";
     musicState = nextState;
     if (
       activeTrackChanged &&
-      document.documentElement.dataset.consoleView === "music"
+      document.documentElement.dataset.consoleView === "music" &&
+      !(shuffleIsActive && getSelectedDisc().id === "shuffle")
     ) {
       selectActiveMusic();
     } else {
@@ -494,15 +766,25 @@ import { musicTracks } from "../data/music";
 
   window.addEventListener("console:view-changed", (event) => {
     const view = (event as CustomEvent<{ view?: string }>).detail?.view;
-    if (view === "music") selectActiveMusic();
+    if (view === "music") {
+      selectActiveMusic();
+    } else {
+      shuffleIsActive = false;
+      closeShufflePool();
+    }
   });
 
-  window.addEventListener("console:language-changed", () =>
-    updateMusicCarousel(),
-  );
+  window.addEventListener("console:language-changed", () => {
+    updateShufflePoolUi();
+    updateMusicCarousel();
+  });
   window.addEventListener("console:input-mode-changed", updateMusicState);
+  window.addEventListener("console:theme-changed", () => {
+    shuffleIsActive = false;
+  });
 
   const initialMusicState = window.consoleAudio?.getMusicState();
   if (initialMusicState) musicState = initialMusicState;
+  updateShufflePoolUi();
   selectActiveMusic();
 </script>

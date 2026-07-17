@@ -905,7 +905,11 @@ const navigateBack = (gamepad: Gamepad) => {
   }
   const dialog = document.querySelector<HTMLDialogElement>("dialog[open]");
   if (dialog) {
-    dialog.querySelector<HTMLButtonElement>("[data-contact-close]")?.click();
+    dialog
+      .querySelector<HTMLButtonElement>(
+        "[data-contact-close], [data-dialog-close]",
+      )
+      ?.click();
     vibrate(gamepad, 0.1);
     return;
   }
