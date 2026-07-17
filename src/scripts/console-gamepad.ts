@@ -57,15 +57,23 @@ const root = document.documentElement;
 
 const isVisible = (element: HTMLElement) => {
   if (element.closest("[inert]")) return false;
-  if (element.getAttribute("aria-hidden") === "true") return false;
+  if (element.closest('[aria-hidden="true"]')) return false;
   if (element instanceof HTMLButtonElement && element.disabled) return false;
-  const style = getComputedStyle(element);
-  return (
-    style.display !== "none" &&
-    style.visibility !== "hidden" &&
-    Number(style.opacity) > 0.03 &&
-    element.getClientRects().length > 0
-  );
+  let current: HTMLElement | null = element;
+  while (current) {
+    const style = getComputedStyle(current);
+    if (
+      current.hidden ||
+      style.display === "none" ||
+      style.visibility === "hidden" ||
+      style.visibility === "collapse" ||
+      Number(style.opacity) <= 0.03
+    ) {
+      return false;
+    }
+    current = current.parentElement;
+  }
+  return element.getClientRects().length > 0;
 };
 
 const getInteractiveAt = (x: number, y: number) => {
@@ -249,10 +257,203 @@ const getNavigationCandidates = () => {
     .filter((element, index, all) => all.indexOf(element) === index);
 };
 
+const getScopedNavigationCandidates = (scope: ParentNode | null) =>
+  scope
+    ? Array.from(scope.querySelectorAll<HTMLElement>(INTERACTIVE_SELECTOR))
+        .filter(isVisible)
+        .filter((element, index, all) => all.indexOf(element) === index)
+    : [];
+
+const getCurrentNavigationTarget = () => {
+  if (pointerTarget && isVisible(pointerTarget)) return pointerTarget;
+  const active = document.activeElement;
+  if (!(active instanceof HTMLElement)) return null;
+  const interactive = active.closest<HTMLElement>(INTERACTIVE_SELECTOR);
+  return interactive && isVisible(interactive) ? interactive : null;
+};
+
+const getElementCenter = (element: HTMLElement) => {
+  const bounds = element.getBoundingClientRect();
+  return {
+    x: bounds.left + bounds.width / 2,
+    y: bounds.top + bounds.height / 2,
+    height: bounds.height,
+  };
+};
+
+const playNavigationBoundary = (repeated = false) => {
+  if (!repeated) window.consoleAudio?.play("boundary");
+};
+
+const focusNavigationTarget = (element: HTMLElement) => {
+  focusAndPointTo(element, true);
+  window.consoleAudio?.play("navigate");
+};
+
+const getHeaderNavigationCandidates = () =>
+  getScopedNavigationCandidates(
+    document.querySelector<HTMLElement>(".console-topbar"),
+  );
+
+const getFooterNavigationCandidates = () =>
+  getScopedNavigationCandidates(
+    document.querySelector<HTMLElement>(".console-bottombar"),
+  );
+
+const moveLinearFocus = (
+  candidates: HTMLElement[],
+  direction: "left" | "right",
+  repeated = false,
+) => {
+  const ordered = [...candidates].sort(
+    (first, second) => getElementCenter(first).x - getElementCenter(second).x,
+  );
+  if (!ordered.length) return false;
+  const current = getCurrentNavigationTarget();
+  const currentIndex = current ? ordered.indexOf(current) : -1;
+  if (currentIndex < 0) {
+    const nearest = ordered
+      .map((candidate) => ({
+        candidate,
+        distance: Math.abs(getElementCenter(candidate).x - pointerX),
+      }))
+      .sort((first, second) => first.distance - second.distance)[0]?.candidate;
+    if (!nearest) return false;
+    focusNavigationTarget(nearest);
+    return true;
+  }
+  const nextIndex = currentIndex + (direction === "left" ? -1 : 1);
+  const next = ordered[nextIndex];
+  if (!next) {
+    playNavigationBoundary(repeated);
+    return false;
+  }
+  focusNavigationTarget(next);
+  return true;
+};
+
+const focusNearestByX = (
+  candidates: HTMLElement[],
+  preferredX = pointerX,
+  repeated = false,
+) => {
+  const nearest = candidates
+    .map((candidate) => ({
+      candidate,
+      distance: Math.abs(getElementCenter(candidate).x - preferredX),
+    }))
+    .sort((first, second) => first.distance - second.distance)[0]?.candidate;
+  if (!nearest) {
+    playNavigationBoundary(repeated);
+    return false;
+  }
+  focusNavigationTarget(nearest);
+  return true;
+};
+
+const getEdgeRow = (candidates: HTMLElement[], edge: "top" | "bottom") => {
+  if (!candidates.length) return [];
+  const entries = candidates.map((candidate) => ({
+    candidate,
+    ...getElementCenter(candidate),
+  }));
+  const edgeY =
+    edge === "top"
+      ? Math.min(...entries.map((entry) => entry.y))
+      : Math.max(...entries.map((entry) => entry.y));
+  const tolerance = Math.max(
+    24,
+    entries.reduce((sum, entry) => sum + entry.height, 0) / entries.length / 2,
+  );
+  return entries
+    .filter((entry) => Math.abs(entry.y - edgeY) <= tolerance)
+    .map((entry) => entry.candidate);
+};
+
+const moveGridFocus = (
+  candidates: HTMLElement[],
+  direction: Direction,
+  repeated = false,
+  announceBoundary = true,
+) => {
+  if (!candidates.length) return false;
+  const entries = candidates
+    .map((candidate) => ({ candidate, ...getElementCenter(candidate) }))
+    .sort((first, second) => first.y - second.y || first.x - second.x);
+  const rows: Array<{
+    y: number;
+    height: number;
+    items: typeof entries;
+  }> = [];
+
+  entries.forEach((entry) => {
+    const currentRow = rows.at(-1);
+    const tolerance = Math.max(
+      24,
+      Math.min(entry.height, currentRow?.height ?? entry.height) / 2,
+    );
+    if (!currentRow || Math.abs(entry.y - currentRow.y) > tolerance) {
+      rows.push({ y: entry.y, height: entry.height, items: [entry] });
+      return;
+    }
+    currentRow.items.push(entry);
+    currentRow.y =
+      currentRow.items.reduce((sum, item) => sum + item.y, 0) /
+      currentRow.items.length;
+    currentRow.height = Math.max(currentRow.height, entry.height);
+  });
+  rows.forEach((row) => row.items.sort((a, b) => a.x - b.x));
+
+  const current = getCurrentNavigationTarget();
+  const currentRowIndex = rows.findIndex((row) =>
+    row.items.some((item) => item.candidate === current),
+  );
+  if (currentRowIndex < 0) {
+    const nearest = entries
+      .map((entry) => ({
+        candidate: entry.candidate,
+        distance: Math.hypot(entry.x - pointerX, entry.y - pointerY),
+      }))
+      .sort((first, second) => first.distance - second.distance)[0]?.candidate;
+    if (!nearest) return false;
+    focusNavigationTarget(nearest);
+    return true;
+  }
+
+  const currentRow = rows[currentRowIndex];
+  const currentItemIndex = currentRow.items.findIndex(
+    (item) => item.candidate === current,
+  );
+  const currentItem = currentRow.items[currentItemIndex];
+  let next: HTMLElement | undefined;
+
+  if (direction === "left" || direction === "right") {
+    const nextIndex = currentItemIndex + (direction === "left" ? -1 : 1);
+    next = currentRow.items[nextIndex]?.candidate;
+  } else {
+    const nextRowIndex = currentRowIndex + (direction === "up" ? -1 : 1);
+    const nextRow = rows[nextRowIndex];
+    next = nextRow?.items
+      .map((item) => ({
+        candidate: item.candidate,
+        distance: Math.abs(item.x - currentItem.x),
+      }))
+      .sort((first, second) => first.distance - second.distance)[0]?.candidate;
+  }
+
+  if (!next) {
+    if (announceBoundary) playNavigationBoundary(repeated);
+    return false;
+  }
+  focusNavigationTarget(next);
+  return true;
+};
+
 const moveSpatialFocus = (
   direction: Direction,
   candidates = getNavigationCandidates(),
   repeated = false,
+  announceBoundary = true,
 ) => {
   if (!candidates.length) return false;
 
@@ -312,7 +513,7 @@ const moveSpatialFocus = (
     .sort((a, b) => a.score - b.score)[0]?.candidate;
 
   if (!next) {
-    if (!repeated) window.consoleAudio?.play("boundary");
+    if (announceBoundary) playNavigationBoundary(repeated);
     return false;
   }
   focusAndPointTo(next, true);
@@ -363,6 +564,229 @@ const pointToCurrentCarouselItem = () => {
   });
 };
 
+const handleStartupDirection = (
+  startup: HTMLElement,
+  direction: Direction,
+  repeated: boolean,
+) => {
+  const current = getCurrentNavigationTarget();
+  const topControls = getScopedNavigationCandidates(startup).filter((item) =>
+    item.matches("[data-language-toggle], [data-skip-startup]"),
+  );
+  const activeProfile = startup.querySelector<HTMLElement>(
+    '[data-startup-profile][data-carousel-position="active"]',
+  );
+  const startButton = startup.querySelector<HTMLButtonElement>(
+    "[data-start-console]",
+  );
+  const currentIsTopControl = Boolean(current && topControls.includes(current));
+
+  if (direction === "left" || direction === "right") {
+    if (currentIsTopControl) {
+      moveLinearFocus(topControls, direction, repeated);
+      return;
+    }
+    const arrow = startup.querySelector<HTMLButtonElement>(
+      direction === "left" ? "[data-profile-previous]" : "[data-profile-next]",
+    );
+    if (!arrow) {
+      playNavigationBoundary(repeated);
+      return;
+    }
+    arrow.click();
+    pointToCurrentCarouselItem();
+    return;
+  }
+
+  if (currentIsTopControl) {
+    if (direction === "down" && activeProfile) {
+      focusNavigationTarget(activeProfile);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+
+  if (current === startButton) {
+    if (direction === "up" && activeProfile) {
+      focusNavigationTarget(activeProfile);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+
+  if (direction === "up") {
+    focusNearestByX(topControls, pointerX, repeated);
+    return;
+  }
+
+  if (startButton && isVisible(startButton)) {
+    focusNavigationTarget(startButton);
+  } else {
+    playNavigationBoundary(repeated);
+  }
+};
+
+const handleMusicDirection = (direction: Direction, repeated: boolean) => {
+  const current = getCurrentNavigationTarget();
+  const headerControls = getHeaderNavigationCandidates();
+  const footerControls = getFooterNavigationCandidates();
+  const actionControls = getScopedNavigationCandidates(
+    document.querySelector<HTMLElement>(".music-channel__actions"),
+  );
+  const activeDisc = document.querySelector<HTMLElement>(
+    '[data-music-disc][data-carousel-position="active"]',
+  );
+  const currentIsHeader = Boolean(current?.closest(".console-topbar"));
+  const currentIsFooter = Boolean(current?.closest(".console-bottombar"));
+  const currentIsAction = Boolean(current && actionControls.includes(current));
+  const currentIsDisc = Boolean(
+    current?.matches("[data-music-disc], [data-music-arrow]"),
+  );
+
+  if (currentIsHeader) {
+    if (direction === "left" || direction === "right") {
+      moveLinearFocus(headerControls, direction, repeated);
+    } else if (direction === "down" && activeDisc) {
+      focusNavigationTarget(activeDisc);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+
+  if (currentIsFooter) {
+    if (direction === "left" || direction === "right") {
+      moveLinearFocus(footerControls, direction, repeated);
+    } else if (direction === "up") {
+      focusNearestByX(actionControls, pointerX, repeated);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+
+  if (currentIsAction) {
+    if (direction === "left" || direction === "right") {
+      moveLinearFocus(actionControls, direction, repeated);
+    } else if (direction === "up" && activeDisc) {
+      focusNavigationTarget(activeDisc);
+    } else if (direction === "down") {
+      focusNearestByX(footerControls, pointerX, repeated);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+
+  if (currentIsDisc || !current) {
+    if (direction === "left" || direction === "right") {
+      const arrow = document.querySelector<HTMLButtonElement>(
+        direction === "left"
+          ? '[data-music-arrow="previous"]'
+          : '[data-music-arrow="next"]',
+      );
+      if (!arrow || arrow.disabled) {
+        playNavigationBoundary(repeated);
+        return;
+      }
+      window.consoleAudio?.play("navigate");
+      arrow.click();
+      pointToCurrentCarouselItem();
+    } else if (direction === "up") {
+      focusNearestByX(headerControls, pointerX, repeated);
+    } else {
+      const playButton =
+        document.querySelector<HTMLElement>("[data-music-play]");
+      if (playButton && isVisible(playButton)) {
+        focusNavigationTarget(playButton);
+      } else {
+        playNavigationBoundary(repeated);
+      }
+    }
+    return;
+  }
+
+  if (activeDisc) {
+    focusNavigationTarget(activeDisc);
+  } else {
+    playNavigationBoundary(repeated);
+  }
+};
+
+const handleGalleryDirection = (direction: Direction, repeated: boolean) => {
+  const current = getCurrentNavigationTarget();
+  const headerControls = getHeaderNavigationCandidates();
+  const footerControls = getFooterNavigationCandidates();
+  const galleryControls = getGalleryNavigationCandidates();
+  const currentIsHeader = Boolean(current?.closest(".console-topbar"));
+  const currentIsFooter = Boolean(current?.closest(".console-bottombar"));
+
+  if (currentIsHeader) {
+    if (direction === "left" || direction === "right") {
+      moveLinearFocus(headerControls, direction, repeated);
+    } else if (direction === "down") {
+      focusNearestByX(getEdgeRow(galleryControls, "top"), pointerX, repeated);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+
+  if (currentIsFooter) {
+    if (direction === "left" || direction === "right") {
+      moveLinearFocus(footerControls, direction, repeated);
+    } else if (direction === "up") {
+      focusNearestByX(
+        getEdgeRow(galleryControls, "bottom"),
+        pointerX,
+        repeated,
+      );
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+
+  const moved = moveGridFocus(galleryControls, direction, repeated, false);
+  if (moved) return;
+  if (direction === "up") {
+    focusNearestByX(headerControls, pointerX, repeated);
+  } else if (direction === "down") {
+    focusNearestByX(footerControls, pointerX, repeated);
+  } else {
+    playNavigationBoundary(repeated);
+  }
+};
+
+const handlePageChromeDirection = (direction: Direction, repeated: boolean) => {
+  const current = getCurrentNavigationTarget();
+  const headerControls = getHeaderNavigationCandidates();
+  const footerControls = getFooterNavigationCandidates();
+  if (current?.closest(".console-topbar")) {
+    if (direction === "left" || direction === "right") {
+      moveLinearFocus(headerControls, direction, repeated);
+    } else if (direction === "down") {
+      focusNearestByX(footerControls, pointerX, repeated);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+  if (current?.closest(".console-bottombar")) {
+    if (direction === "left" || direction === "right") {
+      moveLinearFocus(footerControls, direction, repeated);
+    } else if (direction === "up") {
+      focusNearestByX(headerControls, pointerX, repeated);
+    } else {
+      playNavigationBoundary(repeated);
+    }
+    return;
+  }
+  moveSpatialFocus(direction, getNavigationCandidates(), repeated);
+};
+
 const handleDirection = (direction: Direction, repeated = false) => {
   useGamepadMode();
   gamepadNavigationMethod = "structured";
@@ -373,40 +797,22 @@ const handleDirection = (direction: Direction, repeated = false) => {
   }
 
   const startup = getReadyStartup();
-  if (startup && (direction === "left" || direction === "right")) {
-    const arrow = startup.querySelector<HTMLButtonElement>(
-      direction === "left" ? "[data-profile-previous]" : "[data-profile-next]",
-    );
-    arrow?.click();
-    pointToCurrentCarouselItem();
+  if (startup) {
+    handleStartupDirection(startup, direction, repeated);
     return;
   }
 
-  if (
-    root.dataset.consoleView === "music" &&
-    (direction === "left" || direction === "right")
-  ) {
-    const arrow = document.querySelector<HTMLButtonElement>(
-      direction === "left"
-        ? '[data-music-arrow="previous"]'
-        : '[data-music-arrow="next"]',
-    );
-    if (!arrow || arrow.disabled) {
-      if (!repeated) window.consoleAudio?.play("boundary");
-      return;
-    }
-    window.consoleAudio?.play("navigate");
-    arrow.click();
-    pointToCurrentCarouselItem();
+  if (root.dataset.consoleView === "music") {
+    handleMusicDirection(direction, repeated);
     return;
   }
 
   if (root.dataset.consoleView === "gallery") {
-    moveSpatialFocus(direction, getGalleryNavigationCandidates(), repeated);
+    handleGalleryDirection(direction, repeated);
     return;
   }
 
-  moveSpatialFocus(direction, getNavigationCandidates(), repeated);
+  handlePageChromeDirection(direction, repeated);
 };
 
 const activateCurrentTarget = (gamepad: Gamepad) => {
@@ -419,6 +825,14 @@ const activateCurrentTarget = (gamepad: Gamepad) => {
   let target = pointerTarget && isVisible(pointerTarget) ? pointerTarget : null;
   if (!target && activeElement && isVisible(activeElement))
     target = activeElement;
+  if (
+    getReadyStartup() &&
+    target?.matches(
+      "[data-startup-profile], [data-profile-previous], [data-profile-next]",
+    )
+  ) {
+    target = document.querySelector<HTMLButtonElement>("[data-start-console]");
+  }
   if (
     root.dataset.consoleView === "music" &&
     gamepadNavigationMethod === "structured" &&
