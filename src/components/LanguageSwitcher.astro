@@ -1,0 +1,49 @@
+---
+interface Props {
+  placement?: "console" | "menu" | "site";
+}
+
+const { placement = "console" } = Astro.props;
+---
+
+<div
+  class:list={["language-switcher", `language-switcher--${placement}`]}
+  data-language-switcher
+  data-open="false"
+>
+  <button
+    class="language-switcher__toggle"
+    type="button"
+    data-language-toggle
+    aria-haspopup="menu"
+    aria-expanded="false"
+    aria-label="Sprache auswählen"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.92 6h-3.1a15.7 15.7 0 0 0-1.15-3.03A8.05 8.05 0 0 1 18.92 8ZM12 4c.83 1 1.5 2.35 1.83 4h-3.66C10.5 6.35 11.17 5 12 4ZM4.26 14a7.8 7.8 0 0 1 0-4h3.4a16.9 16.9 0 0 0 0 4h-3.4Zm.82 2h3.1c.25 1.1.64 2.12 1.15 3.03A8.05 8.05 0 0 1 5.08 16Zm3.1-8h-3.1a8.05 8.05 0 0 1 4.25-3.03A15.7 15.7 0 0 0 8.18 8ZM12 20c-.83-1-1.5-2.35-1.83-4h3.66C13.5 17.65 12.83 19 12 20Zm2.17-6H9.83a14.5 14.5 0 0 1 0-4h4.34a14.5 14.5 0 0 1 0 4Zm.5 5.03c.5-.91.9-1.93 1.15-3.03h3.1a8.05 8.05 0 0 1-4.25 3.03ZM16.34 14a16.9 16.9 0 0 0 0-4h3.4a7.8 7.8 0 0 1 0 4h-3.4Z"
+      ></path>
+    </svg>
+    <strong data-language-current>DE</strong>
+  </button>
+
+  <div
+    class="language-switcher__menu"
+    role="menu"
+    aria-label="Sprache auswählen"
+    data-i18n-aria="language.label"
+  >
+    <button type="button" role="menuitemradio" data-language-option="de">
+      <span>DE</span><strong>Deutsch</strong><i aria-hidden="true">✓</i>
+    </button>
+    <button type="button" role="menuitemradio" data-language-option="en">
+      <span>EN</span><strong>English</strong><i aria-hidden="true">✓</i>
+    </button>
+    <button type="button" role="menuitemradio" data-language-option="fr">
+      <span>FR</span><strong>Français</strong><i aria-hidden="true">✓</i>
+    </button>
+    <button type="button" role="menuitemradio" data-language-option="es">
+      <span>ES</span><strong>Español</strong><i aria-hidden="true">✓</i>
+    </button>
+  </div>
+</div>

@@ -1,4 +1,6 @@
 ---
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+
 interface Props {
   compact?: boolean;
 }
@@ -7,16 +9,29 @@ const { compact = false } = Astro.props;
 ---
 
 <header class:list={["site-header", { "site-header--compact": compact }]}>
-  <a class="brand" href="/" aria-label="D. Henschel – Startseite">
+  <a
+    class="brand"
+    href="/"
+    aria-label="D. Henschel – Startseite"
+    data-i18n-aria="common.home"
+  >
     <span class="brand__mark">DH</span>
     <span class="brand__signal" aria-hidden="true"></span>
   </a>
 
-  <nav class="site-nav" aria-label="Hauptnavigation">
-    <a href="/#projekte">Projekte</a>
-    <a href="/#profil">Profil</a>
-    <a href="/#kontakt">Kontakt</a>
-  </nav>
+  <div class="site-header__nav-group">
+    <LanguageSwitcher placement="site" />
+
+    <nav
+      class="site-nav"
+      aria-label="Hauptnavigation"
+      data-i18n-aria="site.navigation"
+    >
+      <a href="/#gallery" data-i18n="site.projects">Projekte</a>
+      <a href="/#about" data-i18n="site.profile">Profil</a>
+      <a href="/#gallery" data-i18n="site.contact">Kontakt</a>
+    </nav>
+  </div>
 
   <a
     class="header-link"

@@ -9,13 +9,23 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
 ---
 
 <section class="channel-library" aria-labelledby="library-title">
-  <h1 id="library-title" class="visually-hidden">Meine Websites</h1>
+  <h1 id="library-title" class="visually-hidden" data-i18n="gallery.title">
+    Meine Websites
+  </h1>
 
-  <div class="channel-library__pages" aria-label="Menüseite 1 von 1">
+  <div
+    class="channel-library__pages"
+    aria-label="Menüseite 1 von 1"
+    data-i18n-aria="gallery.page"
+  >
     <span class="is-active"></span><span></span><span></span><span></span>
   </div>
 
-  <ul class="channel-grid" aria-label="Website-Kanäle">
+  <ul
+    class="channel-grid"
+    aria-label="Website-Kanäle"
+    data-i18n-aria="gallery.channels"
+  >
     {
       channels.map(({ index, project }) => (
         <li class:list={["channel-item", { "channel-item--empty": !project }]}>
@@ -28,12 +38,14 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
               data-channel-image={project.image}
               data-channel-view={project.view}
               aria-label={`${project.title} öffnen`}
+              data-i18n-aria="gallery.open"
+              data-i18n-params={JSON.stringify({ title: project.title })}
               style={`--channel-accent: ${project.accent}; --channel-accent-rgb: ${project.accentRgb};`}
             >
               <span class="channel-card__screen">
                 {project.view === "about" ? (
                   <span class="about-channel-cover" aria-hidden="true">
-                    <strong>About Me</strong>
+                    <strong data-i18n="gallery.about">About Me</strong>
                   </span>
                 ) : (
                   <>
@@ -41,6 +53,10 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
                       class="channel-card__cover"
                       src={project.image}
                       alt={`Vorschau von ${project.title}`}
+                      data-i18n-alt="gallery.preview"
+                      data-i18n-params={JSON.stringify({
+                        title: project.title,
+                      })}
                       width="1280"
                       height="720"
                       loading={Number(index) <= 5 ? "eager" : "lazy"}
@@ -67,6 +83,8 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
             <article
               class="channel-card channel-card--empty"
               aria-label={`Freier Kanal ${index}`}
+              data-i18n-aria="gallery.empty"
+              data-i18n-params={JSON.stringify({ index })}
             >
               <span class="channel-card__screen">
                 <span class="empty-channel" aria-hidden="true">
@@ -81,7 +99,8 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   </ul>
 
   <p class="channel-library__hint" aria-hidden="true">
-    <span>A</span> Auswählen
+    <span>A</span>
+    <i data-i18n="gallery.select">Auswählen</i>
   </p>
 </section>
 
@@ -100,13 +119,15 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     <strong data-launch-title></strong>
     <span class="launch-progress"><i></i></span>
     <p class="launch-fact">
-      <span>Völlig unnütze Info</span>
+      <span data-i18n="launch.fact">Völlig unnütze Info</span>
       <small data-launch-tip>Pixel werden alphabetisch sortiert.</small>
     </p>
   </div>
 </div>
 
 <script>
+  import { getLaunchTips } from "../scripts/i18n";
+
   const channelLinks = document.querySelectorAll<HTMLAnchorElement>(
     "[data-channel-link]",
   );
@@ -256,34 +277,6 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   });
   window.addEventListener("pagehide", stopAllChannelPreviews);
 
-  const launchTips = [
-    "Pixel werden alphabetisch sortiert.",
-    "Das Internet wird kurz entknotet.",
-    "Der Ladebalken lädt gerade auch sich selbst.",
-    "Mindestens ein div wird fachgerecht vorgewärmt.",
-    "Kaffee wird auf Betriebstemperatur gebracht.",
-    "Die Website sucht noch ihren linken Socken.",
-    "Der Server fragt kurz seine Mutter.",
-    "Unsichtbare Kabel werden fachgerecht entwirrt.",
-    "Der Fortschrittsbalken übt schon mal das Ankommen.",
-    "Alle Nullen und Einsen werden vorsichtshalber nachgezählt.",
-    "Ein besonders wichtiges Pixel verspätet sich.",
-    "Die Cloud wird kurz aufgeschüttelt.",
-    "Browserkrümel werden unter den Teppich gekehrt.",
-    "Das WLAN holt noch einmal tief Luft.",
-    "Die Website zieht sich schnell etwas Hübsches an.",
-    "Der Cache sucht gerade seine Lesebrille.",
-    "CSS wird gewissenhaft nach Farben sortiert.",
-    "JavaScript verhandelt noch mit der Realität.",
-    "Der Ladehamster wechselt gerade das Laufrad.",
-    "404-Fehler werden vorsorglich versteckt.",
-    "Die Bits laufen sich schon einmal warm.",
-    "Ein Button wird noch frisch poliert.",
-    "Die Daten nehmen heute die landschaftlich schöne Route.",
-    "Der Server nickt bedeutungsvoll.",
-    "Das Internet macht kurz ein bisschen Platz.",
-    "Der letzte Bug wird sorgfältig als Feature umetikettiert.",
-  ];
   let activeSelectionAnimation: Animation | null = null;
   let activeSelectedLink: HTMLAnchorElement | null = null;
   let activeZoomAnimation: Animation | null = null;
@@ -526,6 +519,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
         if (launchLoadingImage) launchLoadingImage.src = image;
         if (launchTitle) launchTitle.textContent = title;
         if (launchTip) {
+          const launchTips = getLaunchTips();
           launchTip.textContent =
             launchTips[Math.floor(Math.random() * launchTips.length)];
         }

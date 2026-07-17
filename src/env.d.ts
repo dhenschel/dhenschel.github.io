@@ -30,3 +30,5 @@ interface ConsoleAudioController {
 interface Window {
   consoleAudio?: ConsoleAudioController;
 }
+
+type ConsoleLanguage = "de" | "en" | "fr" | "es";

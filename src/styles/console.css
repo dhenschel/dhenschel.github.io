@@ -201,6 +201,18 @@ html[data-boot="skip"] .startup-screen {
   font-weight: 800;
 }
 
+.startup-screen__language {
+  position: absolute;
+  z-index: 6;
+  top: 2.05rem;
+  left: 6.15rem;
+}
+
+.startup-screen__start i,
+.channel-library__hint i {
+  font-style: normal;
+}
+
 .startup-screen__skip {
   position: absolute;
   z-index: 4;
@@ -566,6 +578,21 @@ html[data-boot="skip"] .startup-screen {
   gap: clamp(0.7rem, 1.15vw, 1rem);
   padding-left: 0;
   transition: padding-left 480ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+.console-identity > .language-switcher {
+  align-self: flex-start;
+  margin-top: 0.8rem;
+}
+
+.console-identity > .language-switcher .language-switcher__toggle {
+  min-width: 3.15rem;
+  height: 2.55rem;
+  padding-inline: 0.64rem;
+}
+
+.console-online b {
+  font: inherit;
 }
 
 .console-back-button {
@@ -2685,7 +2712,21 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   .console-identity {
-    gap: 0.9rem;
+    gap: 0.42rem;
+  }
+
+  .console-identity > .language-switcher {
+    margin-top: 0.55rem;
+  }
+
+  .console-identity > .language-switcher .language-switcher__toggle {
+    min-width: 2.55rem;
+    height: 2.35rem;
+    padding-inline: 0.48rem;
+  }
+
+  .console-identity > .language-switcher .language-switcher__toggle svg {
+    display: none;
   }
 
   .console-back-button {

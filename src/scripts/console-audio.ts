@@ -6,6 +6,7 @@ import {
   type MusicTrackId,
 } from "../data/music";
 import { musicCompositions, type MusicComposition } from "./music-compositions";
+import { t } from "./i18n";
 
 const AUDIO_STORAGE_KEY = "dh-console-audio";
 const MUSIC_STORAGE_KEY = "dh-console-music-v1";
@@ -493,10 +494,16 @@ const updateSoundControl = () => {
   button.setAttribute("aria-pressed", String(audioEnabled));
   button.setAttribute(
     "aria-label",
-    audioEnabled ? "Sound ausschalten" : "Sound einschalten",
+    audioEnabled ? t("controls.disableSound") : t("controls.enableSound"),
   );
-  button.title = audioEnabled ? "Sound ausschalten" : "Sound einschalten";
-  if (label) label.textContent = audioEnabled ? "Sound an" : "Sound aus";
+  button.title = audioEnabled
+    ? t("controls.disableSound")
+    : t("controls.enableSound");
+  if (label) {
+    label.textContent = audioEnabled
+      ? t("controls.soundOn")
+      : t("controls.soundOff");
+  }
 };
 
 const setEnabled = (enabled: boolean) => {
@@ -600,6 +607,7 @@ export const initializeConsoleAudio = () => {
   };
 
   updateSoundControl();
+  window.addEventListener("console:language-changed", updateSoundControl);
   bindInterfaceSounds();
   broadcastMusicState();
 

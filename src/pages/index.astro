@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ContactDialog from "../components/ContactDialog.astro";
+import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import MusicChannel from "../components/MusicChannel.astro";
 import ProjectHub from "../components/ProjectHub.astro";
 import StartupScreen from "../components/StartupScreen.astro";
@@ -47,6 +48,8 @@ const structuredData = {
 <BaseLayout
   title="D. Henschel — Website-Menü"
   description="Das persönliche Website-Menü von D. Henschel mit ClipCollection, CozySite, Restaurant Lava, BootBucht24 und kommenden Projekten."
+  titleKey="page.home.title"
+  descriptionKey="page.home.description"
 >
   <script is:inline>
     (() => {
@@ -89,9 +92,11 @@ const structuredData = {
         type="button"
         data-console-back
         aria-label="Zur Website-Galerie zurückkehren"
+        data-i18n-aria="header.backGallery"
         aria-hidden="true"
         tabindex="-1"
         title="Zurück zur Galerie"
+        data-i18n-title="header.backGalleryShort"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="m14.8 4.8-7.2 7.2 7.2 7.2 1.6-1.6-5.6-5.6 5.6-5.6-1.6-1.6Z"
@@ -104,11 +109,13 @@ const structuredData = {
         type="button"
         data-replay-startup
         aria-label="Profilmenü von dhenschel öffnen"
+        data-i18n-aria="header.openProfile"
       >
         <span class="profile-picture profile-picture--bar">
           <img
             src={siteProfile.image}
             alt={siteProfile.imageAlt}
+            data-i18n-alt="site.profileAlt"
             width="800"
             height="800"
           />
@@ -116,13 +123,17 @@ const structuredData = {
         <strong>{siteProfile.name}</strong>
       </button>
 
+      <LanguageSwitcher placement="console" />
+
       <button
         class="header-music-button"
         type="button"
         data-music-channel-open
         aria-label="Music Channel öffnen"
+        data-i18n-aria="header.openMusic"
         aria-pressed="false"
         title="Music Channel öffnen"
+        data-i18n-title="header.openMusic"
       >
         <span class="header-music-button__motion" aria-hidden="true">
           <span class="header-music-button__disc">
@@ -137,7 +148,9 @@ const structuredData = {
         <span data-console-date>--.--.----</span>
         <time data-console-time>--:--</time>
       </div>
-      <span class="console-online"><i></i> Online</span>
+      <span class="console-online"
+        ><i></i> <b data-i18n="common.online">Online</b></span
+      >
     </div>
   </header>
 
@@ -271,13 +284,21 @@ const structuredData = {
       >
         <div class="about-panel">
           <header class="about-panel__header">
-            <span>Profilkanal</span>
-            <h1 id="about-title" tabindex="-1" data-about-heading>About Me</h1>
+            <span data-i18n="about.channel">Profilkanal</span>
+            <h1
+              id="about-title"
+              tabindex="-1"
+              data-about-heading
+              data-i18n="about.title"
+            >
+              About Me
+            </h1>
           </header>
           <div
             class="about-panel__content"
             data-about-content
             aria-label="Persönliche Informationen"
+            data-i18n-aria="about.information"
           >
           </div>
         </div>
@@ -293,7 +314,9 @@ const structuredData = {
       type="button"
       data-contact-open
       aria-label="Kontaktformular öffnen"
+      data-i18n-aria="controls.openContact"
       title="Kontakt"
+      data-i18n-title="common.contact"
     >
       <span>
         <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
@@ -304,9 +327,9 @@ const structuredData = {
       </span>
     </button>
 
-    <nav aria-label="Rechtliches">
-      <a href="/impressum/">Impressum</a>
-      <a href="/datenschutz/">Datenschutz</a>
+    <nav aria-label="Rechtliches" data-i18n-aria="common.legal">
+      <a href="/impressum/" data-i18n="common.imprint">Impressum</a>
+      <a href="/datenschutz/" data-i18n="common.privacy">Datenschutz</a>
     </nav>
 
     <div class="console-bottombar__actions">
@@ -335,6 +358,7 @@ const structuredData = {
         type="button"
         data-theme-toggle
         aria-label="Farbschema wechseln"
+        data-i18n-aria="controls.changeTheme"
       >
         <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
           <path
@@ -381,6 +405,7 @@ const structuredData = {
 
   <script>
     import { initializeConsoleAudio } from "../scripts/console-audio";
+    import { getLocale, t } from "../scripts/i18n";
 
     initializeConsoleAudio();
 
@@ -531,13 +556,14 @@ const structuredData = {
 
     const updateConsoleTime = () => {
       const now = new Date();
-      const time = new Intl.DateTimeFormat("de-DE", {
+      const locale = getLocale();
+      const time = new Intl.DateTimeFormat(locale, {
         timeZone: "Europe/Berlin",
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
       }).format(now);
-      const date = new Intl.DateTimeFormat("de-DE", {
+      const date = new Intl.DateTimeFormat(locale, {
         timeZone: "Europe/Berlin",
         day: "numeric",
         month: "long",
@@ -551,7 +577,8 @@ const structuredData = {
     const updateThemeLabel = () => {
       const theme = document.documentElement.dataset.consoleTheme;
       if (themeLabel) {
-        themeLabel.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+        themeLabel.textContent =
+          theme === "dark" ? t("controls.lightMode") : t("controls.darkMode");
       }
     };
 
@@ -578,11 +605,13 @@ const structuredData = {
       fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
       fullscreenToggle.setAttribute(
         "aria-label",
-        isFullscreen ? "Vollbildmodus beenden" : "Vollbildmodus starten",
+        isFullscreen
+          ? t("controls.exitFullscreen")
+          : t("controls.enterFullscreen"),
       );
       fullscreenToggle.title = isFullscreen
-        ? "Vollbildmodus beenden"
-        : "Vollbildmodus starten";
+        ? t("controls.exitFullscreen")
+        : t("controls.enterFullscreen");
     };
 
     if (fullscreenToggle && !document.fullscreenEnabled) {
@@ -625,6 +654,11 @@ const structuredData = {
 
     updateConsoleTime();
     updateThemeLabel();
+    window.addEventListener("console:language-changed", () => {
+      updateConsoleTime();
+      updateThemeLabel();
+      updateFullscreenControl();
+    });
     applyConsoleView(
       window.location.hash === "#about"
         ? "about"

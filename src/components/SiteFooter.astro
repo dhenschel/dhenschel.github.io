@@ -1,18 +1,25 @@
 <footer class="site-footer shell">
   <div class="site-footer__top">
-    <a class="brand" href="/" aria-label="D. Henschel – Startseite">
+    <a
+      class="brand"
+      href="/"
+      aria-label="D. Henschel – Startseite"
+      data-i18n-aria="common.home"
+    >
       <span class="brand__mark">DH</span>
       <span class="brand__signal" aria-hidden="true"></span>
     </a>
-    <p>Entworfen und entwickelt mit Astro. Keine Cookies, kein Tracking.</p>
+    <p data-i18n="site.footerText">
+      Entworfen und entwickelt mit Astro. Keine Cookies, kein Tracking.
+    </p>
   </div>
 
   <div class="site-footer__bottom">
     <p>© {new Date().getFullYear()} D. Henschel</p>
-    <nav aria-label="Rechtliches">
-      <a href="/impressum/">Impressum</a>
-      <a href="/datenschutz/">Datenschutz</a>
+    <nav aria-label="Rechtliches" data-i18n-aria="common.legal">
+      <a href="/impressum/" data-i18n="common.imprint">Impressum</a>
+      <a href="/datenschutz/" data-i18n="common.privacy">Datenschutz</a>
     </nav>
-    <a href="#main-content">Nach oben ↑</a>
+    <a href="#main-content" data-i18n="site.toTop">Nach oben ↑</a>
   </div>
 </footer>

@@ -11,18 +11,23 @@ import { musicTracks } from "../data/music";
 >
   <div class="music-channel" data-music-channel>
     <header class="music-channel__header">
-      <span>Music Channel</span>
+      <span data-i18n="music.channel">Music Channel</span>
       <h1 id="music-channel-title" tabindex="-1" data-music-heading>
-        Sound Library
+        <span data-i18n="music.library">Sound Library</span>
       </h1>
     </header>
 
-    <div class="music-carousel" aria-label="Hintergrundmusik auswählen">
+    <div
+      class="music-carousel"
+      aria-label="Hintergrundmusik auswählen"
+      data-i18n-aria="music.choose"
+    >
       <button
         class="music-carousel__arrow music-carousel__arrow--previous"
         type="button"
         data-music-arrow="previous"
         aria-label="Vorherige Musik-Disc"
+        data-i18n-aria="music.previous"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="m14.8 4.8-7.2 7.2 7.2 7.2 1.6-1.6-5.6-5.6 5.6-5.6-1.6-1.6Z"
@@ -41,6 +46,8 @@ import { musicTracks } from "../data/music";
               data-carousel-position={index === 0 ? "active" : "visible"}
               data-carousel-distance={index}
               aria-label={`${track.title} auswählen und anhören`}
+              data-i18n-aria="music.selectTrack"
+              data-i18n-params={JSON.stringify({ title: track.title })}
               aria-pressed="false"
               tabindex={index === 0 ? "0" : "-1"}
               style={`--disc-color: ${track.color}; --disc-color-dark: ${track.colorDark}; --music-disc-index: ${index};`}
@@ -48,7 +55,11 @@ import { musicTracks } from "../data/music";
               <span class="music-disc__surface" aria-hidden="true">
                 <span class="music-disc__rings" />
                 <span class="music-disc__label">
-                  <small>{track.label}</small>
+                  <small
+                    data-i18n={`music.track.${track.translationKey}.label`}
+                  >
+                    {track.label}
+                  </small>
                   <strong>{track.shortTitle}</strong>
                   <i />
                 </span>
@@ -73,6 +84,7 @@ import { musicTracks } from "../data/music";
         type="button"
         data-music-arrow="next"
         aria-label="Nächste Musik-Disc"
+        data-i18n-aria="music.next"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="m9.2 4.8 7.2 7.2-7.2 7.2-1.6-1.6 5.6-5.6-5.6-5.6 1.6-1.6Z"
@@ -82,24 +94,33 @@ import { musicTracks } from "../data/music";
     </div>
 
     <div class="music-channel__details" aria-live="polite">
-      <p data-music-position>Disc 1 von {musicTracks.length}</p>
+      <p data-music-position>
+        Disc 1 von {musicTracks.length}
+      </p>
       <h2 data-music-title>{musicTracks[0].title}</h2>
-      <p data-music-description>{musicTracks[0].description}</p>
-      <strong data-music-playing-status>Aktuelle Hintergrundmusik</strong>
+      <p
+        data-music-description
+        data-i18n={`music.track.${musicTracks[0].translationKey}.description`}
+      >
+        {musicTracks[0].description}
+      </p>
+      <strong data-music-playing-status data-i18n="music.current"
+        >Aktuelle Hintergrundmusik</strong
+      >
     </div>
 
     <div class="music-channel__actions">
       <button class="music-channel__play" type="button" data-music-play>
         <span>A</span>
-        <strong data-music-play-label>Anhören</strong>
+        <strong data-music-play-label data-i18n="music.listen">Anhören</strong>
       </button>
       <button type="button" data-music-default="light" aria-pressed="false">
         <span aria-hidden="true">☀</span>
-        <strong>Als Tag-Standard</strong>
+        <strong data-i18n="music.dayDefault">Als Tag-Standard</strong>
       </button>
       <button type="button" data-music-default="dark" aria-pressed="false">
         <span aria-hidden="true">☾</span>
-        <strong>Als Nacht-Standard</strong>
+        <strong data-i18n="music.nightDefault">Als Nacht-Standard</strong>
       </button>
     </div>
   </div>
@@ -112,6 +133,7 @@ import { musicTracks } from "../data/music";
     type ConsoleTheme,
     type MusicTrackId,
   } from "../data/music";
+  import { t } from "../scripts/i18n";
 
   const musicDiscs = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-music-disc]"),
@@ -153,6 +175,10 @@ import { musicTracks } from "../data/music";
   };
 
   const getSelectedTrack = () => musicTracks[selectedMusicIndex];
+  const getTrackDescription = (index = selectedMusicIndex) => {
+    const track = musicTracks[index];
+    return t(`music.track.${track.translationKey}.description`);
+  };
 
   const getDiscRotation = (surface: HTMLElement) => {
     const currentTransform = getComputedStyle(surface).transform;
@@ -180,8 +206,8 @@ import { musicTracks } from "../data/music";
       if (status) {
         status.textContent = isActive
           ? musicState.playing
-            ? "Läuft gerade"
-            : "Ausgewählt"
+            ? t("music.playing")
+            : t("music.selected")
           : "";
       }
       const dayBadge = disc.querySelector<HTMLElement>(
@@ -198,20 +224,22 @@ import { musicTracks } from "../data/music";
     const selectedIsActive = selectedTrack.id === musicState.activeTrackId;
     if (musicPlayLabel) {
       musicPlayLabel.textContent =
-        selectedIsActive && musicState.playing ? "Läuft gerade" : "Anhören";
+        selectedIsActive && musicState.playing
+          ? t("music.playing")
+          : t("music.listen");
     }
     musicPlay?.setAttribute(
       "aria-label",
       selectedIsActive && musicState.playing
-        ? `${selectedTrack.title} läuft gerade`
-        : `${selectedTrack.title} anhören`,
+        ? t("music.playingTrack", { title: selectedTrack.title })
+        : t("music.listenTrack", { title: selectedTrack.title }),
     );
     if (musicPlayingStatus) {
       musicPlayingStatus.textContent = selectedIsActive
         ? musicState.playing
-          ? "Läuft gerade"
-          : "Als Hintergrundmusik ausgewählt"
-        : "Zum Anhören A, Enter oder Leertaste drücken";
+          ? t("music.playing")
+          : t("music.selectedBackground")
+        : t("music.playHint");
     }
 
     musicDefaultButtons.forEach((button) => {
@@ -227,13 +255,13 @@ import { musicTracks } from "../data/music";
         (track) => track.id === musicState.activeTrackId,
       );
       headerMusicButton.title = activeTrack
-        ? `Music Channel öffnen – ${activeTrack.title}`
-        : "Music Channel öffnen";
+        ? t("header.openMusicTrackTitle", { title: activeTrack.title })
+        : t("header.openMusic");
       headerMusicButton.setAttribute(
         "aria-label",
         activeTrack
-          ? `Music Channel öffnen. Aktuell: ${activeTrack.title}`
-          : "Music Channel öffnen",
+          ? t("header.openMusicTrack", { title: activeTrack.title })
+          : t("header.openMusic"),
       );
     }
   };
@@ -265,10 +293,13 @@ import { musicTracks } from "../data/music";
 
     const track = getSelectedTrack();
     if (musicPosition) {
-      musicPosition.textContent = `Disc ${selectedMusicIndex + 1} von ${total}`;
+      musicPosition.textContent = t("music.position", {
+        current: selectedMusicIndex + 1,
+        total,
+      });
     }
     if (musicTitle) musicTitle.textContent = track.title;
-    if (musicDescription) musicDescription.textContent = track.description;
+    if (musicDescription) musicDescription.textContent = getTrackDescription();
     updateMusicState();
     if (focusDisc)
       musicDiscs[selectedMusicIndex]?.focus({ preventScroll: true });
@@ -392,6 +423,10 @@ import { musicTracks } from "../data/music";
     const view = (event as CustomEvent<{ view?: string }>).detail?.view;
     if (view === "music") selectActiveMusic();
   });
+
+  window.addEventListener("console:language-changed", () =>
+    updateMusicCarousel(),
+  );
 
   const initialMusicState = window.consoleAudio?.getMusicState();
   if (initialMusicState) musicState = initialMusicState;

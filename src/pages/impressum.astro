@@ -4,25 +4,32 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 ---
 
-<BaseLayout title="Impressum — D. Henschel" noindex>
+<BaseLayout
+  title="Impressum — D. Henschel"
+  titleKey="page.imprint.title"
+  noindex
+>
   <SiteHeader compact />
   <main id="main-content" class="legal-page shell">
     <p class="eyebrow">LEGAL / 01</p>
-    <h1>Impressum</h1>
+    <h1 data-i18n="common.imprint">Impressum</h1>
     <div class="legal-notice">
-      <strong>Vor dem offiziellen Launch zu vervollständigen</strong>
-      <p>
+      <strong data-i18n="legal.placeholderTitle"
+        >Vor dem offiziellen Launch zu vervollständigen</strong
+      >
+      <p data-i18n="legal.imprint.placeholder">
         Die erforderlichen Betreiber- und Kontaktangaben liegen noch nicht vor.
         Diese Seite ist deshalb ein gekennzeichneter Platzhalter und wird nicht
         indexiert.
       </p>
     </div>
-    <p>
+    <p data-i18n="legal.imprint.note">
       Bitte die Angaben aus <code>docs/CONTENT.md</code> bereitstellen. Der endgültige
       Inhalt sollte passend zur tatsächlichen Nutzung der Website rechtlich geprüft
       werden.
     </p>
-    <a class="text-link" href="/">← Zur Startseite</a>
+    <a class="text-link" href="/" data-i18n="legal.backHome">← Zur Startseite</a
+    >
   </main>
   <SiteFooter />
 </BaseLayout>

@@ -1,31 +1,41 @@
 ---
 import { siteProfile } from "../data/site";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
 
 const defaultProfileId = "dhenschel";
 const startupProfiles = [
   {
     id: "guest-one",
     name: "Gast 01",
+    nameKey: "startup.guestOne",
     image: "/profile-guest-monkey.webp",
     imageAlt: "Schwarz-weißes Affenportrait für Gastprofil 01",
+    imageAltKey: "startup.monkeyAlt",
     available: false,
     status: "Noch nicht eingerichtet",
+    statusKey: "startup.unavailable",
   },
   {
     id: defaultProfileId,
     name: siteProfile.name,
+    nameKey: undefined,
     image: siteProfile.image,
     imageAlt: siteProfile.imageAlt,
+    imageAltKey: "site.profileAlt",
     available: true,
     status: "Hauptprofil",
+    statusKey: "startup.mainProfile",
   },
   {
     id: "guest-two",
     name: "Gast 02",
+    nameKey: "startup.guestTwo",
     image: "/profile-guest-duck.webp",
     imageAlt: "Illustrierte Ente für Gastprofil 02",
+    imageAltKey: "startup.duckAlt",
     available: false,
     status: "Noch nicht eingerichtet",
+    statusKey: "startup.unavailable",
   },
 ];
 const initialProfileIndex = startupProfiles.findIndex(
@@ -73,24 +83,34 @@ const initialProfileIndex = startupProfiles.findIndex(
   data-phase="ready"
   aria-hidden="true"
 >
-  <button class="startup-screen__skip" type="button" data-skip-startup>
+  <button
+    class="startup-screen__skip"
+    type="button"
+    data-skip-startup
+    data-i18n="startup.skip"
+  >
     Überspringen
   </button>
 
   <div class="startup-screen__brand">DH</div>
+  <div class="startup-screen__language">
+    <LanguageSwitcher placement="menu" />
+  </div>
 
   <div class="startup-screen__content">
-    <p>Profil auswählen</p>
+    <p data-i18n="startup.selectProfile">Profil auswählen</p>
     <div
       class="startup-profile-carousel"
       role="region"
       aria-label="Profilauswahl"
+      data-i18n-aria="startup.profileSelection"
       data-startup-carousel
     >
       <button
         class="startup-profile-carousel__arrow startup-profile-carousel__arrow--previous"
         type="button"
         aria-label="Vorheriges Profil auswählen"
+        data-i18n-aria="startup.previous"
         data-profile-previous
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -124,8 +144,10 @@ const initialProfileIndex = startupProfiles.findIndex(
                 data-startup-profile
                 data-profile-id={profile.id}
                 data-profile-name={profile.name}
+                data-profile-name-key={profile.nameKey}
                 data-profile-available={String(profile.available)}
                 data-profile-status={profile.status}
+                data-profile-status-key={profile.statusKey}
                 data-profile-default={isDefault ? "true" : undefined}
                 data-carousel-position={initialPosition}
                 aria-current={isDefault ? "true" : undefined}
@@ -135,12 +157,13 @@ const initialProfileIndex = startupProfiles.findIndex(
                   <img
                     src={profile.image}
                     alt={profile.imageAlt}
+                    data-i18n-alt={profile.imageAltKey}
                     width="800"
                     height="800"
                   />
                 </span>
-                <strong>{profile.name}</strong>
-                <small>{profile.status}</small>
+                <strong data-i18n={profile.nameKey}>{profile.name}</strong>
+                <small data-i18n={profile.statusKey}>{profile.status}</small>
               </article>
             );
           })
@@ -151,6 +174,7 @@ const initialProfileIndex = startupProfiles.findIndex(
         class="startup-profile-carousel__arrow startup-profile-carousel__arrow--next"
         type="button"
         aria-label="Nächstes Profil auswählen"
+        data-i18n-aria="startup.next"
         data-profile-next
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -163,12 +187,14 @@ const initialProfileIndex = startupProfiles.findIndex(
       class="startup-screen__profile-status"
       data-startup-profile-status
       aria-live="polite"
+      data-i18n="startup.mainProfile"
     >
       Hauptprofil
     </p>
 
     <button class="startup-screen__start" type="button" data-start-console>
-      <span>A</span> Menü starten
+      <span>A</span>
+      <i data-i18n="startup.start">Menü starten</i>
     </button>
   </div>
 
@@ -176,10 +202,14 @@ const initialProfileIndex = startupProfiles.findIndex(
     <img src="/cursor-hand.svg" alt="" width="36" height="36" />
   </div>
 
-  <p class="startup-screen__hint">Willkommen zurück</p>
+  <p class="startup-screen__hint" data-i18n="startup.welcome">
+    Willkommen zurück
+  </p>
 </div>
 
 <script>
+  import { t } from "../scripts/i18n";
+
   const startupScreen = document.querySelector<HTMLElement>(
     "[data-startup-screen]",
   );
@@ -255,6 +285,12 @@ const initialProfileIndex = startupProfiles.findIndex(
       ((index % startupProfiles.length) + startupProfiles.length) %
       startupProfiles.length;
     const selectedProfile = startupProfiles[normalizedIndex];
+    const selectedName = selectedProfile.dataset.profileNameKey
+      ? t(selectedProfile.dataset.profileNameKey)
+      : (selectedProfile.dataset.profileName ?? t("startup.profileFallback"));
+    const selectedStatus = selectedProfile.dataset.profileStatusKey
+      ? t(selectedProfile.dataset.profileStatusKey)
+      : (selectedProfile.dataset.profileStatus ?? t("startup.selectProfile"));
     const profileAvailable =
       selectedProfile.dataset.profileAvailable === "true";
 
@@ -278,6 +314,19 @@ const initialProfileIndex = startupProfiles.findIndex(
       } else {
         profile.removeAttribute("aria-current");
       }
+      const profileName = profile.dataset.profileNameKey
+        ? t(profile.dataset.profileNameKey)
+        : (profile.dataset.profileName ?? t("startup.profileFallback"));
+      const profileStatus = profile.dataset.profileStatusKey
+        ? t(profile.dataset.profileStatusKey)
+        : (profile.dataset.profileStatus ?? t("startup.selectProfile"));
+      profile.setAttribute(
+        "aria-label",
+        t("startup.profileGroup", {
+          name: profileName,
+          status: profileStatus,
+        }),
+      );
     });
 
     startupProfilePicture = selectedProfile.querySelector<HTMLElement>(
@@ -288,8 +337,7 @@ const initialProfileIndex = startupProfiles.findIndex(
         selectedProfile.dataset.profileId ?? "unknown";
     }
     if (startupProfileStatus) {
-      startupProfileStatus.textContent =
-        selectedProfile.dataset.profileStatus ?? "Profil auswählen";
+      startupProfileStatus.textContent = selectedStatus;
     }
 
     startConsole.disabled = !profileAvailable;
@@ -297,27 +345,33 @@ const initialProfileIndex = startupProfiles.findIndex(
     startConsole.setAttribute(
       "aria-label",
       profileAvailable
-        ? `Menü mit ${selectedProfile.dataset.profileName ?? "Profil"} starten`
-        : "Dieses Profil ist noch nicht eingerichtet",
+        ? t("startup.startWith", { name: selectedName })
+        : t("startup.notReady"),
     );
     startConsole.title = profileAvailable
-      ? "Menü starten"
-      : "Dieses Profil ist noch nicht eingerichtet";
+      ? t("startup.start")
+      : t("startup.notReady");
 
     const previousIndex =
       (normalizedIndex - 1 + startupProfiles.length) % startupProfiles.length;
     const nextIndex = (normalizedIndex + 1) % startupProfiles.length;
-    const previousName =
-      startupProfiles[previousIndex]?.dataset.profileName ?? "Profil";
-    const nextName =
-      startupProfiles[nextIndex]?.dataset.profileName ?? "Profil";
+    const previousProfileElement = startupProfiles[previousIndex];
+    const nextProfileElement = startupProfiles[nextIndex];
+    const previousName = previousProfileElement?.dataset.profileNameKey
+      ? t(previousProfileElement.dataset.profileNameKey)
+      : (previousProfileElement?.dataset.profileName ??
+        t("startup.profileFallback"));
+    const nextName = nextProfileElement?.dataset.profileNameKey
+      ? t(nextProfileElement.dataset.profileNameKey)
+      : (nextProfileElement?.dataset.profileName ??
+        t("startup.profileFallback"));
     previousProfile?.setAttribute(
       "aria-label",
-      `Vorheriges Profil auswählen: ${previousName}`,
+      t("startup.previousNamed", { name: previousName }),
     );
     nextProfile?.setAttribute(
       "aria-label",
-      `Nächstes Profil auswählen: ${nextName}`,
+      t("startup.nextNamed", { name: nextName }),
     );
   };
 
@@ -460,6 +514,9 @@ const initialProfileIndex = startupProfiles.findIndex(
   skipStartup?.addEventListener("click", finishStartup);
   replayStartupButtons.forEach((button) =>
     button.addEventListener("click", () => showStartupMenu("push")),
+  );
+  window.addEventListener("console:language-changed", () =>
+    selectStartupProfile(selectedStartupProfileIndex),
   );
   window.addEventListener("popstate", () => {
     if (window.location.hash === "#menu") {

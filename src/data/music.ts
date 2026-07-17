@@ -10,6 +10,7 @@ export type ConsoleTheme = "light" | "dark";
 
 export type MusicTrack = {
   id: MusicTrackId;
+  translationKey: "home" | "night" | "orbit" | "signal";
   title: string;
   shortTitle: string;
   description: string;
@@ -22,6 +23,7 @@ export type MusicTrack = {
 export const musicTracks: readonly MusicTrack[] = [
   {
     id: "home-pulse",
+    translationKey: "home",
     title: "Home Pulse",
     shortTitle: "HOME",
     description:
@@ -32,6 +34,7 @@ export const musicTracks: readonly MusicTrack[] = [
   },
   {
     id: "blue-hour",
+    translationKey: "night",
     title: "Blue Hour",
     shortTitle: "NIGHT",
     description:
@@ -42,6 +45,7 @@ export const musicTracks: readonly MusicTrack[] = [
   },
   {
     id: "soft-orbit",
+    translationKey: "orbit",
     title: "Soft Orbit",
     shortTitle: "ORBIT",
     description:
@@ -53,6 +57,7 @@ export const musicTracks: readonly MusicTrack[] = [
   },
   {
     id: "signal-garden",
+    translationKey: "signal",
     title: "Signal Garden",
     shortTitle: "SIGNAL",
     description:

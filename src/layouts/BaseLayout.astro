@@ -6,6 +6,8 @@ interface Props {
   description?: string;
   image?: string;
   noindex?: boolean;
+  titleKey?: string;
+  descriptionKey?: string;
 }
 
 const {
@@ -13,6 +15,8 @@ const {
   description = "Portfolio von D. Henschel: digitale Produkte mit System und Charakter.",
   image = "/social-card.svg",
   noindex = false,
+  titleKey,
+  descriptionKey,
 } = Astro.props;
 
 const baseUrl = Astro.site ?? Astro.url.origin;
@@ -23,6 +27,25 @@ const socialImageUrl = new URL(image, baseUrl);
 <!doctype html>
 <html lang="de">
   <head>
+    <script is:inline>
+      (() => {
+        const supported = ["de", "en", "fr", "es"];
+        let stored = null;
+        try {
+          stored = localStorage.getItem("dh-console-language");
+        } catch {
+          stored = null;
+        }
+        const browserLanguage = navigator.language.slice(0, 2).toLowerCase();
+        const language = supported.includes(stored)
+          ? stored
+          : supported.includes(browserLanguage)
+            ? browserLanguage
+            : "de";
+        document.documentElement.lang = language;
+        document.documentElement.dataset.language = language;
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b0d10" />
@@ -47,8 +70,18 @@ const socialImageUrl = new URL(image, baseUrl);
 
     <title>{title}</title>
   </head>
-  <body>
-    <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
+  <body
+    data-i18n-document-title={titleKey}
+    data-i18n-document-description={descriptionKey}
+  >
+    <script>
+      import { initializeI18n } from "../scripts/i18n";
+
+      initializeI18n();
+    </script>
+    <a class="skip-link" href="#main-content" data-i18n="common.skipContent"
+      >Zum Inhalt springen</a
+    >
     <slot />
   </body>
 </html>

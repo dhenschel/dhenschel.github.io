@@ -10,42 +10,47 @@ import { siteProfile } from "../data/site";
   <form class="contact-form" data-contact-form autocomplete="off">
     <header>
       <div>
-        <small>Nachricht</small>
-        <h2>Kontakt aufnehmen</h2>
+        <small data-i18n="contact.eyebrow">Nachricht</small>
+        <h2 data-i18n="contact.title">Kontakt aufnehmen</h2>
       </div>
       <button
         type="button"
         data-contact-close
         aria-label="Kontaktformular schließen"
+        data-i18n-aria="contact.close"
       >
         ×
       </button>
     </header>
 
     <label>
-      <span>Dein Name</span>
+      <span data-i18n="contact.name">Dein Name</span>
       <input name="name" autocomplete="off" required />
     </label>
     <label>
-      <span>Deine E-Mail</span>
+      <span data-i18n="contact.email">Deine E-Mail</span>
       <input name="email" type="email" autocomplete="off" required />
     </label>
     <label>
-      <span>Nachricht</span>
+      <span data-i18n="contact.message">Nachricht</span>
       <textarea name="message" rows="5" autocomplete="off" required></textarea>
     </label>
 
     <footer>
-      <p data-contact-status>
+      <p data-contact-status data-i18n="contact.info">
         Beim Absenden öffnet sich dein E-Mail-Programm mit der vorbereiteten
         Nachricht.
       </p>
-      <button type="submit">Nachricht vorbereiten</button>
+      <button type="submit" data-i18n="contact.prepare">
+        Nachricht vorbereiten
+      </button>
     </footer>
   </form>
 </dialog>
 
 <script>
+  import { t } from "../scripts/i18n";
+
   const contactDialog = document.querySelector<HTMLDialogElement>(
     "[data-contact-dialog]",
   );
@@ -62,12 +67,9 @@ import { siteProfile } from "../data/site";
     "[data-contact-status]",
   );
   const contactEmail = contactDialog?.dataset.contactEmail ?? "";
-  const defaultContactStatus =
-    "Beim Absenden öffnet sich dein E-Mail-Programm mit der vorbereiteten Nachricht.";
-
   const resetContactForm = () => {
     contactForm?.reset();
-    if (contactStatus) contactStatus.textContent = defaultContactStatus;
+    if (contactStatus) contactStatus.textContent = t("contact.info");
   };
 
   resetContactForm();
@@ -85,8 +87,7 @@ import { siteProfile } from "../data/site";
     event.preventDefault();
     if (!contactEmail) {
       if (contactStatus) {
-        contactStatus.textContent =
-          "Noch keine öffentliche Empfängeradresse hinterlegt.";
+        contactStatus.textContent = t("contact.noRecipient");
       }
       window.consoleAudio?.play("error");
       return;
@@ -96,9 +97,15 @@ import { siteProfile } from "../data/site";
     const name = String(formData.get("name") ?? "");
     const email = String(formData.get("email") ?? "");
     const message = String(formData.get("message") ?? "");
-    const subject = encodeURIComponent(`Portfolio-Anfrage von ${name}`);
-    const body = encodeURIComponent(`${message}\n\nAntwort an: ${email}`);
+    const subject = encodeURIComponent(t("contact.subject", { name }));
+    const body = encodeURIComponent(
+      `${message}\n\n${t("contact.replyTo", { email })}`,
+    );
     window.consoleAudio?.play("confirm");
     window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+  });
+
+  window.addEventListener("console:language-changed", () => {
+    if (contactStatus) contactStatus.textContent = t("contact.info");
   });
 </script>

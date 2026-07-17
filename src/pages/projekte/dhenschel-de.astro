@@ -7,29 +7,48 @@ import SiteFooter from "../../components/SiteFooter.astro";
 <BaseLayout
   title="dhenschel.de — Case Study"
   description="Konzept und technische Entscheidungen hinter dem Portfolio-Hub von D. Henschel."
+  titleKey="page.case.title"
+  descriptionKey="page.case.description"
 >
   <SiteHeader compact />
   <main id="main-content" class="case-study">
     <header class="case-hero shell">
-      <a class="back-link" href="/#projekte">← Zurück zur Library</a>
+      <a class="back-link" href="/#gallery" data-i18n="case.back"
+        >← Zurück zur Library</a
+      >
       <p class="eyebrow"><span class="status-dot"></span> CASE FILE / 001</p>
-      <h1>Ein Portfolio, das sich wie ein Produkt anfühlt.</h1>
-      <p class="case-hero__lede">
+      <h1 data-i18n="case.headline">
+        Ein Portfolio, das sich wie ein Produkt anfühlt.
+      </h1>
+      <p class="case-hero__lede" data-i18n="case.lede">
         dhenschel.de verbindet die schnelle Orientierung eines klassischen
         Entwickler-Portfolios mit der Auswahl- und Statuslogik eines modernen
         Console Hubs.
       </p>
       <dl class="case-hero__meta">
-        <div><dt>Jahr</dt><dd>2026</dd></div>
-        <div><dt>Rolle</dt><dd>Konzept · Design · Entwicklung</dd></div>
-        <div><dt>Stack</dt><dd>Astro · TypeScript · CSS</dd></div>
-        <div><dt>Status</dt><dd>In Entwicklung</dd></div>
+        <div><dt data-i18n="case.year">Jahr</dt><dd>2026</dd></div>
+        <div>
+          <dt data-i18n="case.role">Rolle</dt><dd data-i18n="case.roleValue">
+            Konzept · Design · Entwicklung
+          </dd>
+        </div>
+        <div>
+          <dt data-i18n="case.stack">Stack</dt><dd>Astro · TypeScript · CSS</dd>
+        </div>
+        <div>
+          <dt data-i18n="case.status">Status</dt><dd
+            data-i18n="case.statusValue"
+          >
+            In Entwicklung
+          </dd>
+        </div>
       </dl>
     </header>
 
     <div
       class="case-visual shell"
       aria-label="Abstrakte Darstellung des Portfolio-Hubs"
+      data-i18n-aria="case.visualAria"
     >
       <div class="case-visual__screen">
         <span class="case-visual__label">PROJECT LIBRARY / ONLINE</span>
@@ -39,7 +58,7 @@ import SiteFooter from "../../components/SiteFooter.astro";
           >
         </div>
         <div class="case-visual__readout">
-          <strong>DIGITALE PRODUKTE</strong>
+          <strong data-i18n="case.products">DIGITALE PRODUKTE</strong>
           <span>SYSTEM / CHARACTER / CLARITY</span>
         </div>
       </div>
@@ -49,8 +68,10 @@ import SiteFooter from "../../components/SiteFooter.astro";
       <section class="case-section">
         <p class="eyebrow">01 / CHALLENGE</p>
         <div>
-          <h2>Eigenständig wirken, ohne Orientierung zu opfern.</h2>
-          <p>
+          <h2 data-i18n="case.challenge.title">
+            Eigenständig wirken, ohne Orientierung zu opfern.
+          </h2>
+          <p data-i18n="case.challenge.text">
             Viele Entwickler-Portfolios sind entweder sehr funktional und
             austauschbar oder visuell eindrucksvoll, aber schwer zu bedienen.
             Das Ziel ist eine dritte Option: ein wiedererkennbares Interface,
@@ -62,8 +83,10 @@ import SiteFooter from "../../components/SiteFooter.astro";
       <section class="case-section">
         <p class="eyebrow">02 / APPROACH</p>
         <div>
-          <h2>Die Spielebibliothek als Navigationsmodell.</h2>
-          <p>
+          <h2 data-i18n="case.approach.title">
+            Die Spielebibliothek als Navigationsmodell.
+          </h2>
+          <p data-i18n="case.approach.text">
             Projektcover, aktiver Status, Index und Inspector bilden gemeinsam
             den Console Hub. Die Metapher bleibt bewusst leicht: Jeder Titel ist
             ein normaler Link, alle Informationen sind semantisches HTML und auf
@@ -71,12 +94,23 @@ import SiteFooter from "../../components/SiteFooter.astro";
           </p>
           <ul class="case-points">
             <li>
-              <span>01</span> Tastatursteuerung zusätzlich zur direkten Auswahl
+              <span>01</span>
+              <i data-i18n="case.point.keyboard"
+                >Tastatursteuerung zusätzlich zur direkten Auswahl</i
+              >
             </li>
             <li>
-              <span>02</span> Vollständiger Inhalt auch ohne Client-JavaScript
+              <span>02</span>
+              <i data-i18n="case.point.noJs"
+                >Vollständiger Inhalt auch ohne Client-JavaScript</i
+              >
             </li>
-            <li><span>03</span> Reduzierte Bewegung über Systemeinstellung</li>
+            <li>
+              <span>03</span>
+              <i data-i18n="case.point.motion"
+                >Reduzierte Bewegung über Systemeinstellung</i
+              >
+            </li>
           </ul>
         </div>
       </section>
@@ -84,17 +118,31 @@ import SiteFooter from "../../components/SiteFooter.astro";
       <section class="case-section">
         <p class="eyebrow">03 / SYSTEM</p>
         <div>
-          <h2>Statischer Kern, Interaktion nur dort, wo sie trägt.</h2>
-          <p>
+          <h2 data-i18n="case.system.title">
+            Statischer Kern, Interaktion nur dort, wo sie trägt.
+          </h2>
+          <p data-i18n="case.system.text">
             Astro erzeugt alle Seiten als statisches HTML. Projektinhalte werden
             strukturiert gepflegt und später automatisch für Hub, Archiv und
             Case Studies wiederverwendet. JavaScript steuert nur die Auswahl im
             Hub und kleine Interface-Details.
           </p>
           <div class="metric-grid">
-            <div><strong>0</strong><span>Tracking-Skripte</span></div>
-            <div><strong>100%</strong><span>statisch deploybar</span></div>
-            <div><strong>AA</strong><span>Accessibility-Ziel</span></div>
+            <div>
+              <strong>0</strong><span data-i18n="case.metric.tracking"
+                >Tracking-Skripte</span
+              >
+            </div>
+            <div>
+              <strong>100%</strong><span data-i18n="case.metric.static"
+                >statisch deploybar</span
+              >
+            </div>
+            <div>
+              <strong>AA</strong><span data-i18n="case.metric.accessibility"
+                >Accessibility-Ziel</span
+              >
+            </div>
           </div>
         </div>
       </section>
@@ -102,14 +150,16 @@ import SiteFooter from "../../components/SiteFooter.astro";
       <section class="case-section case-section--next">
         <p class="eyebrow">04 / NEXT</p>
         <div>
-          <h2>Jetzt kommen die echten Projekte.</h2>
-          <p>
+          <h2 data-i18n="case.next.title">Jetzt kommen die echten Projekte.</h2>
+          <p data-i18n="case.next.text">
             Die technische und visuelle Bühne steht. Als Nächstes ersetzen echte
             Projektinhalte die vorbereiteten Slots, ergänzt um Screenshots,
             Ergebnisse und konkrete technische Entscheidungen.
           </p>
-          <a class="button button--primary" href="/#projekte"
-            >Library ansehen →</a
+          <a
+            class="button button--primary"
+            href="/#gallery"
+            data-i18n="case.library">Library ansehen →</a
           >
         </div>
       </section>
