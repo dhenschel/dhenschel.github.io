@@ -398,17 +398,6 @@ html[data-boot="skip"] .startup-screen {
   white-space: nowrap;
 }
 
-.startup-profile small {
-  max-width: 100%;
-  margin-top: 0.2rem;
-  overflow: hidden;
-  color: var(--console-muted);
-  font-size: 0.66rem;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .startup-profile--unavailable .profile-picture--boot {
   filter: grayscale(0.35) saturate(0.72);
 }
@@ -539,10 +528,12 @@ html[data-boot="skip"] .startup-screen {
 
 .startup-screen__hint {
   position: absolute;
-  bottom: 2rem;
+  bottom: clamp(1.5rem, 4vh, 3rem);
   margin: 0;
   color: var(--console-muted);
-  font-size: 0.8rem;
+  font-size: clamp(1.4rem, 2.8vw, 2.25rem);
+  font-weight: 760;
+  letter-spacing: -0.035em;
 }
 
 /* Fixed top menu */
