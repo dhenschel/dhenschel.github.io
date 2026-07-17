@@ -220,6 +220,159 @@ html[data-boot="skip"] .startup-screen {
   display: none;
 }
 
+.startup-screen__ambient {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.startup-screen__tile {
+  position: absolute;
+  width: var(--startup-tile-width, 9rem);
+  height: var(--startup-tile-height, 7rem);
+  border: 1px solid var(--console-line);
+  border-radius: 1.7rem;
+  background: linear-gradient(
+    145deg,
+    var(--console-glass-sheen),
+    transparent 68%
+  );
+  box-shadow:
+    inset 0 1px 0 var(--console-glass-sheen),
+    0 1.2rem 3rem rgb(7 44 86 / 5%);
+  opacity: 0.32;
+  animation: startup-tile-float var(--startup-tile-duration, 14s) ease-in-out
+    var(--startup-tile-delay, 0s) infinite alternate;
+  backdrop-filter: blur(0.35rem);
+  will-change: transform, opacity;
+}
+
+.startup-screen__tile--one {
+  --startup-tile-width: 10rem;
+  --startup-tile-height: 7.2rem;
+  --startup-tile-x: 3.8rem;
+  --startup-tile-y: 2.2rem;
+  --startup-tile-rotate: -11deg;
+  --startup-tile-rotate-end: -3deg;
+  --startup-tile-duration: 13s;
+
+  top: 13%;
+  left: 11%;
+}
+
+.startup-screen__tile--two {
+  --startup-tile-width: 7.5rem;
+  --startup-tile-height: 7.5rem;
+  --startup-tile-x: -2.8rem;
+  --startup-tile-y: 3.4rem;
+  --startup-tile-rotate: 9deg;
+  --startup-tile-rotate-end: 1deg;
+  --startup-tile-duration: 16s;
+  --startup-tile-delay: -5s;
+
+  top: 16%;
+  right: 14%;
+}
+
+.startup-screen__tile--three {
+  --startup-tile-width: 13rem;
+  --startup-tile-height: 8rem;
+  --startup-tile-x: 3rem;
+  --startup-tile-y: -3.2rem;
+  --startup-tile-rotate: 7deg;
+  --startup-tile-rotate-end: 14deg;
+  --startup-tile-duration: 18s;
+  --startup-tile-delay: -9s;
+
+  bottom: 12%;
+  left: 7%;
+}
+
+.startup-screen__tile--four {
+  --startup-tile-width: 9.5rem;
+  --startup-tile-height: 10.5rem;
+  --startup-tile-x: -3.6rem;
+  --startup-tile-y: -2.5rem;
+  --startup-tile-rotate: -7deg;
+  --startup-tile-rotate-end: 2deg;
+  --startup-tile-duration: 15s;
+  --startup-tile-delay: -2s;
+
+  right: 9%;
+  bottom: 10%;
+}
+
+.startup-screen__spark {
+  position: absolute;
+  width: var(--startup-spark-size, 0.7rem);
+  height: var(--startup-spark-size, 0.7rem);
+  border: 2px solid var(--console-surface-solid);
+  border-radius: 50%;
+  background: var(--console-particle);
+  box-shadow:
+    0 0 0 0.22rem var(--console-accent-halo),
+    0 0 1.5rem var(--console-accent-halo);
+  animation: startup-spark-drift var(--startup-spark-duration, 11s) ease-in-out
+    var(--startup-spark-delay, 0s) infinite alternate;
+  will-change: transform, opacity;
+}
+
+.startup-screen__spark--one {
+  --startup-spark-size: 0.85rem;
+  --startup-spark-x: 3rem;
+  --startup-spark-y: -2.5rem;
+  --startup-spark-duration: 10s;
+
+  top: 29%;
+  left: 7%;
+}
+
+.startup-screen__spark--two {
+  --startup-spark-size: 0.55rem;
+  --startup-spark-x: -2.4rem;
+  --startup-spark-y: 3.2rem;
+  --startup-spark-duration: 13s;
+  --startup-spark-delay: -6s;
+
+  top: 34%;
+  right: 8%;
+}
+
+.startup-screen__spark--three {
+  --startup-spark-size: 0.68rem;
+  --startup-spark-x: 2.2rem;
+  --startup-spark-y: -3.6rem;
+  --startup-spark-duration: 12s;
+  --startup-spark-delay: -3s;
+
+  bottom: 25%;
+  left: 20%;
+}
+
+.startup-screen__spark--four {
+  --startup-spark-size: 0.95rem;
+  --startup-spark-x: -3rem;
+  --startup-spark-y: -2rem;
+  --startup-spark-duration: 14s;
+  --startup-spark-delay: -8s;
+
+  right: 23%;
+  bottom: 20%;
+}
+
+.startup-screen__spark--five {
+  --startup-spark-size: 0.48rem;
+  --startup-spark-x: 2.7rem;
+  --startup-spark-y: 2.4rem;
+  --startup-spark-duration: 9s;
+  --startup-spark-delay: -4s;
+
+  top: 10%;
+  left: 45%;
+}
+
 .startup-screen__brand {
   position: absolute;
   top: 1.8rem;
@@ -702,10 +855,6 @@ html[data-console-view="music"] .console-back-button {
 
 .console-profile-button:focus-visible {
   outline: none;
-}
-
-.console-profile-button.gamepad-pointer-target {
-  outline: none !important;
 }
 
 .header-music-button {
@@ -2712,6 +2861,50 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 }
 
+@keyframes startup-tile-float {
+  0% {
+    opacity: 0.18;
+    transform: translate3d(0, 0, 0) rotate(var(--startup-tile-rotate, 0deg))
+      scale(0.96);
+  }
+
+  52% {
+    opacity: 0.42;
+  }
+
+  100% {
+    opacity: 0.28;
+    transform: translate3d(
+        var(--startup-tile-x, 2rem),
+        var(--startup-tile-y, -2rem),
+        0
+      )
+      rotate(var(--startup-tile-rotate-end, 5deg)) scale(1.05);
+  }
+}
+
+@keyframes startup-spark-drift {
+  0% {
+    opacity: 0.28;
+    transform: translate3d(0, 0, 0) scale(0.72);
+  }
+
+  45% {
+    opacity: 0.92;
+    transform: translate3d(0.8rem, -0.6rem, 0) scale(1.08);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: translate3d(
+        var(--startup-spark-x, 2rem),
+        var(--startup-spark-y, -2rem),
+        0
+      )
+      scale(0.86);
+  }
+}
+
 @keyframes console-orbit-upper {
   0% {
     opacity: 0.6;
@@ -3225,7 +3418,8 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   .console-background::after,
   .console-background span,
   .startup-screen::before,
-  .startup-screen::after {
+  .startup-screen::after,
+  .startup-screen__ambient span {
     animation: none !important;
   }
 

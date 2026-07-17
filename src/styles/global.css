@@ -155,6 +155,10 @@
     outline-offset: 0.25rem;
   }
 
+  .console-profile-button.gamepad-pointer-target {
+    outline: none !important;
+  }
+
   @keyframes gamepad-pointer-click {
     0% {
       opacity: 0.85;
