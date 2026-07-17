@@ -1,342 +1,285 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
+import LegalLayout from "../layouts/LegalLayout.astro";
 ---
 
-<BaseLayout
+<LegalLayout
   title="Datenschutz — D. Henschel"
-  description="Vorlage für die Datenschutzerklärung des persönlichen Portfolios von D. Henschel."
-  noindex
-  bodyClass="legal-console-body"
+  description="Datenschutzerklärung des persönlichen Portfolios von Daniel Henschel."
+  current="datenschutz"
 >
-  <div class="legal-console-background" aria-hidden="true">
-    <span></span><span></span><span></span>
-  </div>
-  <SiteHeader compact />
-
-  <main id="main-content" class="legal-page legal-page--console shell">
-    <header class="legal-hero">
-      <div>
-        <p class="legal-kicker"><i></i> Rechtliches · Kanal 02</p>
-        <h1>Datenschutz</h1>
-        <p class="legal-lead">
-          Technisch zugeschnitten auf dieses statische Portfolio mit GitHub
-          Pages, lokalen Einstellungen und Kontaktaufnahme per E-Mail.
-        </p>
-      </div>
-      <div class="legal-template-badge">
-        <span>Vorlage</span>
-        <strong>Vor Veröffentlichung prüfen</strong>
-      </div>
-    </header>
-
-    <div class="legal-privacy-summary" aria-label="Technische Übersicht">
-      <span><i></i> Kein eigenes Tracking</span>
-      <span><i></i> Keine Werbe-Cookies</span>
-      <span><i></i> Lokale Einstellungen</span>
-      <span><i></i> Hosting über GitHub Pages</span>
+  <header class="legal-hero">
+    <div>
+      <p class="legal-kicker"><i></i> Rechtliches · Kanal 02</p>
+      <h1>Datenschutz</h1>
+      <p class="legal-lead">
+        Informationen zur Datenverarbeitung auf diesem statischen Portfolio mit
+        GitHub Pages, lokalen Einstellungen und Kontaktaufnahme per E-Mail.
+      </p>
     </div>
+  </header>
 
-    <div class="legal-layout">
-      <aside class="legal-toc" aria-label="Inhaltsübersicht">
-        <strong>Datenschutz</strong>
-        <nav>
-          <a href="#verantwortlicher">Verantwortlicher</a>
-          <a href="#hosting">Hosting</a>
-          <a href="#speicher">Lokale Speicherung</a>
-          <a href="#kontakt">Kontaktaufnahme</a>
-          <a href="#links">Externe Links</a>
-          <a href="#rechte">Deine Rechte</a>
-          <a href="#aufsicht">Beschwerderecht</a>
-          <a href="#checkliste">Checkliste</a>
-        </nav>
-      </aside>
+  <div class="legal-privacy-summary" aria-label="Technische Übersicht">
+    <span><i></i> Kein eigenes Tracking</span>
+    <span><i></i> Keine Werbe-Cookies</span>
+    <span><i></i> Lokale Einstellungen</span>
+    <span><i></i> Hosting über GitHub Pages</span>
+  </div>
 
-      <article class="legal-document" lang="de">
-        <div class="legal-callout legal-callout--warning">
-          <span aria-hidden="true">!</span>
+  <div class="legal-layout">
+    <aside class="legal-toc" aria-label="Inhaltsübersicht">
+      <strong>Datenschutz</strong>
+      <nav>
+        <a href="#verantwortlicher">Verantwortlicher</a>
+        <a href="#hosting">Hosting</a>
+        <a href="#speicher">Lokale Speicherung</a>
+        <a href="#kontakt">Kontaktaufnahme</a>
+        <a href="#links">Externe Links</a>
+        <a href="#rechte">Deine Rechte</a>
+        <a href="#aufsicht">Beschwerderecht</a>
+      </nav>
+    </aside>
+
+    <article class="legal-document" lang="de">
+      <section id="verantwortlicher" class="legal-card">
+        <span class="legal-section-number">01</span>
+        <h2>Verantwortlicher</h2>
+        <p class="legal-reference">
+          Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO)
+        </p>
+        <address class="legal-address">
+          <strong>Daniel Henschel</strong>
+          <span>Kurt-Schumacher-Ring 162</span>
+          <span>18146 Rostock</span>
+          <span>Deutschland</span>
+          <a href="mailto:danielhenschel04@gmail.com"
+            >danielhenschel04@gmail.com</a
+          >
+          <a href="tel:+4915203446489">+49 1520 3446489</a>
+        </address>
+      </section>
+
+      <section id="hosting" class="legal-card">
+        <span class="legal-section-number">02</span>
+        <h2>Hosting über GitHub Pages</h2>
+        <p>
+          Diese Website wird als statische Website über GitHub Pages
+          bereitgestellt. GitHub dokumentiert, dass beim Besuch einer
+          GitHub-Pages-Website die IP-Adresse der Besucher unabhängig von einer
+          Anmeldung zu Sicherheitszwecken protokolliert und gespeichert wird.
+          Nach der Datenschutzerklärung von GitHub können außerdem technische
+          Nutzungs- und Verbindungsdaten verarbeitet werden, beispielsweise
+          Zeitpunkt der Anfrage, Geräte- und Browserinformationen, aufgerufene
+          Seiten und verweisende Website.
+        </p>
+        <dl class="legal-data-list">
           <div>
-            <strong>Vorlage anhand des Live-Systems prüfen</strong>
+            <dt>Anbieter</dt>
+            <dd>
+              GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam,
+              Niederlande, und GitHub, Inc., 88 Colin P. Kelly Jr. Street, San
+              Francisco, CA 94107, USA
+            </dd>
+          </div>
+          <div>
+            <dt>Zweck</dt>
+            <dd>Auslieferung, Stabilität und Sicherheit der Website</dd>
+          </div>
+          <div>
+            <dt>Rechtsgrundlage</dt>
+            <dd>
+              Art. 6 Abs. 1 lit. f DSGVO; berechtigtes Interesse an einer
+              sicheren und zuverlässigen Bereitstellung des Portfolios
+            </dd>
+          </div>
+          <div>
+            <dt>Speicherdauer</dt>
+            <dd>
+              Die konkrete Dauer wird durch GitHub nach den dort beschriebenen
+              Sicherheits- und Aufbewahrungskriterien bestimmt. Darauf besteht
+              kein unmittelbarer technischer Zugriff.
+            </dd>
+          </div>
+          <div>
+            <dt>Drittlandtransfer</dt>
+            <dd>
+              Eine Verarbeitung in den USA und weiteren Ländern ist möglich.
+              GitHub nennt hierfür unter anderem Standardvertragsklauseln und
+              das EU–US Data Privacy Framework.
+            </dd>
+          </div>
+        </dl>
+        <div class="legal-source-links">
+          <a
+            href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection"
+            target="_blank"
+            rel="noreferrer">Datenerfassung bei GitHub Pages ↗</a
+          >
+          <a
+            href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+            target="_blank"
+            rel="noreferrer">GitHub-Datenschutzerklärung ↗</a
+          >
+        </div>
+      </section>
+
+      <section id="speicher" class="legal-card">
+        <span class="legal-section-number">03</span>
+        <h2>Lokale Speicherung auf deinem Gerät</h2>
+        <p>
+          Die Website verwendet keine eigenen Werbe- oder Analyse-Cookies. Sie
+          speichert ausschließlich Einstellungen, die für die gewählte
+          Konsolenoberfläche benötigt werden, lokal im Browser. Diese Werte
+          werden durch die Website nicht an den Betreiber übertragen.
+        </p>
+        <div class="legal-table-wrap">
+          <table class="legal-storage-table">
+            <thead>
+              <tr>
+                <th>Speicher</th>
+                <th>Inhalt und Zweck</th>
+                <th>Dauer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>localStorage</code></td>
+                <td>Sprache und helles/dunkles Farbschema</td>
+                <td>Bis zum Löschen der Browserdaten</td>
+              </tr>
+              <tr>
+                <td><code>localStorage</code></td>
+                <td>Soundstatus und bevorzugte Musik für Tag und Nacht</td>
+                <td>Bis zum Löschen oder Ändern der Einstellung</td>
+              </tr>
+              <tr>
+                <td><code>sessionStorage</code></td>
+                <td>Merker, ob die Startanimation bereits angezeigt wurde</td>
+                <td>Bis zum Ende der Browsersitzung</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Rechtsgrundlage für den Endgerätezugriff ist § 25 Abs. 2 Nr. 2 TDDDG,
+          da die Speicherung der ausdrücklich gewählten Darstellung und
+          Funktionen dient. Die Einstellungen können jederzeit über die
+          Browserdaten gelöscht werden.
+        </p>
+        <p>
+          Die Erkennung von Maus, Tastatur oder Controller erfolgt lokal über
+          Browser-Schnittstellen. Gerätekennungen oder Eingaben werden weder
+          gespeichert noch an den Betreiber übertragen. Auch Musik und
+          Soundeffekte werden lokal im Browser erzeugt beziehungsweise aus
+          Dateien dieser Website abgespielt.
+        </p>
+      </section>
+
+      <section id="kontakt" class="legal-card">
+        <span class="legal-section-number">04</span>
+        <h2>Kontaktaufnahme per E-Mail</h2>
+        <p>
+          Das Kontaktformular besitzt kein Server-Backend. Die eingegebenen
+          Daten werden beim Betätigen von „Nachricht vorbereiten“ nicht an diese
+          Website gesendet. Stattdessen öffnet ein <code>mailto:</code>-Link das
+          auf dem Gerät eingerichtete E-Mail-Programm. Erst beim Versenden der
+          vorbereiteten Nachricht werden Name, E-Mail-Adresse, Nachricht und die
+          üblichen E-Mail-Metadaten über die beteiligten Mailanbieter
+          verarbeitet.
+        </p>
+        <dl class="legal-data-list">
+          <div>
+            <dt>Zweck</dt>
+            <dd>Bearbeitung und Beantwortung der Anfrage</dd>
+          </div>
+          <div>
+            <dt>Rechtsgrundlage</dt>
+            <dd>
+              Art. 6 Abs. 1 lit. b DSGVO bei vorvertraglichen Anfragen;
+              ansonsten Art. 6 Abs. 1 lit. f DSGVO aufgrund des Interesses an
+              der Kommunikation und Beantwortung
+            </dd>
+          </div>
+          <div>
+            <dt>Speicherdauer</dt>
+            <dd>
+              Die Daten werden nach abschließender Bearbeitung der Anfrage
+              gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten oder
+              berechtigten Ansprüche eine längere Speicherung erfordern.
+            </dd>
+          </div>
+        </dl>
+        <div class="legal-callout legal-callout--info">
+          <span aria-hidden="true">i</span>
+          <div>
+            <strong>E-Mail-Verarbeitung über Gmail</strong>
             <p>
-              Diese Erklärung beschreibt den aktuellen technischen Stand des
-              Repositories. Neue Analysewerkzeuge, eingebettete Drittinhalte,
-              Formulardienste oder ein anderer Hoster erfordern eine Anpassung.
-              Platzhalter müssen ersetzt werden. Dies ist keine Rechtsberatung.
+              Eingehende Nachrichten werden über Dienste von Google verarbeitet.
+              Für Nutzer im Europäischen Wirtschaftsraum ist die Google Ireland
+              Limited, Gordon House, Barrow Street, Dublin 4, Irland zuständig.
             </p>
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noreferrer">Google-Datenschutzerklärung ↗</a
+            >
           </div>
         </div>
+      </section>
 
-        <section id="verantwortlicher" class="legal-card">
-          <span class="legal-section-number">01</span>
-          <h2>Verantwortlicher</h2>
-          <p class="legal-reference">
-            Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO)
-          </p>
-          <address class="legal-address">
-            <strong class="legal-placeholder"
-              >[Vollständiger Vor- und Nachname]</strong
-            >
-            <span class="legal-placeholder">[Straße und Hausnummer]</span>
-            <span class="legal-placeholder">[PLZ und Wohnort]</span>
-            <span>Deutschland</span>
-            <span class="legal-placeholder">[E-Mail-Adresse]</span>
-          </address>
-        </section>
+      <section id="links" class="legal-card">
+        <span class="legal-section-number">05</span>
+        <h2>Externe Websites und GitHub</h2>
+        <p>
+          Projektkarten und Schaltflächen verlinken auf externe Websites. Es
+          werden auf dieser Seite keine externen Social-Media-Widgets oder
+          fremden Analyse-Skripte eingebettet. Eine Verbindung zum jeweiligen
+          Drittanbieter entsteht erst beim Öffnen eines externen Links. Ab
+          diesem Zeitpunkt gelten die Datenschutzinformationen des
+          Zielanbieters.
+        </p>
+      </section>
 
-        <section id="hosting" class="legal-card">
-          <span class="legal-section-number">02</span>
-          <h2>Hosting über GitHub Pages</h2>
-          <p>
-            Diese Website wird als statische Website über GitHub Pages
-            bereitgestellt. GitHub dokumentiert, dass beim Besuch einer GitHub-
-            Pages-Website die IP-Adresse der Besucher unabhängig von einer
-            Anmeldung zu Sicherheitszwecken protokolliert und gespeichert wird.
-            Nach der Datenschutzerklärung von GitHub können außerdem technische
-            Nutzungs- und Verbindungsdaten verarbeitet werden, beispielsweise
-            Zeitpunkt der Anfrage, Geräte- und Browserinformationen, aufgerufene
-            Seiten und verweisende Website.
-          </p>
-          <dl class="legal-data-list">
-            <div>
-              <dt>Anbieter</dt>
-              <dd>
-                GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam,
-                Niederlande, und GitHub, Inc., 88 Colin P. Kelly Jr. Street, San
-                Francisco, CA 94107, USA
-              </dd>
-            </div>
-            <div>
-              <dt>Zweck</dt>
-              <dd>Auslieferung, Stabilität und Sicherheit der Website</dd>
-            </div>
-            <div>
-              <dt>Rechtsgrundlage</dt>
-              <dd>
-                Art. 6 Abs. 1 lit. f DSGVO; berechtigtes Interesse an einer
-                sicheren und zuverlässigen Bereitstellung des Portfolios
-              </dd>
-            </div>
-            <div>
-              <dt>Speicherdauer</dt>
-              <dd>
-                Die konkrete Dauer wird durch GitHub nach den dort beschriebenen
-                Sicherheits- und Aufbewahrungskriterien bestimmt. Darauf besteht
-                kein unmittelbarer technischer Zugriff.
-              </dd>
-            </div>
-            <div>
-              <dt>Drittlandtransfer</dt>
-              <dd>
-                Eine Verarbeitung in den USA und weiteren Ländern ist möglich.
-                GitHub nennt hierfür unter anderem Standardvertragsklauseln und
-                das EU–US Data Privacy Framework.
-              </dd>
-            </div>
-          </dl>
-          <div class="legal-source-links">
-            <a
-              href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection"
-              target="_blank"
-              rel="noreferrer">Datenerfassung bei GitHub Pages ↗</a
-            >
-            <a
-              href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
-              target="_blank"
-              rel="noreferrer">GitHub-Datenschutzerklärung ↗</a
-            >
-          </div>
-        </section>
+      <section id="rechte" class="legal-card">
+        <span class="legal-section-number">06</span>
+        <h2>Datenschutzrechte</h2>
+        <p>
+          Soweit die gesetzlichen Voraussetzungen erfüllt sind, bestehen
+          insbesondere folgende Rechte:
+        </p>
+        <ul class="legal-check-list">
+          <li>Auskunft über verarbeitete personenbezogene Daten</li>
+          <li>Berichtigung unrichtiger oder unvollständiger Daten</li>
+          <li>Löschung oder Einschränkung der Verarbeitung</li>
+          <li>Datenübertragbarkeit</li>
+          <li>
+            Widerspruch gegen Verarbeitungen auf Grundlage berechtigter
+            Interessen
+          </li>
+          <li>Widerruf einer erteilten Einwilligung für die Zukunft</li>
+        </ul>
+        <p>
+          Für Anfragen genügt eine Nachricht an die oben angegebene
+          Kontaktadresse. Vor einer Auskunft kann eine angemessene
+          Identitätsprüfung erforderlich sein.
+        </p>
+      </section>
 
-        <section id="speicher" class="legal-card">
-          <span class="legal-section-number">03</span>
-          <h2>Lokale Speicherung auf deinem Gerät</h2>
-          <p>
-            Die Website verwendet keine eigenen Werbe- oder Analyse-Cookies. Sie
-            speichert ausschließlich Einstellungen, die für die von dir gewählte
-            Konsolenoberfläche benötigt werden, lokal im Browser. Diese Werte
-            werden durch die Website nicht an den Betreiber übertragen.
-          </p>
-          <div class="legal-table-wrap">
-            <table class="legal-storage-table">
-              <thead>
-                <tr>
-                  <th>Speicher</th>
-                  <th>Inhalt und Zweck</th>
-                  <th>Dauer</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>localStorage</code></td>
-                  <td>Sprache und helles/dunkles Farbschema</td>
-                  <td>Bis zum Löschen der Browserdaten</td>
-                </tr>
-                <tr>
-                  <td><code>localStorage</code></td>
-                  <td>Soundstatus und bevorzugte Musik für Tag und Nacht</td>
-                  <td>Bis zum Löschen oder Ändern der Einstellung</td>
-                </tr>
-                <tr>
-                  <td><code>sessionStorage</code></td>
-                  <td>Merker, ob die Startanimation bereits angezeigt wurde</td>
-                  <td>Bis zum Ende der Browsersitzung</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="legal-helper">
-            Rechtsgrundlage für den Endgerätezugriff ist nach aktueller
-            Einschätzung § 25 Abs. 2 Nr. 2 TDDDG, weil die Speicherung der
-            ausdrücklich gewählten Darstellung und Funktionen dient. Die
-            Einstellungen können jederzeit über die Browserdaten gelöscht
-            werden.
-          </p>
-          <p>
-            Die Erkennung von Maus, Tastatur oder Controller erfolgt lokal über
-            Browser-Schnittstellen. Gerätekennungen oder Eingaben werden weder
-            gespeichert noch an den Betreiber übertragen. Auch Musik und
-            Soundeffekte werden lokal im Browser erzeugt beziehungsweise aus
-            Dateien dieser Website abgespielt.
-          </p>
-        </section>
+      <section id="aufsicht" class="legal-card">
+        <span class="legal-section-number">07</span>
+        <h2>Beschwerderecht</h2>
+        <p>
+          Betroffene Personen haben das Recht, sich bei einer
+          Datenschutzaufsichtsbehörde zu beschweren. Zuständig ist insbesondere
+          die Aufsichtsbehörde des Aufenthaltsorts, des Arbeitsplatzes oder des
+          Orts des mutmaßlichen Verstoßes.
+        </p>
+      </section>
 
-        <section id="kontakt" class="legal-card">
-          <span class="legal-section-number">04</span>
-          <h2>Kontaktaufnahme per E-Mail</h2>
-          <p>
-            Das Kontaktformular besitzt kein Server-Backend. Die eingegebenen
-            Daten werden beim Betätigen von „Nachricht vorbereiten“ nicht an
-            diese Website gesendet. Stattdessen öffnet ein <code>mailto:</code
-            >-Link das auf deinem Gerät eingerichtete E-Mail-Programm. Erst wenn
-            du die vorbereitete Nachricht dort selbst versendest, werden Name,
-            E-Mail-Adresse, Nachricht und die üblichen E-Mail-Metadaten über die
-            beteiligten Mailanbieter verarbeitet.
-          </p>
-          <dl class="legal-data-list">
-            <div>
-              <dt>Zweck</dt>
-              <dd>Bearbeitung und Beantwortung deiner Anfrage</dd>
-            </div>
-            <div>
-              <dt>Rechtsgrundlage</dt>
-              <dd>
-                Art. 6 Abs. 1 lit. b DSGVO bei vorvertraglichen Anfragen;
-                ansonsten Art. 6 Abs. 1 lit. f DSGVO aufgrund des Interesses an
-                der Kommunikation und Beantwortung
-              </dd>
-            </div>
-            <div>
-              <dt>Speicherdauer</dt>
-              <dd class="legal-placeholder">
-                [Eigene Löschroutine festlegen, z. B. nach abschließender
-                Bearbeitung, sofern keine gesetzlichen Pflichten oder Ansprüche
-                eine längere Aufbewahrung erfordern]
-              </dd>
-            </div>
-          </dl>
-          <div class="legal-callout legal-callout--info">
-            <span aria-hidden="true">i</span>
-            <div>
-              <strong>Aktuell hinterlegte Gmail-Adresse</strong>
-              <p>
-                Sofern die Gmail-Adresse als Empfangsadresse bestehen bleibt,
-                werden eingehende Nachrichten über Dienste von Google
-                verarbeitet. Für Nutzer im Europäischen Wirtschaftsraum nennt
-                Google die Google Ireland Limited, Gordon House, Barrow Street,
-                Dublin 4, Irland. Prüfe diesen Abschnitt erneut, falls der
-                Mailanbieter oder die Kontaktadresse geändert wird.
-              </p>
-              <a
-                href="https://policies.google.com/privacy"
-                target="_blank"
-                rel="noreferrer">Google-Datenschutzerklärung ↗</a
-              >
-            </div>
-          </div>
-        </section>
-
-        <section id="links" class="legal-card">
-          <span class="legal-section-number">05</span>
-          <h2>Externe Websites und GitHub</h2>
-          <p>
-            Projektkarten und Schaltflächen verlinken auf externe Websites. Es
-            werden auf dieser Seite keine externen Social-Media-Widgets oder
-            fremden Analyse-Skripte eingebettet. Eine Verbindung zum jeweiligen
-            Drittanbieter entsteht erst, wenn du einen externen Link öffnest. Ab
-            diesem Zeitpunkt gelten die Datenschutzinformationen des
-            Zielanbieters.
-          </p>
-        </section>
-
-        <section id="rechte" class="legal-card">
-          <span class="legal-section-number">06</span>
-          <h2>Deine Datenschutzrechte</h2>
-          <p>
-            Soweit die gesetzlichen Voraussetzungen erfüllt sind, stehen dir
-            insbesondere folgende Rechte zu:
-          </p>
-          <ul class="legal-check-list">
-            <li>Auskunft über verarbeitete personenbezogene Daten</li>
-            <li>Berichtigung unrichtiger oder unvollständiger Daten</li>
-            <li>Löschung oder Einschränkung der Verarbeitung</li>
-            <li>Datenübertragbarkeit</li>
-            <li>
-              Widerspruch gegen Verarbeitungen auf Grundlage berechtigter
-              Interessen
-            </li>
-            <li>Widerruf einer erteilten Einwilligung für die Zukunft</li>
-          </ul>
-          <p class="legal-helper">
-            Für Anfragen genügt eine Nachricht an die oben einzutragende
-            Kontaktadresse. Vor einer Auskunft kann eine angemessene
-            Identitätsprüfung erforderlich sein.
-          </p>
-        </section>
-
-        <section id="aufsicht" class="legal-card">
-          <span class="legal-section-number">07</span>
-          <h2>Beschwerderecht</h2>
-          <p>
-            Du hast das Recht, dich bei einer Datenschutzaufsichtsbehörde zu
-            beschweren. Zuständig ist insbesondere die Aufsichtsbehörde deines
-            Aufenthaltsorts, deines Arbeitsplatzes oder des Orts des
-            mutmaßlichen Verstoßes.
-          </p>
-          <p class="legal-placeholder">
-            [Optional: Zuständige Landesdatenschutzbehörde am Wohnort des
-            Verantwortlichen mit Anschrift und Website ergänzen]
-          </p>
-        </section>
-
-        <section id="checkliste" class="legal-card legal-card--checklist">
-          <span class="legal-section-number">08</span>
-          <h2>Vor dem Veröffentlichen</h2>
-          <ul class="legal-check-list">
-            <li>Verantwortlichen und vollständige Kontaktdaten eintragen</li>
-            <li>Zuständige Landesdatenschutzbehörde bestimmen</li>
-            <li>Eigene Löschroutine für E-Mails festlegen</li>
-            <li>
-              GitHub- und Google-Angaben noch einmal gegen aktuelle Seiten
-              prüfen
-            </li>
-            <li>
-              Bei neuen Drittanbietern oder Tracking die Erklärung aktualisieren
-            </li>
-            <li>
-              <code>noindex</code> erst nach Abschluss der Prüfung entfernen
-            </li>
-          </ul>
-        </section>
-
-        <footer class="legal-document__footer">
-          <span>Stand</span>
-          <strong class="legal-placeholder">[Monat Jahr]</strong>
-          <a href="/">Zurück zum Konsolenmenü</a>
-        </footer>
-      </article>
-    </div>
-  </main>
-
-  <SiteFooter />
-</BaseLayout>
+      <footer class="legal-document__footer">
+        <span>Stand</span>
+        <strong>17.07.2026</strong>
+        <a href="/#gallery">Zurück zur Galerie</a>
+      </footer>
+    </article>
+  </div>
+</LegalLayout>

@@ -2470,6 +2470,196 @@
     color: #fff;
   }
 
+  /* Legal channels use the same visual system as the console menu. */
+  .legal-console-body {
+    color: var(--console-text);
+    background: var(--console-bg-deep);
+    font-family: var(--console-font);
+  }
+
+  .legal-console-main {
+    min-height: 100svh;
+    overflow: clip;
+  }
+
+  .legal-page--console {
+    min-height: 100svh;
+    padding-block: calc(7.15rem + clamp(2.5rem, 6vw, 5rem))
+      calc(5rem + clamp(3rem, 6vw, 5.5rem));
+  }
+
+  .legal-hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding-bottom: clamp(1.8rem, 4vw, 3.25rem);
+    border-color: var(--console-line);
+  }
+
+  .legal-kicker {
+    color: var(--console-muted);
+  }
+
+  .legal-kicker i {
+    background: var(--console-green);
+    box-shadow: 0 0 0.75rem var(--console-green-halo);
+  }
+
+  .legal-page--console h1 {
+    max-width: none;
+    color: var(--console-text);
+    font-family: var(--console-font);
+    font-size: clamp(2.8rem, 6vw, 5.4rem);
+    font-weight: 760;
+    letter-spacing: -0.055em;
+    line-height: 0.95;
+  }
+
+  .legal-lead {
+    color: var(--console-muted);
+  }
+
+  .legal-privacy-summary span {
+    border-color: var(--console-line);
+    color: var(--console-text);
+    background: var(--console-bg-soft);
+    box-shadow: var(--console-shadow);
+  }
+
+  .legal-privacy-summary i {
+    background: var(--console-green);
+    box-shadow: 0 0 0.6rem var(--console-green-halo);
+  }
+
+  .legal-toc {
+    top: 8.35rem;
+    border-color: var(--console-line);
+    background: var(--console-surface-solid);
+    box-shadow: var(--console-shadow);
+    backdrop-filter: none;
+  }
+
+  .legal-toc > strong,
+  .legal-card h2,
+  .legal-callout strong {
+    color: var(--console-text);
+  }
+
+  .legal-toc a {
+    color: var(--console-muted);
+  }
+
+  .legal-toc a:hover,
+  .legal-toc a.gamepad-pointer-target,
+  .legal-toc a:focus-visible {
+    color: var(--console-text);
+    background: var(--console-focus);
+  }
+
+  .legal-card,
+  .legal-callout {
+    border-color: var(--console-line);
+    background:
+      linear-gradient(145deg, var(--console-glass-sheen), transparent 34%),
+      var(--console-surface);
+    box-shadow: var(--console-shadow);
+    backdrop-filter: none;
+  }
+
+  .legal-card {
+    scroll-margin-top: 8.35rem;
+  }
+
+  .legal-card::after {
+    background: linear-gradient(90deg, transparent, var(--console-blue));
+  }
+
+  .legal-section-number,
+  .legal-card a,
+  .legal-source-links a,
+  .legal-document__footer a {
+    color: var(--console-blue);
+  }
+
+  .legal-card p,
+  .legal-card li,
+  .legal-card dd,
+  .legal-callout p {
+    color: var(--console-muted);
+  }
+
+  .legal-reference,
+  .legal-data-list dt,
+  .legal-document__footer {
+    color: var(--console-muted) !important;
+  }
+
+  .legal-address {
+    border-color: var(--console-line);
+    color: var(--console-text);
+    background: var(--console-bg-soft);
+  }
+
+  .legal-address a:hover,
+  .legal-card a:hover,
+  .legal-card a:focus-visible {
+    color: var(--console-blue-dark);
+  }
+
+  .legal-callout--info {
+    border-color: var(--console-line);
+    background: var(--console-bg-soft);
+  }
+
+  .legal-callout--info > span {
+    color: #fff;
+    background: var(--console-blue);
+  }
+
+  .legal-data-list > div,
+  .legal-data-list > div:last-child {
+    border-color: var(--console-line);
+  }
+
+  .legal-check-list li::before {
+    border-color: var(--console-blue);
+  }
+
+  .legal-table-wrap {
+    border-color: var(--console-line);
+  }
+
+  .legal-storage-table th,
+  .legal-storage-table td {
+    border-color: var(--console-line);
+    color: var(--console-muted);
+  }
+
+  .legal-storage-table th {
+    color: var(--console-text);
+    background: var(--console-bg-soft);
+  }
+
+  .legal-console-body code {
+    border-color: var(--console-line);
+    color: var(--console-blue);
+    background: var(--console-bg-soft);
+  }
+
+  .legal-source-links a {
+    border-color: var(--console-line);
+    background: var(--console-bg-soft);
+  }
+
+  .legal-source-links a:hover,
+  .legal-source-links a:focus-visible {
+    border-color: var(--console-blue);
+    color: var(--console-text);
+    background: var(--console-focus);
+  }
+
+  .legal-document__footer strong {
+    color: var(--console-text);
+  }
+
   @keyframes legal-orbit-drift {
     from {
       opacity: 0.45;
@@ -2845,7 +3035,7 @@
     }
 
     .legal-page--console {
-      padding-block: 3rem 4.5rem;
+      padding-block: calc(5.8rem + 2rem) calc(4.8rem + 2.5rem);
     }
 
     .legal-page--console h1 {

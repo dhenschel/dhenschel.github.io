@@ -913,12 +913,14 @@ html[data-input-mode="gamepad"]
 }
 
 html[data-console-view="about"] .console-identity,
-html[data-console-view="music"] .console-identity {
+html[data-console-view="music"] .console-identity,
+html[data-console-view="legal"] .console-identity {
   padding-left: 4.45rem;
 }
 
 html[data-console-view="about"] .console-back-button,
-html[data-console-view="music"] .console-back-button {
+html[data-console-view="music"] .console-back-button,
+html[data-console-view="legal"] .console-back-button {
   opacity: 1;
   pointer-events: auto;
   transform: translate(0, -50%) scale(1);
@@ -2500,8 +2502,13 @@ html[data-input-mode="gamepad"]
 
 .console-bottombar nav a:hover,
 .console-bottombar nav a.gamepad-pointer-target,
-.console-bottombar nav a:focus-visible {
+.console-bottombar nav a:focus-visible,
+.console-bottombar nav a[aria-current="page"] {
   color: var(--console-text);
+}
+
+.console-bottombar nav a[aria-current="page"] {
+  font-weight: 800;
 }
 
 .console-bottombar__actions {
@@ -3212,7 +3219,8 @@ html[data-console-theme="dark"] .theme-toggle__moon {
   }
 
   html[data-console-view="about"] .console-identity,
-  html[data-console-view="music"] .console-identity {
+  html[data-console-view="music"] .console-identity,
+  html[data-console-view="legal"] .console-identity {
     padding-left: 3.55rem;
   }
 

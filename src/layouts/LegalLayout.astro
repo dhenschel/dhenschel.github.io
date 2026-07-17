@@ -1,0 +1,405 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import ContactDialog from "../components/ContactDialog.astro";
+import InputModeIndicator from "../components/InputModeIndicator.astro";
+import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import { siteProfile } from "../data/site";
+import "../styles/console.css";
+
+interface Props {
+  title: string;
+  description: string;
+  current: "impressum" | "datenschutz";
+}
+
+const { title, description, current } = Astro.props;
+---
+
+<BaseLayout {title} {description} bodyClass="legal-console-body">
+  <script is:inline>
+    (() => {
+      const storageKey = "dh-console-theme";
+      let storedTheme = null;
+      try {
+        storedTheme = localStorage.getItem(storageKey);
+      } catch {
+        storedTheme = null;
+      }
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      document.documentElement.dataset.consoleTheme =
+        storedTheme === "dark" || storedTheme === "light"
+          ? storedTheme
+          : systemTheme;
+      document.documentElement.dataset.consoleView = "legal";
+    })();
+  </script>
+
+  <header class="console-topbar console-topbar--legal">
+    <div class="console-identity">
+      <a
+        class="console-back-button"
+        href="/#gallery"
+        data-console-back
+        aria-label="Zur Website-Galerie zurückkehren"
+        data-i18n-aria="header.backGallery"
+        title="Zurück zur Galerie"
+        data-i18n-title="header.backGalleryShort"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m14.8 4.8-7.2 7.2 7.2 7.2 1.6-1.6-5.6-5.6 5.6-5.6-1.6-1.6Z"
+          ></path>
+        </svg>
+      </a>
+
+      <a
+        class="console-profile-button"
+        href="/#menu"
+        aria-label="Profilmenü von dhenschel öffnen"
+        data-i18n-aria="header.openProfile"
+      >
+        <span class="profile-picture profile-picture--bar">
+          <img
+            src={siteProfile.image}
+            alt={siteProfile.imageAlt}
+            data-i18n-alt="site.profileAlt"
+            width="800"
+            height="800"
+          />
+        </span>
+        <strong>{siteProfile.name}</strong>
+      </a>
+
+      <LanguageSwitcher placement="console" />
+
+      <a
+        class="header-music-button"
+        href="/#music"
+        aria-label="Music Channel öffnen"
+        data-i18n-aria="header.openMusic"
+        title="Music Channel öffnen"
+        data-i18n-title="header.openMusic"
+      >
+        <span class="header-music-button__motion" aria-hidden="true">
+          <span class="header-music-button__disc"><i></i></span>
+        </span>
+      </a>
+    </div>
+
+    <InputModeIndicator placement="header" />
+
+    <div class="console-status">
+      <div class="console-clock">
+        <span data-console-date>--.--.----</span>
+        <time data-console-time>--:--</time>
+      </div>
+      <span class="console-online"
+        ><i></i> <b data-i18n="common.online">Online</b></span
+      >
+    </div>
+  </header>
+
+  <main id="main-content" class="console-home legal-console-main">
+    <div class="console-background" data-console-background aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="legal-page legal-page--console shell">
+      <slot />
+    </div>
+  </main>
+
+  <footer class="console-bottombar console-bottombar--legal">
+    <button
+      class="contact-button"
+      type="button"
+      data-contact-open
+      aria-label="Kontaktformular öffnen"
+      data-i18n-aria="controls.openContact"
+      title="Kontakt"
+      data-i18n-title="common.contact"
+    >
+      <span>
+        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+          <path
+            d="M3 5h18v14H3V5Zm2 2v.3l7 5.25 7-5.25V7H5Zm14 10V9.8l-7 5.25L5 9.8V17h14Z"
+          ></path>
+        </svg>
+      </span>
+    </button>
+
+    <nav aria-label="Rechtliches" data-i18n-aria="common.legal">
+      <a
+        href="/impressum/"
+        data-i18n="common.imprint"
+        aria-current={current === "impressum" ? "page" : undefined}>Impressum</a
+      >
+      <a
+        href="/datenschutz/"
+        data-i18n="common.privacy"
+        aria-current={current === "datenschutz" ? "page" : undefined}
+        >Datenschutz</a
+      >
+    </nav>
+
+    <div class="console-bottombar__actions">
+      <button
+        class="theme-toggle sound-toggle"
+        type="button"
+        data-sound-toggle
+        aria-label="Sound ausschalten"
+        aria-pressed="true"
+        title="Sound ausschalten"
+      >
+        <svg class="sound-toggle__on" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 9v6h4l5 4V5L8 9H4Zm11.7-1.7a1 1 0 0 1 1.4 0 6.6 6.6 0 0 1 0 9.4 1 1 0 1 1-1.4-1.4 4.6 4.6 0 0 0 0-6.6 1 1 0 0 1 0-1.4Zm2.8-2.8a1 1 0 0 1 1.4 0 10.6 10.6 0 0 1 0 15 1 1 0 1 1-1.4-1.4 8.6 8.6 0 0 0 0-12.2 1 1 0 0 1 0-1.4Z"
+          ></path>
+        </svg>
+        <svg class="sound-toggle__off" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 9v6h4l5 4V5L8 9H4Zm11.3.3 1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1-2.1-2.1Z"
+          ></path>
+        </svg>
+        <strong data-sound-label>Sound an</strong>
+      </button>
+
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        aria-label="Farbschema wechseln"
+        data-i18n-aria="controls.changeTheme"
+      >
+        <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0-5 1 1.8L12 5l-1-1.2L12 2Zm0 20-1-1.8 1-1.2 1 1.2L12 22ZM2 12l1.8-1L5 12l-1.2 1L2 12Zm20 0-1.8 1L19 12l1.2-1L22 12ZM4.9 4.9l2 .55.2 1.65-1.65-.2-.55-2Zm14.2 14.2-2-.55-.2-1.65 1.65.2.55 2Zm0-14.2-.55 2-1.65.2.2-1.65 2-.55ZM4.9 19.1l.55-2 1.65-.2-.2 1.65-2 .55Z"
+          ></path>
+        </svg>
+        <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 9 9 0 1 0 20.5 15.2Z"
+          ></path>
+        </svg>
+        <strong data-theme-label>Theme</strong>
+      </button>
+
+      <button
+        class="theme-toggle fullscreen-toggle"
+        type="button"
+        data-fullscreen-toggle
+        aria-label="Vollbildmodus starten"
+        aria-pressed="false"
+        title="Vollbildmodus starten"
+      >
+        <svg
+          class="fullscreen-toggle__enter"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4h6v2H6v4H4V4Zm10 0h6v6h-2V6h-4V4ZM4 14h2v4h4v2H4v-6Zm14 0h2v6h-6v-2h4v-4Z"
+          ></path>
+        </svg>
+        <svg
+          class="fullscreen-toggle__exit"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 4h2v6H4V8h4V4Zm6 0h2v4h4v2h-6V4ZM4 14h6v6H8v-4H4v-2Zm10 0h6v2h-4v4h-2v-6Z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </footer>
+
+  <ContactDialog />
+
+  <script>
+    import { initializeConsoleAudio } from "../scripts/console-audio";
+    import { getLocale, t } from "../scripts/i18n";
+
+    initializeConsoleAudio();
+
+    const timeElements = document.querySelectorAll<HTMLElement>(
+      "[data-console-time]",
+    );
+    const dateElements = document.querySelectorAll<HTMLElement>(
+      "[data-console-date]",
+    );
+    const themeToggle = document.querySelector<HTMLButtonElement>(
+      "[data-theme-toggle]",
+    );
+    const themeLabel =
+      document.querySelector<HTMLElement>("[data-theme-label]");
+    const fullscreenToggle = document.querySelector<HTMLButtonElement>(
+      "[data-fullscreen-toggle]",
+    );
+
+    const updateConsoleTime = () => {
+      const now = new Date();
+      const locale = getLocale();
+      const time = new Intl.DateTimeFormat(locale, {
+        timeZone: "Europe/Berlin",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).format(now);
+      const date = new Intl.DateTimeFormat(locale, {
+        timeZone: "Europe/Berlin",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(now);
+
+      timeElements.forEach((element) => (element.textContent = time));
+      dateElements.forEach((element) => (element.textContent = date));
+    };
+
+    const updateThemeLabel = () => {
+      if (!themeLabel) return;
+      themeLabel.textContent =
+        document.documentElement.dataset.consoleTheme === "dark"
+          ? t("controls.lightMode")
+          : t("controls.darkMode");
+    };
+
+    themeToggle?.addEventListener("click", () => {
+      const current = document.documentElement.dataset.consoleTheme;
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.dataset.consoleTheme = next;
+      try {
+        localStorage.setItem("dh-console-theme", next);
+      } catch {
+        // Theme persistence is optional.
+      }
+      updateThemeLabel();
+      window.dispatchEvent(
+        new CustomEvent("console:theme-changed", { detail: { theme: next } }),
+      );
+    });
+
+    const updateFullscreenControl = () => {
+      if (!fullscreenToggle) return;
+      const isFullscreen = Boolean(document.fullscreenElement);
+      fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
+      fullscreenToggle.setAttribute(
+        "aria-label",
+        isFullscreen
+          ? t("controls.exitFullscreen")
+          : t("controls.enterFullscreen"),
+      );
+      fullscreenToggle.title = isFullscreen
+        ? t("controls.exitFullscreen")
+        : t("controls.enterFullscreen");
+    };
+
+    if (fullscreenToggle && !document.fullscreenEnabled) {
+      fullscreenToggle.hidden = true;
+    } else {
+      fullscreenToggle?.addEventListener("click", async () => {
+        try {
+          if (document.fullscreenElement) await document.exitFullscreen();
+          else await document.documentElement.requestFullscreen();
+        } catch {
+          // Browsers can reject fullscreen outside an active user gesture.
+        }
+      });
+      document.addEventListener("fullscreenchange", updateFullscreenControl);
+      updateFullscreenControl();
+    }
+
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+    systemTheme.addEventListener("change", (event) => {
+      let storedTheme = null;
+      try {
+        storedTheme = localStorage.getItem("dh-console-theme");
+      } catch {
+        storedTheme = null;
+      }
+      if (!storedTheme) {
+        const nextTheme = event.matches ? "dark" : "light";
+        document.documentElement.dataset.consoleTheme = nextTheme;
+        updateThemeLabel();
+        window.dispatchEvent(
+          new CustomEvent("console:theme-changed", {
+            detail: { theme: nextTheme },
+          }),
+        );
+      }
+    });
+
+    const consoleBackground = document.querySelector<HTMLElement>(
+      "[data-console-background]",
+    );
+    const randomBetween = (minimum: number, maximum: number) =>
+      minimum + Math.random() * (maximum - minimum);
+    const randomInteger = (minimum: number, maximum: number) =>
+      Math.floor(randomBetween(minimum, maximum + 1));
+    const randomSigned = (minimum: number, maximum: number) =>
+      randomBetween(minimum, maximum) * (Math.random() < 0.5 ? -1 : 1);
+    const decimal = (value: number) => value.toFixed(2);
+
+    if (consoleBackground) {
+      const particleCount = randomInteger(3, 7);
+      const particles = Array.from(
+        consoleBackground.querySelectorAll<HTMLElement>("span"),
+      );
+      while (particles.length < particleCount) {
+        const particle = document.createElement("span");
+        consoleBackground.append(particle);
+        particles.push(particle);
+      }
+      particles.forEach((particle, index) => {
+        if (index >= particleCount) {
+          particle.remove();
+          return;
+        }
+        const size = randomBetween(0.38, 1.15);
+        const duration = randomBetween(7, 12);
+        particle.style.top = `${decimal(randomBetween(12, 84))}%`;
+        particle.style.left = `${decimal(randomBetween(4, 92))}%`;
+        particle.style.right = "auto";
+        particle.style.bottom = "auto";
+        particle.style.width = `${decimal(size)}rem`;
+        particle.style.height = `${decimal(size)}rem`;
+        particle.style.setProperty(
+          "--particle-x",
+          `${decimal(randomSigned(4, 9))}rem`,
+        );
+        particle.style.setProperty(
+          "--particle-y",
+          `${decimal(randomSigned(3.5, 8))}rem`,
+        );
+        particle.style.setProperty(
+          "--particle-scale",
+          decimal(randomBetween(0.76, 1.52)),
+        );
+        particle.style.setProperty(
+          "--particle-duration",
+          `${decimal(duration)}s`,
+        );
+        particle.style.setProperty(
+          "--particle-pulse",
+          `${decimal(randomBetween(2.6, 4.2))}s`,
+        );
+        particle.style.setProperty(
+          "--particle-delay",
+          `-${decimal(randomBetween(0, duration))}s`,
+        );
+        particle.style.animationDirection =
+          Math.random() < 0.5 ? "alternate" : "alternate-reverse";
+      });
+    }
+
+    updateConsoleTime();
+    updateThemeLabel();
+    window.addEventListener("console:language-changed", () => {
+      updateConsoleTime();
+      updateThemeLabel();
+      updateFullscreenControl();
+    });
+    window.setInterval(updateConsoleTime, 60_000);
+  </script>
+</BaseLayout>
