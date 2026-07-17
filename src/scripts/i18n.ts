@@ -21,6 +21,7 @@ const de: Record<string, string> = {
   "orientation.eyebrow": "Querformat erforderlich",
   "orientation.title": "Bitte drehe dein Gerät",
   "orientation.description": "Diese Konsole ist für das Querformat gestaltet.",
+  "orientation.desktopHint": "Beste Erfahrung auf Desktop",
   "common.legal": "Rechtliches",
   "common.imprint": "Impressum",
   "common.privacy": "Datenschutz",
@@ -111,7 +112,7 @@ const de: Record<string, string> = {
   "music.shuffle.title": "Shuffle",
   "music.shuffle.label": "Zufall",
   "music.shuffle.description":
-    "Wählt zufällig aus deinem persönlichen Pool und wechselt nach einer Weile automatisch zur nächsten CD – direkte Wiederholungen werden vermieden.",
+    "Wählt zufällig aus deinem persönlichen Pool und wechselt nach mindestens drei Minuten sanft zur nächsten CD – direkte Wiederholungen werden vermieden.",
   "music.shuffle.play": "Shuffle starten",
   "music.shuffle.again": "Neu mischen",
   "music.shuffle.playAria": "Eine zufällige CD aus dem Shuffle-Pool abspielen",
@@ -234,6 +235,7 @@ const en: Record<string, string> = {
   "orientation.eyebrow": "Landscape required",
   "orientation.title": "Please rotate your device",
   "orientation.description": "This console is designed for landscape mode.",
+  "orientation.desktopHint": "Best experienced on desktop",
   "common.legal": "Legal",
   "common.imprint": "Legal Notice",
   "common.privacy": "Privacy",
@@ -323,7 +325,7 @@ const en: Record<string, string> = {
   "music.shuffle.title": "Shuffle",
   "music.shuffle.label": "Random",
   "music.shuffle.description":
-    "Selects from your personal pool and automatically changes to another disc after a while, without direct repeats.",
+    "Selects from your personal pool and gently changes to another disc after at least three minutes, without direct repeats.",
   "music.shuffle.play": "Start shuffle",
   "music.shuffle.again": "Shuffle again",
   "music.shuffle.playAria": "Play a random disc from the shuffle pool",
@@ -441,6 +443,7 @@ const fr: Record<string, string> = {
   "orientation.eyebrow": "Mode paysage requis",
   "orientation.title": "Veuillez tourner votre appareil",
   "orientation.description": "Cette console est conçue pour le mode paysage.",
+  "orientation.desktopHint": "Meilleure expérience sur ordinateur",
   "common.legal": "Informations légales",
   "common.imprint": "Mentions légales",
   "common.privacy": "Confidentialité",
@@ -526,7 +529,7 @@ const fr: Record<string, string> = {
   "music.shuffle.title": "Aléatoire",
   "music.shuffle.label": "Hasard",
   "music.shuffle.description":
-    "Choisit un disque dans votre sélection et passe automatiquement à un autre après un moment, sans répétition directe.",
+    "Choisit un disque dans votre sélection et passe doucement à un autre après au moins trois minutes, sans répétition directe.",
   "music.shuffle.play": "Lancer l’aléatoire",
   "music.shuffle.again": "Relancer",
   "music.shuffle.playAria":
@@ -650,6 +653,7 @@ const es: Record<string, string> = {
   "orientation.title": "Gira tu dispositivo",
   "orientation.description":
     "Esta consola está diseñada para el modo horizontal.",
+  "orientation.desktopHint": "Mejor experiencia en ordenador",
   "common.legal": "Información legal",
   "common.imprint": "Aviso legal",
   "common.privacy": "Privacidad",
@@ -735,7 +739,7 @@ const es: Record<string, string> = {
   "music.shuffle.title": "Aleatorio",
   "music.shuffle.label": "Azar",
   "music.shuffle.description":
-    "Selecciona un disco de tu colección y cambia automáticamente a otro después de un rato, sin repeticiones directas.",
+    "Selecciona un disco de tu colección y cambia suavemente a otro después de al menos tres minutos, sin repeticiones directas.",
   "music.shuffle.play": "Iniciar aleatorio",
   "music.shuffle.again": "Mezclar de nuevo",
   "music.shuffle.playAria":

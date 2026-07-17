@@ -103,7 +103,19 @@ const socialImageUrl = new URL(image, baseUrl);
       <p data-i18n="orientation.description">
         Diese Konsole ist für das Querformat gestaltet.
       </p>
+      <div class="desktop-experience-hint">
+        <span class="desktop-experience-hint__icon" aria-hidden="true"></span>
+        <span data-i18n="orientation.desktopHint"
+          >Beste Erfahrung auf Desktop</span
+        >
+      </div>
     </aside>
+    <div class="mobile-desktop-hint" role="status">
+      <span class="desktop-experience-hint__icon" aria-hidden="true"></span>
+      <span data-i18n="orientation.desktopHint"
+        >Beste Erfahrung auf Desktop</span
+      >
+    </div>
     <slot />
   </body>
 </html>

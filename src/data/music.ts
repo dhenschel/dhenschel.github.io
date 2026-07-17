@@ -26,7 +26,7 @@ export const shuffleDisc = {
   title: "Shuffle",
   shortTitle: "SHUFFLE",
   description:
-    "Wählt zufällig eine CD aus deinem persönlichen Pool und wechselt nach einer Weile automatisch weiter.",
+    "Wählt zufällig eine CD aus deinem persönlichen Pool und wechselt nach mindestens drei Minuten sanft weiter.",
   color: "#aeb6c1",
   colorDark: "#5d6875",
   label: "Zufall",

@@ -17,8 +17,9 @@ const INTERACTIVE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const MUSIC_LOOKAHEAD_MS = 120;
 const MUSIC_SCHEDULE_AHEAD_SECONDS = 0.48;
-const SHUFFLE_MIN_DURATION_MS = 105_000;
-const SHUFFLE_MAX_DURATION_MS = 150_000;
+const SHUFFLE_MIN_DURATION_MS = 180_000;
+const SHUFFLE_MAX_DURATION_MS = 240_000;
+const SHUFFLE_FADE_DURATION_MS = 1_800;
 
 let audioContext: AudioContext | null = null;
 let masterGain: GainNode | null = null;
@@ -481,7 +482,7 @@ const scheduleShuffleAdvance = () => {
   }, duration);
 };
 
-const startMusic = () => {
+const startMusic = (fadeInSeconds?: number) => {
   if (!audioEnabled || launchInProgress || document.hidden || musicRunning) {
     return;
   }
@@ -512,7 +513,7 @@ const startMusic = () => {
     musicBus.gain.setValueAtTime(0.0001, now);
     musicBus.gain.exponentialRampToValueAtTime(
       1,
-      now + composition.fadeInSeconds,
+      now + (fadeInSeconds ?? composition.fadeInSeconds),
     );
     musicBarIndex = 0;
     musicPhraseIndex = musicStartVariant % composition.phraseCount;
@@ -550,7 +551,10 @@ const stopMusic = (fadeMs = 240) => {
   broadcastMusicState();
 };
 
-const applyActiveTrack = (trackId: MusicTrackId) => {
+const applyActiveTrack = (
+  trackId: MusicTrackId,
+  transition?: { fadeInMs: number; fadeOutMs: number },
+) => {
   if (activeTrackId === trackId) {
     if (!musicRunning) startMusic();
     else scheduleShuffleAdvance();
@@ -558,10 +562,10 @@ const applyActiveTrack = (trackId: MusicTrackId) => {
     return;
   }
 
-  stopMusic(420);
+  stopMusic(transition?.fadeOutMs ?? 420);
   activeTrackId = trackId;
   broadcastMusicState();
-  startMusic();
+  startMusic(transition ? transition.fadeInMs / 1000 : undefined);
 };
 
 const setTrack = (discId: MusicDiscId) => {
@@ -570,7 +574,10 @@ const setTrack = (discId: MusicDiscId) => {
     const nextTrackId = pickShuffleTrack(activeTrackId, previousShuffleTrackId);
     previousShuffleTrackId = activeTrackId;
     playbackMode = "shuffle";
-    applyActiveTrack(nextTrackId);
+    applyActiveTrack(nextTrackId, {
+      fadeInMs: SHUFFLE_FADE_DURATION_MS,
+      fadeOutMs: SHUFFLE_FADE_DURATION_MS,
+    });
     return;
   }
 
