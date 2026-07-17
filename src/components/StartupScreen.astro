@@ -192,7 +192,11 @@ const initialProfileIndex = startupProfiles.findIndex(
     </p>
 
     <button class="startup-screen__start" type="button" data-start-console>
-      <span>A</span>
+      <span class="console-keycaps" aria-hidden="true">
+        <kbd data-i18n="keys.enter">Enter</kbd>
+        <b>/</b>
+        <kbd data-i18n="keys.space">Leertaste</kbd>
+      </span>
       <i data-i18n="startup.start">Menü starten</i>
     </button>
   </div>
@@ -498,9 +502,23 @@ const initialProfileIndex = startupProfiles.findIndex(
   previousProfile?.addEventListener("click", () => rotateStartupProfiles(-1));
   nextProfile?.addEventListener("click", () => rotateStartupProfiles(1));
   startupScreen?.addEventListener("keydown", (event) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    event.preventDefault();
-    rotateStartupProfiles(event.key === "ArrowLeft" ? -1 : 1);
+    const eventTarget = event.target as HTMLElement | null;
+    if (eventTarget?.closest("[data-language-switcher]")) return;
+
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      rotateStartupProfiles(event.key === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+
+    if (
+      (event.key === "Enter" || event.key === " ") &&
+      !eventTarget?.closest("[data-skip-startup]") &&
+      startupScreen?.dataset.phase === "ready"
+    ) {
+      event.preventDefault();
+      startConsole?.click();
+    }
   });
 
   selectStartupProfile(defaultProfileIndex);

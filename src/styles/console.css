@@ -208,8 +208,7 @@ html[data-boot="skip"] .startup-screen {
   left: 6.15rem;
 }
 
-.startup-screen__start i,
-.channel-library__hint i {
+.startup-screen__start i {
   font-style: normal;
 }
 
@@ -453,17 +452,6 @@ html[data-boot="skip"] .startup-screen {
   cursor: pointer;
 }
 
-.startup-screen__start span {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--console-blue-dark);
-  background: #fff;
-  font-size: 0.75rem;
-}
-
 .startup-screen__start:not(:disabled):hover,
 .startup-screen__start:not(:disabled):focus-visible {
   background: var(--console-blue-dark);
@@ -475,11 +463,6 @@ html[data-boot="skip"] .startup-screen {
   background: var(--console-surface-solid);
   box-shadow: none;
   opacity: 0.58;
-}
-
-.startup-screen__start:disabled span {
-  color: var(--console-surface-solid);
-  background: var(--console-muted);
 }
 
 .startup-screen[data-phase="selecting"] .startup-screen__start,
@@ -1712,6 +1695,54 @@ html[data-console-view="music"] .music-screen {
   font-weight: 800;
 }
 
+.startup-screen__start .console-keycaps,
+.music-channel__actions button .console-keycaps {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  align-items: center;
+  gap: 0.22rem;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.console-keycaps kbd {
+  min-width: 2.55rem;
+  padding: 0.34rem 0.45rem 0.27rem;
+  border: 1px solid rgb(15 49 78 / 22%);
+  border-bottom-width: 0.18rem;
+  border-radius: 0.42rem;
+  color: var(--console-blue-dark);
+  background: #fff;
+  box-shadow: 0 0.12rem 0.28rem rgb(11 37 61 / 18%);
+  font-family: inherit;
+  font-size: 0.58rem;
+  font-weight: 820;
+  line-height: 1;
+  text-align: center;
+}
+
+.console-keycaps kbd:last-of-type {
+  min-width: 3.5rem;
+}
+
+.console-keycaps b {
+  font-size: 0.58rem;
+  opacity: 0.68;
+}
+
+.startup-screen__start:disabled .console-keycaps kbd {
+  border-color: transparent;
+  color: var(--console-surface-solid);
+  background: var(--console-muted);
+  box-shadow: none;
+}
+
+.startup-screen__start:disabled .console-keycaps b {
+  color: var(--console-muted);
+}
+
 .music-channel__actions button strong {
   font-size: 0.76rem;
 }
@@ -1748,9 +1779,9 @@ html[data-console-view="music"] .music-screen {
   background: var(--console-blue-dark) !important;
 }
 
-.music-channel__play span {
-  color: var(--console-blue-dark) !important;
-  background: #fff !important;
+.music-channel__play .console-keycaps {
+  color: #fff !important;
+  background: transparent !important;
 }
 
 .channel-library {
@@ -1985,10 +2016,6 @@ html[data-console-view="music"] .music-screen {
   border-radius: 50%;
   color: var(--console-muted);
   font-size: 1.25rem;
-}
-
-.channel-library__hint {
-  display: none;
 }
 
 /* Fixed bottom controls */
