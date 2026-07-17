@@ -536,7 +536,10 @@ const structuredData = {
     });
 
     musicChannelOpen?.addEventListener("click", () => {
-      if (document.documentElement.dataset.consoleView === "music") return;
+      if (document.documentElement.dataset.consoleView === "music") {
+        applyConsoleView("gallery", "push", true);
+        return;
+      }
       applyConsoleView("music", "push", true);
     });
 

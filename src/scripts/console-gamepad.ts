@@ -52,6 +52,7 @@ let pointerTarget: HTMLElement | null = null;
 let pointerElement: HTMLElement | null = null;
 let pointerClickTimer: number | null = null;
 let gamepadNavigationMethod: GamepadNavigationMethod = "pointer";
+let structuredNavigationTarget: HTMLElement | null = null;
 let lastControllerAudioAttemptAt = Number.NEGATIVE_INFINITY;
 
 const root = document.documentElement;
@@ -160,6 +161,7 @@ const leaveGamepadMode = (nativeX?: number, nativeY?: number) => {
     focused.blur();
   }
   gamepadNavigationMethod = "pointer";
+  structuredNavigationTarget = null;
   const nativeTarget =
     typeof nativeX === "number" && typeof nativeY === "number"
       ? getInteractiveAt(nativeX, nativeY)
@@ -194,6 +196,7 @@ const usePointerNavigation = () => {
     if (focused instanceof HTMLElement) focused.blur();
   }
   gamepadNavigationMethod = "pointer";
+  structuredNavigationTarget = null;
 };
 
 const applyDeadZone = (value = 0) => {
@@ -257,6 +260,7 @@ const focusAndPointTo = (
   element: HTMLElement,
   suppressPointerSound = false,
 ) => {
+  structuredNavigationTarget = element;
   element.scrollIntoView({ block: "nearest", inline: "nearest" });
   const bounds = element.getBoundingClientRect();
   if (suppressPointerSound) root.dataset.gamepadNavigating = "true";
@@ -287,6 +291,13 @@ const getScopedNavigationCandidates = (scope: ParentNode | null) =>
     : [];
 
 const getCurrentNavigationTarget = () => {
+  if (
+    gamepadNavigationMethod === "structured" &&
+    structuredNavigationTarget &&
+    isVisible(structuredNavigationTarget)
+  ) {
+    return structuredNavigationTarget;
+  }
   if (pointerTarget && isVisible(pointerTarget)) return pointerTarget;
   const active = document.activeElement;
   if (!(active instanceof HTMLElement)) return null;
@@ -582,6 +593,7 @@ const pointToCurrentCarouselItem = () => {
       false,
     );
     setPointerTarget(current, false);
+    structuredNavigationTarget = current;
     current.focus({ preventScroll: true });
   });
 };
@@ -845,6 +857,11 @@ const activateCurrentTarget = (gamepad: Gamepad) => {
       ? document.activeElement.closest<HTMLElement>(INTERACTIVE_SELECTOR)
       : null;
   let target = pointerTarget && isVisible(pointerTarget) ? pointerTarget : null;
+  if (!target && root.dataset.consoleView === "music") {
+    target = document.querySelector<HTMLButtonElement>(
+      '[data-music-disc][data-carousel-position="active"]',
+    );
+  }
   if (!target && activeElement && isVisible(activeElement))
     target = activeElement;
   if (getReadyStartup() && target?.matches("[data-startup-profile]")) {
