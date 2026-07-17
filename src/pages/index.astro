@@ -444,9 +444,6 @@ const structuredData = {
     const musicHeading = document.querySelector<HTMLElement>(
       "[data-music-heading]",
     );
-    const firstChannel = document.querySelector<HTMLAnchorElement>(
-      "[data-channel-link]",
-    );
     let viewFocusTimer: number | null = null;
 
     type ConsoleView = "gallery" | "about" | "music";
@@ -503,7 +500,7 @@ const structuredData = {
               return;
             }
             const target = galleryIsActive
-              ? firstChannel
+              ? null
               : aboutIsActive
                 ? aboutHeading
                 : (musicPanel?.querySelector<HTMLButtonElement>(
@@ -535,12 +532,15 @@ const structuredData = {
       applyConsoleView(requestedView, request?.historyMode ?? "push", true);
     });
 
-    musicChannelOpen?.addEventListener("click", () => {
+    musicChannelOpen?.addEventListener("click", (event) => {
+      const focusViewTarget =
+        document.documentElement.dataset.inputMode !== "gamepad" &&
+        event.detail === 0;
       if (document.documentElement.dataset.consoleView === "music") {
-        applyConsoleView("gallery", "push", true);
+        applyConsoleView("gallery", "push", focusViewTarget);
         return;
       }
-      applyConsoleView("music", "push", true);
+      applyConsoleView("music", "push", focusViewTarget);
     });
 
     consoleBackButton?.addEventListener("click", () => {

@@ -191,9 +191,12 @@ const useGamepadMode = () => {
 };
 
 const usePointerNavigation = () => {
-  if (gamepadNavigationMethod === "structured") {
-    const focused = document.activeElement;
-    if (focused instanceof HTMLElement) focused.blur();
+  const focused = document.activeElement;
+  if (
+    focused instanceof HTMLElement &&
+    !focused.matches('input, textarea, select, [contenteditable="true"]')
+  ) {
+    focused.blur();
   }
   gamepadNavigationMethod = "pointer";
   structuredNavigationTarget = null;
@@ -1141,9 +1144,23 @@ export const initializeConsoleGamepad = () => {
   });
   window.addEventListener("console:view-changed", (event) => {
     const view = (event as CustomEvent<{ view?: string }>).detail?.view;
-    if (view !== "music" || root.dataset.inputMode !== "gamepad") return;
-    gamepadNavigationMethod = "structured";
-    pointToCurrentCarouselItem();
+    if (
+      root.dataset.inputMode !== "gamepad" ||
+      gamepadNavigationMethod !== "structured"
+    )
+      return;
+    if (view === "music") {
+      pointToCurrentCarouselItem();
+      return;
+    }
+    if (view === "gallery") {
+      window.requestAnimationFrame(() => {
+        const firstChannel = document.querySelector<HTMLElement>(
+          "[data-channel-link]",
+        );
+        if (firstChannel) focusAndPointTo(firstChannel, true);
+      });
+    }
   });
   window.addEventListener("pagehide", () => {
     if (animationFrame) window.cancelAnimationFrame(animationFrame);
