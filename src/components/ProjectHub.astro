@@ -146,9 +146,6 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
-  const supportsHoverPreview = window.matchMedia(
-    "(hover: hover) and (pointer: fine)",
-  ).matches;
   const previewDelay = 1100;
   const previewDuration = 10000;
   const previewExitDuration = 820;
@@ -159,7 +156,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       "[data-channel-preview]",
     );
     const previewSource = preview?.dataset.previewSrc;
-    if (!preview || !previewSource || reducedMotion || !supportsHoverPreview) {
+    if (!preview || !previewSource || reducedMotion) {
       return;
     }
 
@@ -180,6 +177,11 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     const resetPreviewTime = () => {
       if (preview.readyState > 0) preview.currentTime = 0;
     };
+
+    const isPreviewTargeted = () =>
+      document.documentElement.dataset.inputMode === "gamepad"
+        ? link.classList.contains("gamepad-pointer-target")
+        : link.matches(":hover");
 
     const stopPreview = (cooldown = false, slowExit = false) => {
       const wasVisible = link.dataset.previewState === "playing";
@@ -206,7 +208,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       armTimer = null;
       if (
         link.dataset.previewState !== "arming" ||
-        !link.matches(":hover") ||
+        !isPreviewTargeted() ||
         document.documentElement.dataset.launching === "true"
       ) {
         stopPreview();
@@ -226,7 +228,7 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
         await preview.play();
         if (
           currentRun !== previewRun ||
-          !link.matches(":hover") ||
+          !isPreviewTargeted() ||
           document.documentElement.dataset.launching === "true"
         ) {
           return;

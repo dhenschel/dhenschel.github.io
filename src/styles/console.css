@@ -2068,6 +2068,26 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
   transform: scale(1.075);
 }
 
+html[data-input-mode="gamepad"]
+  .channel-card:hover:not(.gamepad-pointer-target):not(:focus-visible) {
+  z-index: auto;
+}
+
+html[data-input-mode="gamepad"]
+  .channel-card:hover:not(.gamepad-pointer-target):not(:focus-visible)
+  .channel-card__screen {
+  border-color: var(--console-surface-solid);
+  box-shadow: var(--console-shadow);
+  transform: translateZ(0);
+}
+
+html[data-input-mode="gamepad"]
+  .channel-card:hover:not(.gamepad-pointer-target):not(:focus-visible)
+  .channel-card__screen
+  img {
+  transform: scale(1.01);
+}
+
 .channel-card--empty .channel-card__screen {
   border-color: var(--console-empty-border);
   background:

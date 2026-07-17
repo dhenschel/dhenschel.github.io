@@ -51,6 +51,7 @@ let pointerTarget: HTMLElement | null = null;
 let pointerElement: HTMLElement | null = null;
 let pointerClickTimer: number | null = null;
 let gamepadNavigationMethod: GamepadNavigationMethod = "pointer";
+let lastControllerAudioAttemptAt = Number.NEGATIVE_INFINITY;
 
 const root = document.documentElement;
 
@@ -156,11 +157,27 @@ const leaveGamepadMode = (nativeX?: number, nativeY?: number) => {
 };
 
 const useGamepadMode = () => {
+  const now = performance.now();
+  if (
+    !window.consoleAudio?.getMusicState().playing &&
+    now - lastControllerAudioAttemptAt > 800
+  ) {
+    lastControllerAudioAttemptAt = now;
+    window.consoleAudio?.startMusic();
+  }
   if (root.dataset.inputMode !== "gamepad") {
     setPointerPosition(lastRealPointerX, lastRealPointerY, false);
     setInputMode("gamepad");
     updatePointerTarget();
   }
+};
+
+const usePointerNavigation = () => {
+  if (gamepadNavigationMethod === "structured") {
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement) focused.blur();
+  }
+  gamepadNavigationMethod = "pointer";
 };
 
 const applyDeadZone = (value = 0) => {
@@ -232,8 +249,11 @@ const getNavigationCandidates = () => {
     .filter((element, index, all) => all.indexOf(element) === index);
 };
 
-const moveSpatialFocus = (direction: Direction) => {
-  const candidates = getNavigationCandidates();
+const moveSpatialFocus = (
+  direction: Direction,
+  candidates = getNavigationCandidates(),
+  repeated = false,
+) => {
   if (!candidates.length) return false;
 
   const activeElement =
@@ -292,13 +312,18 @@ const moveSpatialFocus = (direction: Direction) => {
     .sort((a, b) => a.score - b.score)[0]?.candidate;
 
   if (!next) {
-    window.consoleAudio?.play("error");
+    if (!repeated) window.consoleAudio?.play("boundary");
     return false;
   }
   focusAndPointTo(next, true);
   window.consoleAudio?.play("navigate");
   return true;
 };
+
+const getGalleryNavigationCandidates = () =>
+  Array.from(
+    document.querySelectorAll<HTMLElement>("[data-channel-link]"),
+  ).filter(isVisible);
 
 const getReadyStartup = () => {
   const startup = document.querySelector<HTMLElement>("[data-startup-screen]");
@@ -338,12 +363,12 @@ const pointToCurrentCarouselItem = () => {
   });
 };
 
-const handleDirection = (direction: Direction) => {
+const handleDirection = (direction: Direction, repeated = false) => {
   useGamepadMode();
   gamepadNavigationMethod = "structured";
   const openDialog = document.querySelector<HTMLDialogElement>("dialog[open]");
   if (openDialog || getOpenLanguageSwitcher()) {
-    moveSpatialFocus(direction);
+    moveSpatialFocus(direction, getNavigationCandidates(), repeated);
     return;
   }
 
@@ -367,7 +392,7 @@ const handleDirection = (direction: Direction) => {
         : '[data-music-arrow="next"]',
     );
     if (!arrow || arrow.disabled) {
-      window.consoleAudio?.play("error");
+      if (!repeated) window.consoleAudio?.play("boundary");
       return;
     }
     window.consoleAudio?.play("navigate");
@@ -376,7 +401,12 @@ const handleDirection = (direction: Direction) => {
     return;
   }
 
-  moveSpatialFocus(direction);
+  if (root.dataset.consoleView === "gallery") {
+    moveSpatialFocus(direction, getGalleryNavigationCandidates(), repeated);
+    return;
+  }
+
+  moveSpatialFocus(direction, getNavigationCandidates(), repeated);
 };
 
 const activateCurrentTarget = (gamepad: Gamepad) => {
@@ -508,10 +538,10 @@ const handleButtonPress = (
       if (!repeated) toggleControl("[data-theme-toggle]", gamepad);
       break;
     case 4:
-      handleDirection("left");
+      handleDirection("left", repeated);
       break;
     case 5:
-      handleDirection("right");
+      handleDirection("right", repeated);
       break;
     case 9:
       if (!repeated) openProfileMenu(gamepad);
@@ -524,16 +554,16 @@ const handleButtonPress = (
       if (!repeated) toggleControl("[data-fullscreen-toggle]", gamepad, 0.16);
       break;
     case 12:
-      handleDirection("up");
+      handleDirection("up", repeated);
       break;
     case 13:
-      handleDirection("down");
+      handleDirection("down", repeated);
       break;
     case 14:
-      handleDirection("left");
+      handleDirection("left", repeated);
       break;
     case 15:
-      handleDirection("right");
+      handleDirection("right", repeated);
       break;
   }
 };
@@ -604,7 +634,7 @@ const pollGamepad = (now: number) => {
     root.dataset.launching !== "true" &&
     (leftX !== 0 || leftY !== 0)
   ) {
-    gamepadNavigationMethod = "pointer";
+    usePointerNavigation();
     setPointerPosition(
       pointerX + leftX * CURSOR_SPEED * elapsedSeconds,
       pointerY + leftY * CURSOR_SPEED * elapsedSeconds,
