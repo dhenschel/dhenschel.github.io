@@ -1708,8 +1708,11 @@ html[data-console-view="music"] .music-screen {
 }
 
 .console-keycaps kbd {
-  min-width: 2.55rem;
-  padding: 0.34rem 0.45rem 0.27rem;
+  display: grid;
+  width: 1.7rem;
+  height: 1.55rem;
+  place-items: center;
+  padding: 0 0 0.1rem;
   border: 1px solid rgb(15 49 78 / 22%);
   border-bottom-width: 0.18rem;
   border-radius: 0.42rem;
@@ -1717,14 +1720,10 @@ html[data-console-view="music"] .music-screen {
   background: #fff;
   box-shadow: 0 0.12rem 0.28rem rgb(11 37 61 / 18%);
   font-family: inherit;
-  font-size: 0.58rem;
+  font-size: 0.92rem;
   font-weight: 820;
   line-height: 1;
   text-align: center;
-}
-
-.console-keycaps kbd:last-of-type {
-  min-width: 3.5rem;
 }
 
 .console-keycaps b {
