@@ -8,6 +8,7 @@ interface Props {
   noindex?: boolean;
   titleKey?: string;
   descriptionKey?: string;
+  bodyClass?: string;
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   noindex = false,
   titleKey,
   descriptionKey,
+  bodyClass,
 } = Astro.props;
 
 const baseUrl = Astro.site ?? Astro.url.origin;
@@ -71,6 +73,7 @@ const socialImageUrl = new URL(image, baseUrl);
     <title>{title}</title>
   </head>
   <body
+    class={bodyClass}
     data-i18n-document-title={titleKey}
     data-i18n-document-description={descriptionKey}
   >

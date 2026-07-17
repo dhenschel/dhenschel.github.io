@@ -6,30 +6,186 @@ import SiteFooter from "../components/SiteFooter.astro";
 
 <BaseLayout
   title="Impressum — D. Henschel"
-  titleKey="page.imprint.title"
+  description="Vorlage für das Impressum des persönlichen Portfolios von D. Henschel."
   noindex
+  bodyClass="legal-console-body"
 >
+  <div class="legal-console-background" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
   <SiteHeader compact />
-  <main id="main-content" class="legal-page shell">
-    <p class="eyebrow">LEGAL / 01</p>
-    <h1 data-i18n="common.imprint">Impressum</h1>
-    <div class="legal-notice">
-      <strong data-i18n="legal.placeholderTitle"
-        >Vor dem offiziellen Launch zu vervollständigen</strong
-      >
-      <p data-i18n="legal.imprint.placeholder">
-        Die erforderlichen Betreiber- und Kontaktangaben liegen noch nicht vor.
-        Diese Seite ist deshalb ein gekennzeichneter Platzhalter und wird nicht
-        indexiert.
-      </p>
+
+  <main id="main-content" class="legal-page legal-page--console shell">
+    <header class="legal-hero">
+      <div>
+        <p class="legal-kicker"><i></i> Rechtliches · Kanal 01</p>
+        <h1>Impressum</h1>
+        <p class="legal-lead">
+          Vorlage für ein persönliches Portfolio eines Studenten und einer
+          natürlichen Person ohne eigene Firma oder Organisation.
+        </p>
+      </div>
+      <div class="legal-template-badge">
+        <span>Vorlage</span>
+        <strong>Vor Veröffentlichung ausfüllen</strong>
+      </div>
+    </header>
+
+    <div class="legal-layout">
+      <aside class="legal-toc" aria-label="Inhaltsübersicht">
+        <strong>Impressum</strong>
+        <nav>
+          <a href="#anbieter">Anbieter</a>
+          <a href="#kontakt">Kontakt</a>
+          <a href="#status">Status</a>
+          <a href="#redaktion">Inhaltlich verantwortlich</a>
+          <a href="#links">Externe Links</a>
+          <a href="#urheberrecht">Urheberrecht</a>
+          <a href="#checkliste">Checkliste</a>
+        </nav>
+      </aside>
+
+      <article class="legal-document" lang="de">
+        <div class="legal-callout legal-callout--warning">
+          <span aria-hidden="true">!</span>
+          <div>
+            <strong>Noch nicht veröffentlichungsfertig</strong>
+            <p>
+              Alle Angaben in eckigen Klammern sind Platzhalter. Trage vor dem
+              Entfernen von <code>noindex</code> deine echten Daten ein und lass im
+              Zweifel prüfen, welche Pflichten auf deine konkrete Nutzung zutreffen.
+              Diese Vorlage ist keine Rechtsberatung.
+            </p>
+          </div>
+        </div>
+
+        <section id="anbieter" class="legal-card">
+          <span class="legal-section-number">01</span>
+          <h2>Angaben zum Anbieter</h2>
+          <p class="legal-reference">
+            Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG), soweit anwendbar
+          </p>
+          <address class="legal-address">
+            <strong class="legal-placeholder"
+              >[Vollständiger Vor- und Nachname]</strong
+            >
+            <span>Student und Betreiber dieses persönlichen Portfolios</span>
+            <span class="legal-placeholder">[Straße und Hausnummer]</span>
+            <span class="legal-placeholder">[PLZ und Wohnort]</span>
+            <span>Deutschland</span>
+          </address>
+          <p class="legal-helper">
+            Verwende hier deinen bürgerlichen Namen und eine vollständige,
+            postalisch erreichbare Anschrift. Eine Firmenbezeichnung ist für
+            diese Vorlage nicht vorgesehen.
+          </p>
+        </section>
+
+        <section id="kontakt" class="legal-card">
+          <span class="legal-section-number">02</span>
+          <h2>Kontakt</h2>
+          <dl class="legal-data-list">
+            <div>
+              <dt>E-Mail</dt>
+              <dd class="legal-placeholder">[E-Mail-Adresse]</dd>
+            </div>
+            <div>
+              <dt>Weitere schnelle Kontaktmöglichkeit</dt>
+              <dd class="legal-placeholder">
+                [Telefonnummer oder anderer unmittelbarer Kontaktweg – Bedarf
+                prüfen]
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section id="status" class="legal-card">
+          <span class="legal-section-number">03</span>
+          <h2>Status des Angebots</h2>
+          <p>
+            Diese Website wird derzeit als persönliches studentisches Portfolio
+            von einer natürlichen Person betrieben.
+          </p>
+          <ul class="legal-check-list legal-check-list--facts">
+            <li>Keine eigene Firma oder juristische Person</li>
+            <li>
+              Keine Eintragung im Handels-, Vereins- oder Partnerschaftsregister
+            </li>
+            <li>Keine Umsatzsteuer-Identifikationsnummer</li>
+            <li>Keine zuständige Kammer und kein reglementierter Beruf</li>
+          </ul>
+          <p class="legal-helper">
+            Diese Aussagen nur stehen lassen, solange sie tatsächlich stimmen.
+            Bei späterer freiberuflicher, gewerblicher oder entgeltlicher
+            Nutzung muss das Impressum entsprechend ergänzt werden.
+          </p>
+        </section>
+
+        <section id="redaktion" class="legal-card">
+          <span class="legal-section-number">04</span>
+          <h2>Verantwortlich für journalistisch-redaktionelle Inhalte</h2>
+          <p class="legal-reference">
+            Nur falls § 18 Absatz 2 Medienstaatsvertrag auf Inhalte der Website
+            anwendbar ist
+          </p>
+          <address class="legal-address legal-address--compact">
+            <strong class="legal-placeholder">[Vollständiger Name]</strong>
+            <span class="legal-placeholder">[Anschrift wie oben]</span>
+          </address>
+          <p class="legal-helper">
+            Bei einem reinen Projektportfolio ohne journalistisch-redaktionelle
+            Beiträge kann dieser Abschnitt möglicherweise entfallen. Vor dem
+            Löschen bitte anhand der späteren Inhalte prüfen.
+          </p>
+        </section>
+
+        <section id="links" class="legal-card">
+          <span class="legal-section-number">05</span>
+          <h2>Externe Links</h2>
+          <p>
+            Dieses Portfolio verlinkt auf selbstständige externe Websites und
+            Projekte. Für deren Inhalte und Datenschutzpraktiken sind die
+            jeweiligen Betreiber verantwortlich. Werden konkrete Rechtsverstöße
+            bekannt, werden betroffene Links geprüft und gegebenenfalls
+            entfernt.
+          </p>
+        </section>
+
+        <section id="urheberrecht" class="legal-card">
+          <span class="legal-section-number">06</span>
+          <h2>Urheberrecht</h2>
+          <p>
+            Die auf dieser Website erstellten Inhalte, Designs und Werke
+            unterliegen dem jeweils anwendbaren Urheberrecht. Inhalte Dritter
+            werden als solche gekennzeichnet. Eine Verwendung außerhalb der
+            gesetzlichen Erlaubnisse bedarf der Zustimmung der jeweiligen
+            Rechteinhaber.
+          </p>
+        </section>
+
+        <section id="checkliste" class="legal-card legal-card--checklist">
+          <span class="legal-section-number">07</span>
+          <h2>Vor dem Veröffentlichen</h2>
+          <ul class="legal-check-list">
+            <li>Vollständigen Namen und erreichbare Anschrift eintragen</li>
+            <li>E-Mail und erforderlichen direkten Kontaktweg ergänzen</li>
+            <li>Anwendbarkeit des § 18 MStV anhand der Inhalte prüfen</li>
+            <li>Statusangaben zu Firma, Register und USt-ID bestätigen</li>
+            <li>Bei neuer beruflicher Nutzung alle Angaben aktualisieren</li>
+            <li>
+              <code>noindex</code> erst nach Abschluss der Prüfung entfernen
+            </li>
+          </ul>
+        </section>
+
+        <footer class="legal-document__footer">
+          <span>Stand</span>
+          <strong class="legal-placeholder">[Monat Jahr]</strong>
+          <a href="/">Zurück zum Konsolenmenü</a>
+        </footer>
+      </article>
     </div>
-    <p data-i18n="legal.imprint.note">
-      Bitte die Angaben aus <code>docs/CONTENT.md</code> bereitstellen. Der endgültige
-      Inhalt sollte passend zur tatsächlichen Nutzung der Website rechtlich geprüft
-      werden.
-    </p>
-    <a class="text-link" href="/" data-i18n="legal.backHome">← Zur Startseite</a
-    >
   </main>
+
   <SiteFooter />
 </BaseLayout>
