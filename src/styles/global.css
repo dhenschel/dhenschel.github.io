@@ -338,7 +338,9 @@
   }
 
   .site-nav a:hover,
-  .header-link:hover {
+  .site-nav a.gamepad-pointer-target,
+  .header-link:hover,
+  .header-link.gamepad-pointer-target {
     color: var(--paper);
   }
 
@@ -371,7 +373,8 @@
       transform 220ms var(--ease-out);
   }
 
-  .button:hover {
+  .button:hover,
+  .button.gamepad-pointer-target {
     transform: translateY(-2px);
   }
 
@@ -380,7 +383,8 @@
     background: var(--mint);
   }
 
-  .button--primary:hover {
+  .button--primary:hover,
+  .button--primary.gamepad-pointer-target {
     background: var(--paper-strong);
   }
 
@@ -390,7 +394,8 @@
     background: rgb(255 255 255 / 2%);
   }
 
-  .button--ghost:hover {
+  .button--ghost:hover,
+  .button--ghost.gamepad-pointer-target {
     border-color: var(--paper);
   }
 
@@ -401,7 +406,8 @@
     backdrop-filter: blur(10px);
   }
 
-  .button--light:hover {
+  .button--light:hover,
+  .button--light.gamepad-pointer-target {
     color: var(--ink);
     background: var(--paper);
   }
@@ -420,7 +426,8 @@
     text-transform: uppercase;
   }
 
-  .text-link:hover {
+  .text-link:hover,
+  .text-link.gamepad-pointer-target {
     color: var(--mint);
   }
 
@@ -498,6 +505,7 @@
   }
 
   .language-switcher__toggle:hover,
+  .language-switcher__toggle.gamepad-pointer-target,
   .language-switcher__toggle:focus-visible,
   .language-switcher[data-open="true"] .language-switcher__toggle {
     border-color: var(--console-blue, var(--mint));
@@ -604,6 +612,7 @@
   }
 
   .language-switcher__menu button:hover,
+  .language-switcher__menu button.gamepad-pointer-target,
   .language-switcher__menu button:focus-visible {
     outline: none;
     background: var(--console-focus, rgb(111 255 215 / 12%));

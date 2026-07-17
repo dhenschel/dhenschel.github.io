@@ -259,6 +259,7 @@ html[data-boot="skip"] .startup-screen {
 }
 
 .startup-screen__skip:hover,
+.startup-screen__skip.gamepad-pointer-target,
 .startup-screen__skip:focus-visible {
   color: var(--console-text);
   outline: 3px solid var(--console-focus);
@@ -333,6 +334,7 @@ html[data-boot="skip"] .startup-screen {
 }
 
 .startup-profile-carousel__arrow:hover,
+.startup-profile-carousel__arrow.gamepad-pointer-target,
 .startup-profile-carousel__arrow:focus-visible {
   color: #fff;
   background: var(--console-blue);
@@ -482,6 +484,7 @@ html[data-boot="skip"] .startup-screen {
 }
 
 .startup-screen__start:not(:disabled):hover,
+.startup-screen__start:not(:disabled).gamepad-pointer-target,
 .startup-screen__start:not(:disabled):focus-visible {
   background: var(--console-blue-dark);
   outline: 4px solid var(--console-accent-halo);
@@ -627,6 +630,7 @@ html[data-boot="skip"] .startup-screen {
 }
 
 .console-back-button:hover,
+.console-back-button.gamepad-pointer-target,
 .console-back-button:focus-visible {
   outline: 3px solid var(--console-focus);
   outline-offset: 0.2rem;
@@ -682,6 +686,7 @@ html[data-console-view="music"] .console-back-button {
 }
 
 .console-profile-button:hover .profile-picture--bar,
+.console-profile-button.gamepad-pointer-target .profile-picture--bar,
 .console-profile-button:focus-visible .profile-picture--bar {
   box-shadow:
     var(--console-shadow-strong),
@@ -890,6 +895,7 @@ html[data-music-track="signal-garden"] .header-music-button__disc::before {
 }
 
 .header-music-button:hover .header-music-button__motion,
+.header-music-button.gamepad-pointer-target .header-music-button__motion,
 .header-music-button:focus-visible .header-music-button__motion {
   background: transparent;
   box-shadow:
@@ -899,6 +905,7 @@ html[data-music-track="signal-garden"] .header-music-button__disc::before {
 }
 
 .header-music-button:hover .header-music-button__disc,
+.header-music-button.gamepad-pointer-target .header-music-button__disc,
 .header-music-button:focus-visible .header-music-button__disc {
   animation-duration: 2.2s;
 }
@@ -1304,6 +1311,7 @@ html[data-console-view="music"] .music-screen {
 }
 
 .music-carousel__arrow:hover,
+.music-carousel__arrow.gamepad-pointer-target,
 .music-carousel__arrow:focus-visible {
   color: #fff;
   background: var(--console-blue);
@@ -1820,6 +1828,7 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
 }
 
 .music-channel__actions button:hover,
+.music-channel__actions button.gamepad-pointer-target,
 .music-channel__actions button:focus-visible {
   color: #fff;
   background: var(--console-blue);
@@ -1837,6 +1846,7 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
 }
 
 .music-channel__actions button[aria-pressed="true"]:hover,
+.music-channel__actions button[aria-pressed="true"].gamepad-pointer-target,
 .music-channel__actions button[aria-pressed="true"]:focus-visible {
   color: #fff;
 }
@@ -1847,6 +1857,7 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
 }
 
 .music-channel__play:hover,
+.music-channel__play.gamepad-pointer-target,
 .music-channel__play:focus-visible {
   background: var(--console-blue-dark) !important;
 }
@@ -2168,11 +2179,14 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
 }
 
 .contact-button:hover > span,
+.contact-button.gamepad-pointer-target > span,
 .contact-button:focus-visible > span {
   background: var(--console-blue-dark);
   transform: scale(1.06);
 }
 
+.contact-button.gamepad-pointer-target,
+.theme-toggle.gamepad-pointer-target,
 .contact-button:focus-visible,
 .theme-toggle:focus-visible {
   outline: 3px solid var(--console-focus);
@@ -2191,6 +2205,7 @@ html[data-input-mode="gamepad"] .console-input-prompt__gamepad {
 }
 
 .console-bottombar nav a:hover,
+.console-bottombar nav a.gamepad-pointer-target,
 .console-bottombar nav a:focus-visible {
   color: var(--console-text);
 }

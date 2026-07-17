@@ -17,6 +17,7 @@ const CURSOR_HOTSPOT_Y = 3;
 
 type Direction = "left" | "right" | "up" | "down";
 type InputMode = "keyboard" | "gamepad";
+type GamepadNavigationMethod = "pointer" | "structured";
 
 type RepeatState = {
   nextAt: number;
@@ -49,6 +50,7 @@ let lastRealPointerY = pointerY;
 let pointerTarget: HTMLElement | null = null;
 let pointerElement: HTMLElement | null = null;
 let pointerClickTimer: number | null = null;
+let gamepadNavigationMethod: GamepadNavigationMethod = "pointer";
 
 const root = document.documentElement;
 
@@ -140,6 +142,7 @@ const setInputMode = (mode: InputMode) => {
 };
 
 const leaveGamepadMode = (nativeX?: number, nativeY?: number) => {
+  gamepadNavigationMethod = "pointer";
   const nativeTarget =
     typeof nativeX === "number" && typeof nativeY === "number"
       ? getInteractiveAt(nativeX, nativeY)
@@ -321,18 +324,23 @@ const pointToCurrentCarouselItem = () => {
           '[data-music-disc][data-carousel-position="active"]',
         );
     if (!current) return;
-    const bounds = current.getBoundingClientRect();
+    const musicStage = current.matches("[data-music-disc]")
+      ? current.closest<HTMLElement>(".music-carousel__stage")
+      : null;
+    const bounds = (musicStage ?? current).getBoundingClientRect();
     setPointerPosition(
       bounds.left + bounds.width / 2,
       bounds.top + bounds.height / 2,
-      true,
       false,
     );
+    setPointerTarget(current, false);
+    current.focus({ preventScroll: true });
   });
 };
 
 const handleDirection = (direction: Direction) => {
   useGamepadMode();
+  gamepadNavigationMethod = "structured";
   const openDialog = document.querySelector<HTMLDialogElement>("dialog[open]");
   if (openDialog || getOpenLanguageSwitcher()) {
     moveSpatialFocus(direction);
@@ -373,7 +381,7 @@ const handleDirection = (direction: Direction) => {
 
 const activateCurrentTarget = (gamepad: Gamepad) => {
   useGamepadMode();
-  updatePointerTarget();
+  if (gamepadNavigationMethod === "pointer") updatePointerTarget();
   const activeElement =
     document.activeElement instanceof HTMLElement
       ? document.activeElement.closest<HTMLElement>(INTERACTIVE_SELECTOR)
@@ -381,6 +389,15 @@ const activateCurrentTarget = (gamepad: Gamepad) => {
   let target = pointerTarget && isVisible(pointerTarget) ? pointerTarget : null;
   if (!target && activeElement && isVisible(activeElement))
     target = activeElement;
+  if (
+    root.dataset.consoleView === "music" &&
+    gamepadNavigationMethod === "structured" &&
+    (!target || target.matches("[data-music-arrow], [data-music-disc]"))
+  ) {
+    target = document.querySelector<HTMLButtonElement>(
+      '[data-music-disc][data-carousel-position="active"]',
+    );
+  }
   if (!target && getReadyStartup()) {
     target = document.querySelector<HTMLButtonElement>("[data-start-console]");
   }
@@ -587,6 +604,7 @@ const pollGamepad = (now: number) => {
     root.dataset.launching !== "true" &&
     (leftX !== 0 || leftY !== 0)
   ) {
+    gamepadNavigationMethod = "pointer";
     setPointerPosition(
       pointerX + leftX * CURSOR_SPEED * elapsedSeconds,
       pointerY + leftY * CURSOR_SPEED * elapsedSeconds,
