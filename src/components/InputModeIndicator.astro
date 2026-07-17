@@ -15,41 +15,75 @@ const { placement } = Astro.props;
   aria-live="polite"
   aria-atomic="true"
   aria-label="Aktive Eingabemethode"
-  data-i18n-aria="input.current"
+  data-input-mode-indicator
 >
   <span
-    class="console-input-mode-indicator__icon console-input-mode-indicator__icon--keyboard"
-    aria-hidden="true"
+    class="console-input-mode-indicator__control console-input-mode-indicator__control--gamepad"
+    aria-label="Controller"
+    data-i18n-aria="input.controller"
   >
-    <svg viewBox="0 0 32 24">
-      <rect x="2.5" y="8.5" width="18" height="12" rx="2.4"></rect>
-      <path d="M6 12h2m2.5 0h2m2.5 0h2M6 15.5h2m2.5 0h2m2.5 0h2M7 18h9"></path>
-      <path
-        d="M24 3.5c3 0 5.5 2.5 5.5 5.5v5c0 3-2.5 5.5-5.5 5.5S18.5 17 18.5 14V9c0-3 2.5-5.5 5.5-5.5Z"
-      ></path>
-      <path d="M24 4v5"></path>
-    </svg>
+    <span class="console-input-mode-indicator__icon" aria-hidden="true">
+      <svg viewBox="0 0 32 24">
+        <path
+          d="M9.5 7h13c3.4 0 5.8 2.2 6.5 5.8l.7 3.4c.5 2.7-2.6 4.4-4.5 2.4l-3.1-3.1H9.9l-3.1 3.1c-1.9 2-5 .3-4.5-2.4l.7-3.4C3.7 9.2 6.1 7 9.5 7Z"
+        ></path>
+        <path d="M8.8 10v4m-2-2h4"></path>
+        <circle cx="22.8" cy="10.6" r="1"></circle>
+        <circle cx="25.5" cy="13.2" r="1"></circle>
+      </svg>
+    </span>
+    <i class="console-input-mode-indicator__led" aria-hidden="true"></i>
   </span>
-  <strong
-    class="console-input-mode-indicator__label console-input-mode-indicator__label--keyboard"
-    data-i18n="input.mouseKeyboard">Maus &amp; Tastatur</strong
+
+  <span class="console-input-mode-indicator__separator" aria-hidden="true"
+    >|</span
   >
 
   <span
-    class="console-input-mode-indicator__icon console-input-mode-indicator__icon--gamepad"
-    aria-hidden="true"
+    class="console-input-mode-indicator__control console-input-mode-indicator__control--keyboard"
+    aria-label="Maus und Tastatur"
+    data-i18n-aria="input.mouseKeyboard"
   >
-    <svg viewBox="0 0 32 24">
-      <path
-        d="M9.5 7h13c3.4 0 5.8 2.2 6.5 5.8l.7 3.4c.5 2.7-2.6 4.4-4.5 2.4l-3.1-3.1H9.9l-3.1 3.1c-1.9 2-5 .3-4.5-2.4l.7-3.4C3.7 9.2 6.1 7 9.5 7Z"
-      ></path>
-      <path d="M8.8 10v4m-2-2h4"></path>
-      <circle cx="22.8" cy="10.6" r="1"></circle>
-      <circle cx="25.5" cy="13.2" r="1"></circle>
-    </svg>
+    <span class="console-input-mode-indicator__icon" aria-hidden="true">
+      <svg viewBox="0 0 32 24">
+        <rect x="2.5" y="8.5" width="18" height="12" rx="2.4"></rect>
+        <path d="M6 12h2m2.5 0h2m2.5 0h2M6 15.5h2m2.5 0h2m2.5 0h2M7 18h9"
+        ></path>
+        <path
+          d="M24 3.5c3 0 5.5 2.5 5.5 5.5v5c0 3-2.5 5.5-5.5 5.5S18.5 17 18.5 14V9c0-3 2.5-5.5 5.5-5.5Z"
+        ></path>
+        <path d="M24 4v5"></path>
+      </svg>
+    </span>
+    <i class="console-input-mode-indicator__led" aria-hidden="true"></i>
   </span>
-  <strong
-    class="console-input-mode-indicator__label console-input-mode-indicator__label--gamepad"
-    data-i18n="input.controller">Controller</strong
-  >
 </div>
+
+<script>
+  import { t } from "../scripts/i18n";
+
+  const updateInputModeIndicators = () => {
+    const isGamepad = document.documentElement.dataset.inputMode === "gamepad";
+    const activeInput = t(
+      isGamepad ? "input.controller" : "input.mouseKeyboard",
+    );
+    document
+      .querySelectorAll<HTMLElement>("[data-input-mode-indicator]")
+      .forEach((indicator) =>
+        indicator.setAttribute(
+          "aria-label",
+          `${t("input.current")}: ${activeInput}`,
+        ),
+      );
+  };
+
+  window.addEventListener(
+    "console:input-mode-changed",
+    updateInputModeIndicators,
+  );
+  window.addEventListener(
+    "console:language-changed",
+    updateInputModeIndicators,
+  );
+  updateInputModeIndicators();
+</script>
