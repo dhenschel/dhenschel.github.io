@@ -480,6 +480,11 @@
     padding: 0;
   }
 
+  .language-switcher--menu .language-switcher__toggle {
+    width: 3.2rem;
+    height: 3.2rem;
+  }
+
   .language-switcher__menu {
     position: absolute;
     z-index: 40;
