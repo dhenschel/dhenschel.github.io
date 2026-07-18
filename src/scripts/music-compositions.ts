@@ -796,6 +796,64 @@ const scheduleSaxLikeVoice = (
   vibrato.stop(end + 0.04);
 };
 
+const scheduleDriftRhodesChord = (
+  context: AudioContext,
+  destination: AudioNode,
+  notes: readonly number[],
+  start: number,
+  duration: number,
+  level: number,
+) => {
+  const end = start + Math.max(duration, 0.58);
+  const filter = context.createBiquadFilter();
+  const envelope = context.createGain();
+  const bodyMix = context.createGain();
+  const chorusMix = context.createGain();
+  const tineMix = context.createGain();
+
+  filter.type = "lowpass";
+  filter.Q.value = 1.12;
+  filter.frequency.setValueAtTime(3450, start);
+  filter.frequency.exponentialRampToValueAtTime(940, end);
+  bodyMix.gain.value = 0.62;
+  chorusMix.gain.value = 0.18;
+  tineMix.gain.value = 0.012;
+  envelope.gain.setValueAtTime(0.0001, start);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.012);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.24, start + 0.17);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  bodyMix.connect(filter);
+  chorusMix.connect(filter);
+  tineMix.connect(filter);
+  filter.connect(envelope).connect(destination);
+
+  notes.forEach((note, index) => {
+    const frequency = midiToFrequency(note);
+    const spread = index % 2 === 0 ? -3.2 : 3.2;
+    const body = context.createOscillator();
+    const chorus = context.createOscillator();
+    const tine = context.createOscillator();
+
+    body.type = "sine";
+    body.frequency.value = frequency;
+    chorus.type = "sine";
+    chorus.frequency.value = frequency;
+    chorus.detune.value = spread;
+    tine.type = "triangle";
+    tine.frequency.value = frequency * 2;
+    tine.detune.value = -spread * 0.45;
+    body.connect(bodyMix);
+    chorus.connect(chorusMix);
+    tine.connect(tineMix);
+    body.start(start);
+    chorus.start(start);
+    tine.start(start);
+    body.stop(end + 0.04);
+    chorus.stop(end + 0.04);
+    tine.stop(end + 0.04);
+  });
+};
+
 const scheduleDriftSubBass = (
   context: AudioContext,
   destination: AudioNode,
@@ -835,28 +893,104 @@ const scheduleDriftSubBass = (
   warmth.stop(end + 0.04);
 };
 
+const scheduleDriftKick = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  level: number,
+) => {
+  const end = start + 0.17;
+  const body = context.createOscillator();
+  const click = context.createOscillator();
+  const bodyEnvelope = context.createGain();
+  const clickEnvelope = context.createGain();
+  const clickFilter = context.createBiquadFilter();
+
+  body.type = "sine";
+  body.frequency.setValueAtTime(128, start);
+  body.frequency.exponentialRampToValueAtTime(46, end);
+  bodyEnvelope.gain.setValueAtTime(0.0001, start);
+  bodyEnvelope.gain.exponentialRampToValueAtTime(level, start + 0.005);
+  bodyEnvelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  click.type = "triangle";
+  click.frequency.setValueAtTime(980, start);
+  click.frequency.exponentialRampToValueAtTime(210, start + 0.035);
+  clickFilter.type = "bandpass";
+  clickFilter.frequency.value = 860;
+  clickFilter.Q.value = 0.72;
+  clickEnvelope.gain.setValueAtTime(level * 0.15, start);
+  clickEnvelope.gain.exponentialRampToValueAtTime(0.0001, start + 0.04);
+  body.connect(bodyEnvelope).connect(destination);
+  click.connect(clickFilter).connect(clickEnvelope).connect(destination);
+  body.start(start);
+  click.start(start);
+  body.stop(end + 0.02);
+  click.stop(start + 0.055);
+};
+
+const scheduleDriftSnare = (
+  context: AudioContext,
+  destination: AudioNode,
+  start: number,
+  level: number,
+) => {
+  const end = start + 0.12;
+  const noise = context.createBufferSource();
+  const noiseFilter = context.createBiquadFilter();
+  const noiseEnvelope = context.createGain();
+  const body = context.createOscillator();
+  const bodyEnvelope = context.createGain();
+
+  noise.buffer = getBrushNoiseBuffer(context);
+  noiseFilter.type = "bandpass";
+  noiseFilter.frequency.value = 1750;
+  noiseFilter.Q.value = 0.68;
+  noiseEnvelope.gain.setValueAtTime(0.0001, start);
+  noiseEnvelope.gain.exponentialRampToValueAtTime(level, start + 0.004);
+  noiseEnvelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  body.type = "triangle";
+  body.frequency.setValueAtTime(196, start);
+  body.frequency.exponentialRampToValueAtTime(128, end);
+  bodyEnvelope.gain.setValueAtTime(level * 0.14, start);
+  bodyEnvelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  noise.connect(noiseFilter).connect(noiseEnvelope).connect(destination);
+  body.connect(bodyEnvelope).connect(destination);
+  const offsetRange = Math.max(0, noise.buffer.duration - 0.16);
+  noise.start(start, Math.random() * offsetRange);
+  body.start(start);
+  noise.stop(end + 0.02);
+  body.stop(end + 0.02);
+};
+
 const scheduleAtmosphericTexture = (
   context: AudioContext,
   destination: AudioNode,
   start: number,
   duration: number,
   level: number,
-  centerFrequency: number,
+  note: number,
 ) => {
   const end = start + Math.max(duration, 0.72);
   const source = context.createBufferSource();
+  const tone = context.createOscillator();
+  const toneMix = context.createGain();
   const bandpass = context.createBiquadFilter();
   const lowpass = context.createBiquadFilter();
   const envelope = context.createGain();
+  const frequency = midiToFrequency(note);
 
   source.buffer = getBrushNoiseBuffer(context);
   source.loop = true;
   source.loopEnd = source.buffer.duration;
   source.playbackRate.value = 0.84;
+  tone.type = "sine";
+  tone.frequency.value = frequency;
+  tone.detune.value = Math.random() * 4 - 2;
+  toneMix.gain.value = 0.075;
   bandpass.type = "bandpass";
   bandpass.Q.value = 0.42;
-  bandpass.frequency.setValueAtTime(centerFrequency * 0.74, start);
-  bandpass.frequency.exponentialRampToValueAtTime(centerFrequency * 1.18, end);
+  bandpass.frequency.setValueAtTime(frequency * 2.8, start);
+  bandpass.frequency.exponentialRampToValueAtTime(frequency * 5.4, end);
   lowpass.type = "lowpass";
   lowpass.frequency.value = 3300;
   envelope.gain.setValueAtTime(0.0001, start);
@@ -868,8 +1002,11 @@ const scheduleAtmosphericTexture = (
     .connect(lowpass)
     .connect(envelope)
     .connect(destination);
+  tone.connect(toneMix).connect(lowpass);
   source.start(start, Math.random() * source.buffer.duration);
+  tone.start(start);
   source.stop(end + 0.03);
+  tone.stop(end + 0.03);
 };
 
 const scheduleDriftSynthMotif = (
@@ -881,33 +1018,42 @@ const scheduleDriftSynthMotif = (
   level: number,
 ) => {
   const end = start + Math.max(duration, 0.3);
-  const body = context.createOscillator();
+  const carrier = context.createOscillator();
+  const modulator = context.createOscillator();
+  const modulationDepth = context.createGain();
   const shimmer = context.createOscillator();
   const shimmerMix = context.createGain();
   const filter = context.createBiquadFilter();
   const envelope = context.createGain();
   const frequency = midiToFrequency(note);
 
-  body.type = "triangle";
-  body.frequency.setValueAtTime(frequency * 0.994, start);
-  body.frequency.exponentialRampToValueAtTime(frequency, start + 0.055);
+  carrier.type = "sine";
+  carrier.frequency.setValueAtTime(frequency * 0.994, start);
+  carrier.frequency.exponentialRampToValueAtTime(frequency, start + 0.045);
+  modulator.type = "sine";
+  modulator.frequency.value = frequency * 2;
+  modulationDepth.gain.setValueAtTime(frequency * 0.21, start);
+  modulationDepth.gain.exponentialRampToValueAtTime(frequency * 0.018, end);
   shimmer.type = "sine";
   shimmer.frequency.value = frequency * 2;
   shimmerMix.gain.value = 0.075;
   filter.type = "lowpass";
-  filter.Q.value = 1.18;
-  filter.frequency.setValueAtTime(2850, start);
-  filter.frequency.exponentialRampToValueAtTime(920, end);
+  filter.Q.value = 1.35;
+  filter.frequency.setValueAtTime(4200, start);
+  filter.frequency.exponentialRampToValueAtTime(1180, end);
   envelope.gain.setValueAtTime(0.0001, start);
   envelope.gain.exponentialRampToValueAtTime(level, start + 0.016);
   envelope.gain.exponentialRampToValueAtTime(level * 0.28, start + 0.11);
   envelope.gain.exponentialRampToValueAtTime(0.0001, end);
-  body.connect(filter);
+  modulator.connect(modulationDepth).connect(carrier.frequency);
+  carrier.connect(filter);
   shimmer.connect(shimmerMix).connect(filter);
   filter.connect(envelope).connect(destination);
-  body.start(start);
+  carrier.start(start);
+  modulator.start(start);
   shimmer.start(start);
-  body.stop(end + 0.04);
+  carrier.stop(end + 0.04);
+  modulator.stop(end + 0.04);
   shimmer.stop(end + 0.04);
 };
 
@@ -1872,24 +2018,21 @@ const DRIFT_SCENES: readonly DriftScene[] = [
 ];
 const DRIFT_RHODES: readonly (readonly MusicPulse[])[] = [
   [
-    [0, 1.08, 0.82],
-    [1.75, 0.58, 0.46],
-    [3, 0.72, 0.62],
+    [0, 0.72, 0.78],
+    [2.75, 0.52, 0.58],
   ],
   [
-    [0.5, 0.72, 0.5],
-    [2, 0.94, 0.76],
-    [3.5, 0.3, 0.34],
+    [0.5, 0.54, 0.46],
+    [2, 0.76, 0.74],
   ],
   [
-    [0, 0.82, 0.68],
-    [1.5, 0.56, 0.44],
-    [2.75, 0.88, 0.7],
+    [0, 0.64, 0.66],
+    [1.5, 0.42, 0.4],
+    [3, 0.52, 0.54],
   ],
   [
-    [0.25, 0.68, 0.42],
-    [1.75, 0.76, 0.6],
-    [3.25, 0.5, 0.48],
+    [0.25, 0.5, 0.4],
+    [2.25, 0.72, 0.7],
   ],
 ];
 const DRIFT_BASS: readonly (readonly MusicPulse[])[] = [
@@ -1919,10 +2062,10 @@ const DRIFT_BASS: readonly (readonly MusicPulse[])[] = [
   ],
 ];
 const DRIFT_KICKS: readonly (readonly number[])[] = [
-  [0, 1.75, 2.5],
-  [0, 0.75, 2.25, 3.5],
   [0, 1.5, 2.75],
-  [0, 0.75, 2, 3.25],
+  [0, 0.75, 2.5, 3.25],
+  [0, 1.75, 2.5],
+  [0, 0.5, 2.25, 3.5],
 ];
 const DRIFT_SYNTH_MOTIFS: readonly (readonly MotifNote[])[] = [
   [
@@ -1973,13 +2116,13 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
   const breath = 0.98 + Math.sin((absoluteBar + 1) * 1.13) * 0.02;
 
   DRIFT_RHODES[scene.groovePattern].forEach(([beat, duration, velocity]) =>
-    scheduleElectricPianoChord(
+    scheduleDriftRhodesChord(
       context,
       destination,
       scene.chord,
       start + beat * beatSeconds,
-      duration * beatSeconds + 0.3,
-      0.0155 * velocity * breath,
+      duration * beatSeconds + 0.18,
+      0.0145 * velocity * breath,
     ),
   );
   DRIFT_BASS[scene.groovePattern].forEach(([beat, duration, velocity], index) =>
@@ -1994,35 +2137,39 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
   );
 
   DRIFT_KICKS[scene.groovePattern].forEach((beat, index) =>
-    scheduleNeonKick(
+    scheduleDriftKick(
       context,
       destination,
       start + beat * beatSeconds,
-      (index === 0 ? 0.0135 : 0.0085) * breath,
+      (index === 0 ? 0.0145 : 0.009) * breath,
     ),
   );
   [1, 3].forEach((beat, index) =>
-    scheduleMutedSnare(
+    scheduleDriftSnare(
       context,
       destination,
       start + beat * beatSeconds,
-      (index === 0 ? 0.0045 : 0.0055) * breath,
+      (index === 0 ? 0.005 : 0.006) * breath,
     ),
   );
   if (scene.groovePattern === 1 || scene.groovePattern === 3) {
-    scheduleMutedSnare(
+    scheduleDriftSnare(
       context,
       destination,
       start + 2.75 * beatSeconds,
       0.0022 * breath,
     );
   }
-  [0, 0.55, 1, 1.55, 2, 2.55, 3, 3.55].forEach((beat, index) =>
+  const hatPattern =
+    absoluteBar % 8 === 7
+      ? [0, 0.58, 1, 1.58, 2, 2.58, 3]
+      : [0, 0.58, 0.88, 1, 1.58, 2, 2.58, 2.88, 3, 3.58];
+  hatPattern.forEach((beat, index) =>
     scheduleClosedHat(
       context,
       destination,
       start + beat * beatSeconds,
-      (index % 2 === 0 ? 0.00105 : 0.0018) * breath,
+      (index % 3 === 0 ? 0.00105 : 0.0016) * breath,
     ),
   );
 
@@ -2034,7 +2181,7 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       start + textureBeat * beatSeconds,
       1.25 * beatSeconds,
       0.0028 * breath,
-      980 + ((absoluteBar + phraseIndex) % 4) * 210,
+      69 + ((absoluteBar + phraseIndex) % 4) * 2,
     );
   }
   if (synthMotifIndex !== null) {
@@ -2045,8 +2192,8 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
           destination,
           DRIFT_SCALE[scaleDegree],
           start + beat * beatSeconds,
-          duration * beatSeconds + 0.18,
-          0.022 * velocity * breath,
+          duration * beatSeconds + 0.12,
+          0.019 * velocity * breath,
         ),
     );
   }
@@ -2238,17 +2385,17 @@ export const musicCompositions: Record<MusicTrackId, MusicComposition> = {
   },
   "metro-drift": {
     id: "metro-drift",
-    tempo: 108,
+    tempo: 110,
     barsPerPhrase: 8,
     phraseCount: DRIFT_SYNTH_PHRASES.length,
-    level: 0.128,
-    fadeInSeconds: 1,
+    level: 0.13,
+    fadeInSeconds: 0.9,
     echo: {
-      dry: 0.958,
-      delayBeats: 0.75,
-      feedback: 0.055,
-      filterFrequency: 2250,
-      wet: 0.052,
+      dry: 0.96,
+      delayBeats: 0.5,
+      feedback: 0.045,
+      filterFrequency: 2650,
+      wet: 0.048,
     },
     scheduleBar: scheduleDriftBar,
   },
