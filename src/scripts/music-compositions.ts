@@ -20,6 +20,7 @@ type LoungeScene = {
 type DriftScene = {
   bass: readonly number[];
   chord: readonly number[];
+  melody: readonly number[];
   groovePattern: number;
 };
 
@@ -1032,15 +1033,15 @@ const scheduleDriftSynthMotif = (
   carrier.frequency.exponentialRampToValueAtTime(frequency, start + 0.045);
   modulator.type = "sine";
   modulator.frequency.value = frequency * 2;
-  modulationDepth.gain.setValueAtTime(frequency * 0.21, start);
-  modulationDepth.gain.exponentialRampToValueAtTime(frequency * 0.018, end);
+  modulationDepth.gain.setValueAtTime(frequency * 0.085, start);
+  modulationDepth.gain.exponentialRampToValueAtTime(frequency * 0.012, end);
   shimmer.type = "sine";
   shimmer.frequency.value = frequency * 2;
-  shimmerMix.gain.value = 0.075;
+  shimmerMix.gain.value = 0.035;
   filter.type = "lowpass";
-  filter.Q.value = 1.35;
-  filter.frequency.setValueAtTime(4200, start);
-  filter.frequency.exponentialRampToValueAtTime(1180, end);
+  filter.Q.value = 0.92;
+  filter.frequency.setValueAtTime(3200, start);
+  filter.frequency.exponentialRampToValueAtTime(1050, end);
   envelope.gain.setValueAtTime(0.0001, start);
   envelope.gain.exponentialRampToValueAtTime(level, start + 0.016);
   envelope.gain.exponentialRampToValueAtTime(level * 0.28, start + 0.11);
@@ -1973,46 +1974,53 @@ const scheduleNeonBar = (options: ScheduleBarOptions) => {
   }
 };
 
-const DRIFT_SCALE = [62, 65, 67, 69, 72, 74, 77, 79] as const;
 const DRIFT_SCENES: readonly DriftScene[] = [
   {
     bass: [38, 45, 48, 36],
-    chord: [50, 53, 57, 60, 64],
+    chord: [53, 57, 60, 64],
+    melody: [74, 77, 81, 84, 88],
     groovePattern: 0,
   },
   {
     bass: [34, 41, 45, 33],
-    chord: [46, 50, 53, 57, 60],
+    chord: [50, 53, 57, 60],
+    melody: [70, 74, 77, 81, 84],
     groovePattern: 1,
   },
   {
     bass: [33, 40, 45, 36],
-    chord: [45, 48, 52, 55, 60],
+    chord: [52, 57, 60, 64],
+    melody: [69, 72, 76, 79, 84],
     groovePattern: 2,
   },
   {
     bass: [36, 43, 47, 38],
-    chord: [48, 52, 55, 59, 62],
+    chord: [52, 55, 59, 62],
+    melody: [72, 76, 79, 83, 86],
     groovePattern: 3,
   },
   {
     bass: [38, 45, 41, 36],
-    chord: [50, 53, 57, 60, 64],
+    chord: [53, 57, 60, 64],
+    melody: [74, 77, 81, 84, 88],
     groovePattern: 2,
   },
   {
     bass: [31, 38, 41, 34],
-    chord: [43, 46, 50, 53, 57],
+    chord: [46, 50, 53, 57],
+    melody: [67, 70, 74, 77, 81],
     groovePattern: 1,
   },
   {
     bass: [34, 41, 45, 38],
-    chord: [46, 50, 53, 57, 60],
+    chord: [50, 53, 57, 60],
+    melody: [70, 74, 77, 81, 84],
     groovePattern: 0,
   },
   {
     bass: [33, 40, 43, 37],
-    chord: [45, 50, 52, 55, 61],
+    chord: [50, 52, 55, 61],
+    melody: [69, 74, 76, 79, 85],
     groovePattern: 3,
   },
 ];
@@ -2069,36 +2077,36 @@ const DRIFT_KICKS: readonly (readonly number[])[] = [
 ];
 const DRIFT_SYNTH_MOTIFS: readonly (readonly MotifNote[])[] = [
   [
-    [0.75, 0, 0.28, 0.52],
-    [1.25, 2, 0.24, 0.44],
-    [2.75, 1, 0.34, 0.48],
+    [0.75, 1, 0.26, 0.44],
+    [1.25, 2, 0.22, 0.38],
+    [2.75, 1, 0.3, 0.4],
   ],
   [
-    [1.5, 3, 0.26, 0.46],
-    [2, 4, 0.3, 0.56],
-    [3.25, 2, 0.28, 0.4],
+    [1.5, 2, 0.24, 0.38],
+    [2, 3, 0.28, 0.44],
+    [3.25, 2, 0.24, 0.34],
   ],
   [
-    [0.5, 1, 0.24, 0.4],
-    [1, 2, 0.28, 0.5],
-    [2.5, 5, 0.32, 0.44],
+    [0.5, 0, 0.22, 0.34],
+    [1, 1, 0.26, 0.4],
+    [2.5, 3, 0.28, 0.36],
   ],
   [
-    [0.75, 4, 0.3, 0.42],
-    [2.25, 3, 0.34, 0.48],
-    [3.5, 1, 0.24, 0.38],
+    [0.75, 3, 0.26, 0.34],
+    [2.25, 2, 0.3, 0.4],
+    [3.5, 0, 0.22, 0.32],
   ],
   [
-    [1.25, 6, 0.22, 0.34],
-    [1.75, 5, 0.26, 0.42],
-    [2.75, 3, 0.3, 0.38],
+    [1.25, 4, 0.2, 0.3],
+    [1.75, 3, 0.24, 0.36],
+    [2.75, 1, 0.28, 0.32],
   ],
 ];
 const DRIFT_SYNTH_PHRASES: readonly (readonly (number | null)[])[] = [
-  [0, null, 1, 4, 2, null, 3, null],
-  [null, 2, 0, null, 3, 4, null, 1],
-  [1, null, 3, 0, null, 2, 4, null],
-  [0, 4, null, 2, 1, null, 3, null],
+  [0, null, null, 1, 2, null, null, 3],
+  [null, 2, null, null, 3, null, 0, null],
+  [1, null, null, 0, null, 2, null, 3],
+  [null, 0, 2, null, null, 1, null, 3],
 ];
 
 const scheduleDriftBar = (options: ScheduleBarOptions) => {
@@ -2122,7 +2130,7 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       scene.chord,
       start + beat * beatSeconds,
       duration * beatSeconds + 0.18,
-      0.0145 * velocity * breath,
+      0.0115 * velocity * breath,
     ),
   );
   DRIFT_BASS[scene.groovePattern].forEach(([beat, duration, velocity], index) =>
@@ -2131,8 +2139,8 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       destination,
       scene.bass[index % scene.bass.length],
       start + beat * beatSeconds,
-      duration * beatSeconds + 0.08,
-      0.036 * velocity * breath,
+      duration * beatSeconds + 0.12,
+      0.027 * velocity * breath,
     ),
   );
 
@@ -2141,7 +2149,7 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       context,
       destination,
       start + beat * beatSeconds,
-      (index === 0 ? 0.0145 : 0.009) * breath,
+      (index === 0 ? 0.017 : 0.0105) * breath,
     ),
   );
   [1, 3].forEach((beat, index) =>
@@ -2149,7 +2157,7 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       context,
       destination,
       start + beat * beatSeconds,
-      (index === 0 ? 0.005 : 0.006) * breath,
+      (index === 0 ? 0.0054 : 0.0062) * breath,
     ),
   );
   if (scene.groovePattern === 1 || scene.groovePattern === 3) {
@@ -2157,19 +2165,19 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       context,
       destination,
       start + 2.75 * beatSeconds,
-      0.0022 * breath,
+      0.0018 * breath,
     );
   }
   const hatPattern =
     absoluteBar % 8 === 7
       ? [0, 0.58, 1, 1.58, 2, 2.58, 3]
-      : [0, 0.58, 0.88, 1, 1.58, 2, 2.58, 2.88, 3, 3.58];
+      : [0, 0.58, 1, 1.58, 2, 2.58, 3, 3.58];
   hatPattern.forEach((beat, index) =>
     scheduleClosedHat(
       context,
       destination,
       start + beat * beatSeconds,
-      (index % 3 === 0 ? 0.00105 : 0.0016) * breath,
+      (index % 2 === 0 ? 0.00115 : 0.00155) * breath,
     ),
   );
 
@@ -2180,8 +2188,8 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       destination,
       start + textureBeat * beatSeconds,
       1.25 * beatSeconds,
-      0.0028 * breath,
-      69 + ((absoluteBar + phraseIndex) % 4) * 2,
+      0.0019 * breath,
+      scene.melody[(absoluteBar + phraseIndex) % 3] - 12,
     );
   }
   if (synthMotifIndex !== null) {
@@ -2190,10 +2198,10 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
         scheduleDriftSynthMotif(
           context,
           destination,
-          DRIFT_SCALE[scaleDegree],
+          scene.melody[scaleDegree % scene.melody.length],
           start + beat * beatSeconds,
           duration * beatSeconds + 0.12,
-          0.019 * velocity * breath,
+          0.012 * velocity * breath,
         ),
     );
   }
