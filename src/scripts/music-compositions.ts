@@ -18,11 +18,18 @@ type LoungeScene = {
 };
 
 type DriftScene = {
-  bass: readonly number[];
+  bass: readonly [root: number, fifth: number, octave: number];
   chord: readonly number[];
-  melody: readonly number[];
   groovePattern: number;
 };
+
+type DriftMotifNote = readonly [
+  barOffset: 0 | 1,
+  beat: number,
+  note: number,
+  duration: number,
+  velocity: number,
+];
 
 type MotifNote = readonly [
   beat: number,
@@ -57,6 +64,17 @@ export type MusicComposition = {
     feedback: number;
     filterFrequency: number;
     wet: number;
+  };
+  processing?: {
+    roomWet: number;
+    saturation: number;
+    compressor: {
+      threshold: number;
+      knee: number;
+      ratio: number;
+      attack: number;
+      release: number;
+    };
   };
   scheduleBar: (options: ScheduleBarOptions) => void;
 };
@@ -804,51 +822,60 @@ const scheduleDriftRhodesChord = (
   start: number,
   duration: number,
   level: number,
+  humanizeSeed: number,
 ) => {
-  const end = start + Math.max(duration, 0.58);
-  const filter = context.createBiquadFilter();
-  const envelope = context.createGain();
-  const bodyMix = context.createGain();
-  const chorusMix = context.createGain();
-  const tineMix = context.createGain();
-
-  filter.type = "lowpass";
-  filter.Q.value = 1.12;
-  filter.frequency.setValueAtTime(3450, start);
-  filter.frequency.exponentialRampToValueAtTime(940, end);
-  bodyMix.gain.value = 0.62;
-  chorusMix.gain.value = 0.18;
-  tineMix.gain.value = 0.012;
-  envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.012);
-  envelope.gain.exponentialRampToValueAtTime(level * 0.24, start + 0.17);
-  envelope.gain.exponentialRampToValueAtTime(0.0001, end);
-  bodyMix.connect(filter);
-  chorusMix.connect(filter);
-  tineMix.connect(filter);
-  filter.connect(envelope).connect(destination);
-
   notes.forEach((note, index) => {
+    const timingVariation =
+      Math.sin((humanizeSeed + 1) * (index + 2) * 1.73) * 0.007;
+    const velocityVariation =
+      0.95 + Math.sin((humanizeSeed + 3) * (index + 1) * 0.91) * 0.045;
+    const voiceStart = start + timingVariation;
+    const end = voiceStart + Math.max(duration, 1.8);
+    const releaseAt = Math.max(voiceStart + 0.55, end - 0.48);
     const frequency = midiToFrequency(note);
-    const spread = index % 2 === 0 ? -3.2 : 3.2;
+    const spread = index % 2 === 0 ? -2.2 : 2.2;
     const body = context.createOscillator();
     const chorus = context.createOscillator();
     const tine = context.createOscillator();
+    const filter = context.createBiquadFilter();
+    const envelope = context.createGain();
+    const bodyMix = context.createGain();
+    const chorusMix = context.createGain();
+    const tineMix = context.createGain();
 
     body.type = "sine";
     body.frequency.value = frequency;
     chorus.type = "sine";
     chorus.frequency.value = frequency;
     chorus.detune.value = spread;
-    tine.type = "triangle";
+    tine.type = "sine";
     tine.frequency.value = frequency * 2;
     tine.detune.value = -spread * 0.45;
-    body.connect(bodyMix);
-    chorus.connect(chorusMix);
-    tine.connect(tineMix);
-    body.start(start);
-    chorus.start(start);
-    tine.start(start);
+    bodyMix.gain.value = 0.72;
+    chorusMix.gain.value = 0.09;
+    tineMix.gain.value = 0.006;
+    filter.type = "lowpass";
+    filter.Q.value = 0.58;
+    filter.frequency.setValueAtTime(2600, voiceStart);
+    filter.frequency.exponentialRampToValueAtTime(980, end);
+    envelope.gain.setValueAtTime(0.0001, voiceStart);
+    envelope.gain.exponentialRampToValueAtTime(
+      level * velocityVariation,
+      voiceStart + 0.026,
+    );
+    envelope.gain.exponentialRampToValueAtTime(
+      level * velocityVariation * 0.7,
+      voiceStart + 0.38,
+    );
+    envelope.gain.setValueAtTime(level * velocityVariation * 0.34, releaseAt);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+    body.connect(bodyMix).connect(filter);
+    chorus.connect(chorusMix).connect(filter);
+    tine.connect(tineMix).connect(filter);
+    filter.connect(envelope).connect(destination);
+    body.start(voiceStart);
+    chorus.start(voiceStart);
+    tine.start(voiceStart);
     body.stop(end + 0.04);
     chorus.stop(end + 0.04);
     tine.stop(end + 0.04);
@@ -862,13 +889,15 @@ const scheduleDriftSubBass = (
   start: number,
   duration: number,
   level: number,
+  duckTimes: readonly number[],
 ) => {
-  const end = start + Math.max(duration, 0.38);
+  const end = start + Math.max(duration, 0.62);
   const sub = context.createOscillator();
   const warmth = context.createOscillator();
   const warmthMix = context.createGain();
   const filter = context.createBiquadFilter();
   const envelope = context.createGain();
+  const duckGain = context.createGain();
   const frequency = midiToFrequency(note);
 
   sub.type = "sine";
@@ -876,18 +905,26 @@ const scheduleDriftSubBass = (
   sub.frequency.exponentialRampToValueAtTime(frequency, start + 0.065);
   warmth.type = "triangle";
   warmth.frequency.value = frequency * 2;
-  warmthMix.gain.value = 0.022;
+  warmthMix.gain.value = 0.014;
   filter.type = "lowpass";
   filter.Q.value = 0.82;
-  filter.frequency.setValueAtTime(310, start);
-  filter.frequency.exponentialRampToValueAtTime(125, end);
+  filter.frequency.setValueAtTime(235, start);
+  filter.frequency.exponentialRampToValueAtTime(118, end);
   envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.018);
-  envelope.gain.exponentialRampToValueAtTime(level * 0.64, start + 0.18);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.03);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.78, start + 0.22);
   envelope.gain.exponentialRampToValueAtTime(0.0001, end);
+  duckGain.gain.setValueAtTime(1, start);
+  duckTimes
+    .filter((duckAt) => duckAt > start + 0.04 && duckAt < end - 0.1)
+    .forEach((duckAt) => {
+      duckGain.gain.setValueAtTime(1, duckAt - 0.018);
+      duckGain.gain.linearRampToValueAtTime(0.72, duckAt + 0.012);
+      duckGain.gain.exponentialRampToValueAtTime(1, duckAt + 0.16);
+    });
   sub.connect(filter);
   warmth.connect(warmthMix).connect(filter);
-  filter.connect(envelope).connect(destination);
+  filter.connect(envelope).connect(duckGain).connect(destination);
   sub.start(start);
   warmth.start(start);
   sub.stop(end + 0.04);
@@ -900,7 +937,7 @@ const scheduleDriftKick = (
   start: number,
   level: number,
 ) => {
-  const end = start + 0.17;
+  const end = start + 0.19;
   const body = context.createOscillator();
   const click = context.createOscillator();
   const bodyEnvelope = context.createGain();
@@ -908,25 +945,25 @@ const scheduleDriftKick = (
   const clickFilter = context.createBiquadFilter();
 
   body.type = "sine";
-  body.frequency.setValueAtTime(128, start);
-  body.frequency.exponentialRampToValueAtTime(46, end);
+  body.frequency.setValueAtTime(86, start);
+  body.frequency.exponentialRampToValueAtTime(47, end);
   bodyEnvelope.gain.setValueAtTime(0.0001, start);
   bodyEnvelope.gain.exponentialRampToValueAtTime(level, start + 0.005);
   bodyEnvelope.gain.exponentialRampToValueAtTime(0.0001, end);
   click.type = "triangle";
-  click.frequency.setValueAtTime(980, start);
-  click.frequency.exponentialRampToValueAtTime(210, start + 0.035);
+  click.frequency.setValueAtTime(520, start);
+  click.frequency.exponentialRampToValueAtTime(180, start + 0.04);
   clickFilter.type = "bandpass";
-  clickFilter.frequency.value = 860;
-  clickFilter.Q.value = 0.72;
-  clickEnvelope.gain.setValueAtTime(level * 0.15, start);
-  clickEnvelope.gain.exponentialRampToValueAtTime(0.0001, start + 0.04);
+  clickFilter.frequency.value = 480;
+  clickFilter.Q.value = 0.52;
+  clickEnvelope.gain.setValueAtTime(level * 0.045, start);
+  clickEnvelope.gain.exponentialRampToValueAtTime(0.0001, start + 0.045);
   body.connect(bodyEnvelope).connect(destination);
   click.connect(clickFilter).connect(clickEnvelope).connect(destination);
   body.start(start);
   click.start(start);
   body.stop(end + 0.02);
-  click.stop(start + 0.055);
+  click.stop(start + 0.06);
 };
 
 const scheduleDriftSnare = (
@@ -935,7 +972,7 @@ const scheduleDriftSnare = (
   start: number,
   level: number,
 ) => {
-  const end = start + 0.12;
+  const end = start + 0.085;
   const noise = context.createBufferSource();
   const noiseFilter = context.createBiquadFilter();
   const noiseEnvelope = context.createGain();
@@ -944,15 +981,15 @@ const scheduleDriftSnare = (
 
   noise.buffer = getBrushNoiseBuffer(context);
   noiseFilter.type = "bandpass";
-  noiseFilter.frequency.value = 1750;
-  noiseFilter.Q.value = 0.68;
+  noiseFilter.frequency.value = 1320;
+  noiseFilter.Q.value = 0.82;
   noiseEnvelope.gain.setValueAtTime(0.0001, start);
   noiseEnvelope.gain.exponentialRampToValueAtTime(level, start + 0.004);
   noiseEnvelope.gain.exponentialRampToValueAtTime(0.0001, end);
   body.type = "triangle";
-  body.frequency.setValueAtTime(196, start);
-  body.frequency.exponentialRampToValueAtTime(128, end);
-  bodyEnvelope.gain.setValueAtTime(level * 0.14, start);
+  body.frequency.setValueAtTime(280, start);
+  body.frequency.exponentialRampToValueAtTime(190, end);
+  bodyEnvelope.gain.setValueAtTime(level * 0.1, start);
   bodyEnvelope.gain.exponentialRampToValueAtTime(0.0001, end);
   noise.connect(noiseFilter).connect(noiseEnvelope).connect(destination);
   body.connect(bodyEnvelope).connect(destination);
@@ -969,45 +1006,43 @@ const scheduleAtmosphericTexture = (
   start: number,
   duration: number,
   level: number,
-  note: number,
+  movementSeed: number,
 ) => {
-  const end = start + Math.max(duration, 0.72);
+  const end = start + Math.max(duration, 2.4);
   const source = context.createBufferSource();
-  const tone = context.createOscillator();
-  const toneMix = context.createGain();
   const bandpass = context.createBiquadFilter();
   const lowpass = context.createBiquadFilter();
+  const panner = context.createStereoPanner();
   const envelope = context.createGain();
-  const frequency = midiToFrequency(note);
+  const direction = movementSeed % 2 === 0 ? 1 : -1;
+  const filterStart = 470 + (movementSeed % 4) * 35;
 
   source.buffer = getBrushNoiseBuffer(context);
   source.loop = true;
   source.loopEnd = source.buffer.duration;
-  source.playbackRate.value = 0.84;
-  tone.type = "sine";
-  tone.frequency.value = frequency;
-  tone.detune.value = Math.random() * 4 - 2;
-  toneMix.gain.value = 0.075;
+  source.playbackRate.value = 0.72;
   bandpass.type = "bandpass";
-  bandpass.Q.value = 0.42;
-  bandpass.frequency.setValueAtTime(frequency * 2.8, start);
-  bandpass.frequency.exponentialRampToValueAtTime(frequency * 5.4, end);
+  bandpass.Q.value = 0.62;
+  bandpass.frequency.setValueAtTime(filterStart, start);
+  bandpass.frequency.exponentialRampToValueAtTime(filterStart * 1.42, end);
   lowpass.type = "lowpass";
-  lowpass.frequency.value = 3300;
+  lowpass.Q.value = 0.38;
+  lowpass.frequency.setValueAtTime(980, start);
+  lowpass.frequency.exponentialRampToValueAtTime(1260, end);
+  panner.pan.setValueAtTime(-0.18 * direction, start);
+  panner.pan.linearRampToValueAtTime(0.18 * direction, end);
   envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + duration * 0.3);
-  envelope.gain.setValueAtTime(level * 0.86, start + duration * 0.62);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.32);
+  envelope.gain.setValueAtTime(level * 0.92, end - 0.34);
   envelope.gain.exponentialRampToValueAtTime(0.0001, end);
   source
     .connect(bandpass)
     .connect(lowpass)
+    .connect(panner)
     .connect(envelope)
     .connect(destination);
-  tone.connect(toneMix).connect(lowpass);
-  source.start(start, Math.random() * source.buffer.duration);
-  tone.start(start);
+  source.start(start, (movementSeed * 0.173) % source.buffer.duration);
   source.stop(end + 0.03);
-  tone.stop(end + 0.03);
 };
 
 const scheduleDriftSynthMotif = (
@@ -1018,44 +1053,35 @@ const scheduleDriftSynthMotif = (
   duration: number,
   level: number,
 ) => {
-  const end = start + Math.max(duration, 0.3);
-  const carrier = context.createOscillator();
-  const modulator = context.createOscillator();
-  const modulationDepth = context.createGain();
-  const shimmer = context.createOscillator();
-  const shimmerMix = context.createGain();
+  const end = start + Math.max(duration, 0.48);
+  const body = context.createOscillator();
+  const color = context.createOscillator();
+  const colorMix = context.createGain();
   const filter = context.createBiquadFilter();
   const envelope = context.createGain();
   const frequency = midiToFrequency(note);
 
-  carrier.type = "sine";
-  carrier.frequency.setValueAtTime(frequency * 0.994, start);
-  carrier.frequency.exponentialRampToValueAtTime(frequency, start + 0.045);
-  modulator.type = "sine";
-  modulator.frequency.value = frequency * 2;
-  modulationDepth.gain.setValueAtTime(frequency * 0.085, start);
-  modulationDepth.gain.exponentialRampToValueAtTime(frequency * 0.012, end);
-  shimmer.type = "sine";
-  shimmer.frequency.value = frequency * 2;
-  shimmerMix.gain.value = 0.035;
+  body.type = "sine";
+  body.frequency.setValueAtTime(frequency * 0.996, start);
+  body.frequency.exponentialRampToValueAtTime(frequency, start + 0.06);
+  color.type = "triangle";
+  color.frequency.value = frequency * 2;
+  colorMix.gain.value = 0.026;
   filter.type = "lowpass";
-  filter.Q.value = 0.92;
-  filter.frequency.setValueAtTime(3200, start);
-  filter.frequency.exponentialRampToValueAtTime(1050, end);
+  filter.Q.value = 0.64;
+  filter.frequency.setValueAtTime(2150, start);
+  filter.frequency.exponentialRampToValueAtTime(880, end);
   envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(level, start + 0.016);
-  envelope.gain.exponentialRampToValueAtTime(level * 0.28, start + 0.11);
+  envelope.gain.exponentialRampToValueAtTime(level, start + 0.028);
+  envelope.gain.exponentialRampToValueAtTime(level * 0.54, start + 0.18);
   envelope.gain.exponentialRampToValueAtTime(0.0001, end);
-  modulator.connect(modulationDepth).connect(carrier.frequency);
-  carrier.connect(filter);
-  shimmer.connect(shimmerMix).connect(filter);
+  body.connect(filter);
+  color.connect(colorMix).connect(filter);
   filter.connect(envelope).connect(destination);
-  carrier.start(start);
-  modulator.start(start);
-  shimmer.start(start);
-  carrier.stop(end + 0.04);
-  modulator.stop(end + 0.04);
-  shimmer.stop(end + 0.04);
+  body.start(start);
+  color.start(start);
+  body.stop(end + 0.04);
+  color.stop(end + 0.04);
 };
 
 const schedulePadChord = (
@@ -1976,137 +2002,119 @@ const scheduleNeonBar = (options: ScheduleBarOptions) => {
 
 const DRIFT_SCENES: readonly DriftScene[] = [
   {
-    bass: [38, 45, 48, 36],
+    bass: [38, 45, 50],
     chord: [53, 57, 60, 64],
-    melody: [74, 77, 81, 84, 88],
     groovePattern: 0,
   },
   {
-    bass: [34, 41, 45, 33],
+    bass: [34, 41, 46],
     chord: [50, 53, 57, 60],
-    melody: [70, 74, 77, 81, 84],
     groovePattern: 1,
   },
   {
-    bass: [33, 40, 45, 36],
-    chord: [52, 57, 60, 64],
-    melody: [69, 72, 76, 79, 84],
+    bass: [36, 43, 48],
+    chord: [52, 55, 59, 62],
     groovePattern: 2,
   },
   {
-    bass: [36, 43, 47, 38],
-    chord: [52, 55, 59, 62],
-    melody: [72, 76, 79, 83, 86],
+    bass: [33, 40, 45],
+    chord: [48, 52, 55, 57],
     groovePattern: 3,
   },
   {
-    bass: [38, 45, 41, 36],
-    chord: [53, 57, 60, 64],
-    melody: [74, 77, 81, 84, 88],
-    groovePattern: 2,
-  },
-  {
-    bass: [31, 38, 41, 34],
-    chord: [46, 50, 53, 57],
-    melody: [67, 70, 74, 77, 81],
-    groovePattern: 1,
-  },
-  {
-    bass: [34, 41, 45, 38],
-    chord: [50, 53, 57, 60],
-    melody: [70, 74, 77, 81, 84],
+    bass: [38, 45, 50],
+    chord: [57, 60, 62, 64],
     groovePattern: 0,
   },
   {
-    bass: [33, 40, 43, 37],
-    chord: [50, 52, 55, 61],
-    melody: [69, 74, 76, 79, 85],
+    bass: [34, 41, 46],
+    chord: [53, 57, 60, 62],
+    groovePattern: 1,
+  },
+  {
+    bass: [36, 43, 48],
+    chord: [55, 59, 62, 64],
+    groovePattern: 2,
+  },
+  {
+    bass: [33, 40, 45],
+    chord: [52, 55, 57, 60],
     groovePattern: 3,
   },
 ];
-const DRIFT_RHODES: readonly (readonly MusicPulse[])[] = [
-  [
-    [0, 0.72, 0.78],
-    [2.75, 0.52, 0.58],
-  ],
-  [
-    [0.5, 0.54, 0.46],
-    [2, 0.76, 0.74],
-  ],
-  [
-    [0, 0.64, 0.66],
-    [1.5, 0.42, 0.4],
-    [3, 0.52, 0.54],
-  ],
-  [
-    [0.25, 0.5, 0.4],
-    [2.25, 0.72, 0.7],
-  ],
+const DRIFT_TURNAROUND: DriftScene = {
+  bass: [33, 40, 45],
+  chord: [50, 52, 55, 61],
+  groovePattern: 3,
+};
+const DRIFT_RHODES_FOLLOW_UPS: readonly (number | null)[] = [
+  null,
+  2.85,
+  null,
+  null,
+  null,
+  2.7,
+  3.05,
+  null,
 ];
 const DRIFT_BASS: readonly (readonly MusicPulse[])[] = [
   [
-    [0, 0.72, 0.9],
-    [1.75, 0.44, 0.52],
-    [2.5, 0.62, 0.72],
-    [3.5, 0.32, 0.38],
+    [0.16, 2.25, 0.88],
+    [2.9, 0.72, 0.46],
+  ],
+  [[0.14, 2.7, 0.9]],
+  [
+    [0.16, 2.3, 0.86],
+    [3.12, 0.58, 0.42],
   ],
   [
-    [0, 0.54, 0.82],
-    [0.75, 0.42, 0.46],
-    [2.25, 0.68, 0.76],
-    [3.5, 0.28, 0.4],
-  ],
-  [
-    [0, 0.68, 0.86],
-    [1.5, 0.48, 0.5],
-    [2.75, 0.62, 0.74],
-    [3.5, 0.28, 0.36],
-  ],
-  [
-    [0, 0.62, 0.84],
-    [0.75, 0.4, 0.44],
-    [2, 0.58, 0.7],
-    [3.25, 0.44, 0.5],
+    [0.14, 2.05, 0.88],
+    [2.65, 0.82, 0.48],
   ],
 ];
 const DRIFT_KICKS: readonly (readonly number[])[] = [
-  [0, 1.5, 2.75],
-  [0, 0.75, 2.5, 3.25],
-  [0, 1.75, 2.5],
-  [0, 0.5, 2.25, 3.5],
+  [0, 2.75],
+  [0, 2.5],
+  [0, 1.75, 3.25],
+  [0, 2.25],
 ];
-const DRIFT_SYNTH_MOTIFS: readonly (readonly MotifNote[])[] = [
+const DRIFT_HATS: readonly (readonly (readonly [number, number])[])[] = [
   [
-    [0.75, 1, 0.26, 0.44],
-    [1.25, 2, 0.22, 0.38],
-    [2.75, 1, 0.3, 0.4],
+    [0.08, 0.58],
+    [0.62, 0.32],
+    [1.58, 0.44],
+    [2.08, 0.52],
+    [3.08, 0.48],
   ],
   [
-    [1.5, 2, 0.24, 0.38],
-    [2, 3, 0.28, 0.44],
-    [3.25, 2, 0.24, 0.34],
+    [0, 0.48],
+    [0.58, 0.28],
+    [1.58, 0.42],
+    [2.58, 0.36],
+    [3, 0.5],
   ],
   [
-    [0.5, 0, 0.22, 0.34],
-    [1, 1, 0.26, 0.4],
-    [2.5, 3, 0.28, 0.36],
+    [0, 0.54],
+    [1, 0.34],
+    [1.62, 0.46],
+    [2.58, 0.32],
+    [3.12, 0.5],
   ],
   [
-    [0.75, 3, 0.26, 0.34],
-    [2.25, 2, 0.3, 0.4],
-    [3.5, 0, 0.22, 0.32],
-  ],
-  [
-    [1.25, 4, 0.2, 0.3],
-    [1.75, 3, 0.24, 0.36],
-    [2.75, 1, 0.28, 0.32],
+    [0.12, 0.44],
+    [0.62, 0.28],
+    [1.62, 0.46],
+    [2.12, 0.3],
+    [3.12, 0.48],
+    [3.62, 0.24],
   ],
 ];
-const DRIFT_SYNTH_PHRASES: readonly (readonly (number | null)[])[] = [
-  [0, null, null, 1, 2, null, null, 3],
-  [null, 2, null, null, 3, null, 0, null],
-  [1, null, null, 0, null, 2, null, 3],
-  [null, 0, 2, null, null, 1, null, 3],
+const DRIFT_MOTIF: readonly DriftMotifNote[] = [
+  [0, 1, 69, 0.42, 0.82],
+  [0, 2.65, 72, 0.48, 0.72],
+  [1, 0.7, 74, 0.56, 0.78],
+  [1, 2, 77, 0.46, 0.68],
+  [1, 3.15, 76, 0.62, 0.62],
 ];
 
 const scheduleDriftBar = (options: ScheduleBarOptions) => {
@@ -2118,38 +2126,78 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
     phraseIndex,
     absoluteBar,
     beatSeconds,
+    barSeconds,
   } = options;
-  const scene = DRIFT_SCENES[barIndex];
-  const synthMotifIndex = DRIFT_SYNTH_PHRASES[phraseIndex][barIndex];
-  const breath = 0.98 + Math.sin((absoluteBar + 1) * 1.13) * 0.02;
+  const scene =
+    phraseIndex === 3 && barIndex === 7
+      ? DRIFT_TURNAROUND
+      : DRIFT_SCENES[barIndex];
+  const breath = 0.99 + Math.sin((barIndex + 1) * 1.21) * 0.01;
+  const useAlternateInversion =
+    phraseIndex === 2 && (barIndex === 2 || barIndex === 6);
+  const chord = useAlternateInversion
+    ? [...scene.chord.slice(1), scene.chord[0] + 12]
+    : scene.chord;
+  const kickBeats = DRIFT_KICKS[scene.groovePattern].filter(
+    (_, index, pattern) =>
+      !(phraseIndex === 1 && barIndex === 6 && index === pattern.length - 1),
+  );
 
-  DRIFT_RHODES[scene.groovePattern].forEach(([beat, duration, velocity]) =>
+  scheduleAtmosphericTexture(
+    context,
+    destination,
+    start,
+    barSeconds + 0.72,
+    0.00072,
+    absoluteBar,
+  );
+
+  const rhodesBeat = barIndex === 3 || barIndex === 7 ? 0.18 : 0.035;
+  scheduleDriftRhodesChord(
+    context,
+    destination,
+    chord,
+    start + rhodesBeat * beatSeconds,
+    barSeconds * 0.88,
+    0.0096 * breath,
+    barIndex + phraseIndex * 8,
+  );
+  const followUpBeat = DRIFT_RHODES_FOLLOW_UPS[barIndex];
+  if (
+    followUpBeat !== null &&
+    !(phraseIndex === 1 && barIndex === 6) &&
+    barIndex > 1
+  ) {
     scheduleDriftRhodesChord(
       context,
       destination,
-      scene.chord,
-      start + beat * beatSeconds,
-      duration * beatSeconds + 0.18,
-      0.0115 * velocity * breath,
-    ),
-  );
+      chord.slice(1),
+      start + followUpBeat * beatSeconds,
+      beatSeconds * 0.82,
+      0.0028 * breath,
+      40 + barIndex + phraseIndex * 8,
+    );
+  }
+
+  const kickTimes = kickBeats.map((beat) => start + beat * beatSeconds);
   DRIFT_BASS[scene.groovePattern].forEach(([beat, duration, velocity], index) =>
     scheduleDriftSubBass(
       context,
       destination,
       scene.bass[index % scene.bass.length],
       start + beat * beatSeconds,
-      duration * beatSeconds + 0.12,
-      0.027 * velocity * breath,
+      duration * beatSeconds,
+      0.0155 * velocity * breath,
+      kickTimes,
     ),
   );
 
-  DRIFT_KICKS[scene.groovePattern].forEach((beat, index) =>
+  kickBeats.forEach((beat, index) =>
     scheduleDriftKick(
       context,
       destination,
       start + beat * beatSeconds,
-      (index === 0 ? 0.017 : 0.0105) * breath,
+      (index === 0 ? 0.0125 : 0.0082) * breath,
     ),
   );
   [1, 3].forEach((beat, index) =>
@@ -2157,52 +2205,61 @@ const scheduleDriftBar = (options: ScheduleBarOptions) => {
       context,
       destination,
       start + beat * beatSeconds,
-      (index === 0 ? 0.0054 : 0.0062) * breath,
+      (index === 0 ? 0.0037 : 0.0041) * breath,
     ),
   );
-  if (scene.groovePattern === 1 || scene.groovePattern === 3) {
+  if (phraseIndex === 2 && barIndex === 6) {
     scheduleDriftSnare(
       context,
       destination,
-      start + 2.75 * beatSeconds,
-      0.0018 * breath,
+      start + 2.68 * beatSeconds,
+      0.0011 * breath,
     );
   }
-  const hatPattern =
-    absoluteBar % 8 === 7
-      ? [0, 0.58, 1, 1.58, 2, 2.58, 3]
-      : [0, 0.58, 1, 1.58, 2, 2.58, 3, 3.58];
-  hatPattern.forEach((beat, index) =>
+  const hats =
+    phraseIndex === 2 && barIndex === 3
+      ? DRIFT_HATS[scene.groovePattern].slice(0, 3)
+      : DRIFT_HATS[scene.groovePattern];
+  hats.forEach(([beat, velocity]) =>
     scheduleClosedHat(
       context,
       destination,
       start + beat * beatSeconds,
-      (index % 2 === 0 ? 0.00115 : 0.00155) * breath,
+      0.00145 * velocity * breath,
     ),
   );
 
-  if ([0, 2, 5, 7].includes(barIndex)) {
-    const textureBeat = barIndex % 2 === 0 ? 2.35 : 0.35;
-    scheduleAtmosphericTexture(
-      context,
-      destination,
-      start + textureBeat * beatSeconds,
-      1.25 * beatSeconds,
-      0.0019 * breath,
-      scene.melody[(absoluteBar + phraseIndex) % 3] - 12,
-    );
-  }
-  if (synthMotifIndex !== null) {
-    DRIFT_SYNTH_MOTIFS[synthMotifIndex].forEach(
-      ([beat, scaleDegree, duration, velocity]) =>
+  if (barIndex <= 1) {
+    DRIFT_MOTIF.forEach(
+      ([barOffset, beat, baseNote, duration, velocity], motifIndex) => {
+        if (barOffset !== barIndex) return;
+        if (phraseIndex === 1 && motifIndex === 1) return;
+        const beatShift = phraseIndex === 2 && motifIndex === 3 ? 0.12 : 0;
+        const note =
+          phraseIndex === 3 && motifIndex === DRIFT_MOTIF.length - 1
+            ? 74
+            : baseNote;
+        const noteStart = start + (beat + beatShift) * beatSeconds;
+        const noteLevel = 0.0058 * velocity * breath;
         scheduleDriftSynthMotif(
           context,
           destination,
-          scene.melody[scaleDegree % scene.melody.length],
-          start + beat * beatSeconds,
-          duration * beatSeconds + 0.12,
-          0.012 * velocity * breath,
-        ),
+          note,
+          noteStart,
+          duration * beatSeconds,
+          noteLevel,
+        );
+        if (motifIndex === DRIFT_MOTIF.length - 1) {
+          scheduleDriftSynthMotif(
+            context,
+            destination,
+            note,
+            noteStart + 0.72 * beatSeconds,
+            duration * beatSeconds * 0.82,
+            noteLevel * 0.17,
+          );
+        }
+      },
     );
   }
 };
@@ -2393,17 +2450,28 @@ export const musicCompositions: Record<MusicTrackId, MusicComposition> = {
   },
   "metro-drift": {
     id: "metro-drift",
-    tempo: 110,
+    tempo: 96,
     barsPerPhrase: 8,
-    phraseCount: DRIFT_SYNTH_PHRASES.length,
-    level: 0.13,
-    fadeInSeconds: 0.9,
+    phraseCount: 4,
+    level: 0.142,
+    fadeInSeconds: 1.2,
     echo: {
-      dry: 0.96,
-      delayBeats: 0.5,
-      feedback: 0.045,
-      filterFrequency: 2650,
-      wet: 0.048,
+      dry: 1,
+      delayBeats: 0.75,
+      feedback: 0,
+      filterFrequency: 1800,
+      wet: 0,
+    },
+    processing: {
+      roomWet: 0.075,
+      saturation: 0.46,
+      compressor: {
+        threshold: -35,
+        knee: 18,
+        ratio: 1.7,
+        attack: 0.035,
+        release: 0.3,
+      },
     },
     scheduleBar: scheduleDriftBar,
   },

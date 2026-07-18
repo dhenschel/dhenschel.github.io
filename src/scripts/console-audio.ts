@@ -31,6 +31,10 @@ let musicEcho: DelayNode | null = null;
 let musicEchoFilter: BiquadFilterNode | null = null;
 let musicEchoFeedback: GainNode | null = null;
 let musicEchoWet: GainNode | null = null;
+let musicSaturator: WaveShaperNode | null = null;
+let musicRoom: ConvolverNode | null = null;
+let musicRoomWet: GainNode | null = null;
+let musicCompressor: DynamicsCompressorNode | null = null;
 let effectsGain: GainNode | null = null;
 let musicTimer: number | null = null;
 let shuffleAdvanceTimer: number | null = null;
@@ -119,6 +123,53 @@ let previousShuffleTrackId: MusicTrackId | null = null;
 const getActiveComposition = (): MusicComposition =>
   musicCompositions[activeTrackId];
 
+const defaultMusicProcessing = {
+  roomWet: 0,
+  saturation: 0,
+  compressor: {
+    threshold: 0,
+    knee: 0,
+    ratio: 1,
+    attack: 0.03,
+    release: 0.25,
+  },
+};
+
+const getMusicProcessing = (composition: MusicComposition) =>
+  composition.processing ?? defaultMusicProcessing;
+
+const createSaturationCurve = (amount: number) => {
+  if (amount <= 0) return null;
+  const samples = 2048;
+  const curve = new Float32Array(samples);
+  const shape = 1 + amount * 2.6;
+  for (let index = 0; index < samples; index += 1) {
+    const input = (index / (samples - 1)) * 2 - 1;
+    curve[index] = Math.tanh(input * shape) / shape;
+  }
+  return curve;
+};
+
+const createShortRoomImpulse = (context: AudioContext) => {
+  const duration = 0.68;
+  const length = Math.max(1, Math.ceil(context.sampleRate * duration));
+  const impulse = context.createBuffer(2, length, context.sampleRate);
+  for (let channelIndex = 0; channelIndex < 2; channelIndex += 1) {
+    const channel = impulse.getChannelData(channelIndex);
+    for (let index = 0; index < length; index += 1) {
+      const progress = index / length;
+      const decay = (1 - progress) ** 3.4;
+      const earlyReflection =
+        index ===
+        Math.floor(context.sampleRate * (0.018 + channelIndex * 0.004))
+          ? 0.42
+          : 0;
+      channel[index] = (Math.random() * 2 - 1) * decay * 0.32 + earlyReflection;
+    }
+  }
+  return impulse;
+};
+
 const getMusicState = (): ConsoleMusicState => ({
   activeTrackId,
   playbackMode,
@@ -156,7 +207,17 @@ const readAudioPreference = () => {
 let audioEnabled = readAudioPreference();
 
 const createAudioGraph = () => {
-  if (audioContext && masterGain && musicInput && musicGain && effectsGain) {
+  if (
+    audioContext &&
+    masterGain &&
+    musicInput &&
+    musicGain &&
+    musicSaturator &&
+    musicRoom &&
+    musicRoomWet &&
+    musicCompressor &&
+    effectsGain
+  ) {
     return audioContext;
   }
 
@@ -169,6 +230,10 @@ const createAudioGraph = () => {
   musicEchoFilter = audioContext.createBiquadFilter();
   musicEchoFeedback = audioContext.createGain();
   musicEchoWet = audioContext.createGain();
+  musicSaturator = audioContext.createWaveShaper();
+  musicRoom = audioContext.createConvolver();
+  musicRoomWet = audioContext.createGain();
+  musicCompressor = audioContext.createDynamicsCompressor();
   masterGain = audioContext.createGain();
   musicInput = audioContext.createGain();
   musicGain = audioContext.createGain();
@@ -184,18 +249,32 @@ const createAudioGraph = () => {
   musicEchoWet.gain.value = composition.echo.wet;
   musicGain.gain.value = composition.level;
   effectsGain.gain.value = 0.9;
+  const processing = getMusicProcessing(composition);
+  musicSaturator.curve = createSaturationCurve(processing.saturation);
+  musicSaturator.oversample = "2x";
+  musicRoom.buffer = createShortRoomImpulse(audioContext);
+  musicRoom.normalize = true;
+  musicRoomWet.gain.value = processing.roomWet;
+  musicCompressor.threshold.value = processing.compressor.threshold;
+  musicCompressor.knee.value = processing.compressor.knee;
+  musicCompressor.ratio.value = processing.compressor.ratio;
+  musicCompressor.attack.value = processing.compressor.attack;
+  musicCompressor.release.value = processing.compressor.release;
   compressor.threshold.value = -18;
   compressor.knee.value = 12;
   compressor.ratio.value = 5;
   compressor.attack.value = 0.003;
   compressor.release.value = 0.22;
 
-  musicInput.connect(musicDry).connect(musicGain);
-  musicInput.connect(musicEcho);
+  musicInput.connect(musicSaturator);
+  musicSaturator.connect(musicDry).connect(musicGain);
+  musicSaturator.connect(musicEcho);
   musicEcho.connect(musicEchoFilter);
   musicEchoFilter.connect(musicEchoWet).connect(musicGain);
   musicEchoFilter.connect(musicEchoFeedback).connect(musicEcho);
-  musicGain.connect(masterGain);
+  musicSaturator.connect(musicRoom);
+  musicRoom.connect(musicRoomWet).connect(musicGain);
+  musicGain.connect(musicCompressor).connect(masterGain);
   effectsGain.connect(masterGain);
   masterGain.connect(compressor).connect(audioContext.destination);
   return audioContext;
@@ -211,6 +290,9 @@ const configureMusicGraph = (
     !musicEchoFilter ||
     !musicEchoFeedback ||
     !musicEchoWet ||
+    !musicSaturator ||
+    !musicRoomWet ||
+    !musicCompressor ||
     !musicGain
   ) {
     return;
@@ -218,6 +300,7 @@ const configureMusicGraph = (
 
   const now = context.currentTime;
   const beatSeconds = 60 / composition.tempo;
+  const processing = getMusicProcessing(composition);
   musicDry.gain.setTargetAtTime(composition.echo.dry, now, 0.08);
   musicEcho.delayTime.setTargetAtTime(
     beatSeconds * composition.echo.delayBeats,
@@ -231,6 +314,25 @@ const configureMusicGraph = (
   );
   musicEchoFeedback.gain.setTargetAtTime(composition.echo.feedback, now, 0.08);
   musicEchoWet.gain.setTargetAtTime(composition.echo.wet, now, 0.08);
+  musicSaturator.curve = createSaturationCurve(processing.saturation);
+  musicRoomWet.gain.setTargetAtTime(processing.roomWet, now, 0.12);
+  musicCompressor.threshold.setTargetAtTime(
+    processing.compressor.threshold,
+    now,
+    0.12,
+  );
+  musicCompressor.knee.setTargetAtTime(processing.compressor.knee, now, 0.12);
+  musicCompressor.ratio.setTargetAtTime(processing.compressor.ratio, now, 0.12);
+  musicCompressor.attack.setTargetAtTime(
+    processing.compressor.attack,
+    now,
+    0.12,
+  );
+  musicCompressor.release.setTargetAtTime(
+    processing.compressor.release,
+    now,
+    0.12,
+  );
   musicGain.gain.setTargetAtTime(composition.level, now, 0.08);
 };
 
