@@ -73,6 +73,7 @@ export const projects: Project[] = [
       "Ein verspieltes Web-Experiment mit konfigurierbarem Entenregen, überraschenden Events und viel Raum für neue Ideen.",
     url: "https://www.cozysite.de/",
     image: "/projects/cozysite.jpg",
+    previewVideo: "/projects/previews/cozysite.mp4",
     year: "2026",
     status: "ONLINE",
     accent: "#bae9ff",
