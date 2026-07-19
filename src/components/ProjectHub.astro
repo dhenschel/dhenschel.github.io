@@ -147,8 +147,8 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     "(prefers-reduced-motion: reduce)",
   ).matches;
   const previewDelay = 1100;
-  const previewDuration = 10000;
   const previewExitDuration = 820;
+  const previewReplayDelay = 6000;
   const channelPreviewStops: Array<() => void> = [];
 
   channelLinks.forEach((link) => {
@@ -161,17 +161,17 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
     }
 
     let armTimer: number | null = null;
-    let playbackTimer: number | null = null;
     let resetTimer: number | null = null;
+    let replayTimer: number | null = null;
     let previewRun = 0;
 
     const clearPreviewTimers = () => {
       if (armTimer !== null) window.clearTimeout(armTimer);
-      if (playbackTimer !== null) window.clearTimeout(playbackTimer);
       if (resetTimer !== null) window.clearTimeout(resetTimer);
+      if (replayTimer !== null) window.clearTimeout(replayTimer);
       armTimer = null;
-      playbackTimer = null;
       resetTimer = null;
+      replayTimer = null;
     };
 
     const resetPreviewTime = () => {
@@ -183,7 +183,11 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
         ? link.classList.contains("gamepad-pointer-target")
         : link.matches(":hover");
 
-    const stopPreview = (cooldown = false, slowExit = false) => {
+    const stopPreview = (
+      cooldown = false,
+      slowExit = false,
+      replayWhileTargeted = false,
+    ) => {
       const wasVisible = link.dataset.previewState === "playing";
       previewRun += 1;
       clearPreviewTimers();
@@ -201,6 +205,21 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
         }, previewExitDuration);
       } else {
         resetPreviewTime();
+      }
+
+      if (replayWhileTargeted) {
+        replayTimer = window.setTimeout(() => {
+          replayTimer = null;
+          if (
+            link.dataset.previewState !== "cooldown" ||
+            !isPreviewTargeted() ||
+            document.documentElement.dataset.launching === "true"
+          ) {
+            return;
+          }
+          link.dataset.previewState = "idle";
+          armPreview();
+        }, previewReplayDelay);
       }
     };
 
@@ -234,16 +253,12 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
           return;
         }
         link.dataset.previewState = "playing";
-        playbackTimer = window.setTimeout(
-          () => stopPreview(true, true),
-          previewDuration,
-        );
       } catch {
         if (currentRun === previewRun) stopPreview(true);
       }
     };
 
-    const armPreview = () => {
+    function armPreview() {
       const state = link.dataset.previewState;
       if (
         document.documentElement.dataset.launching === "true" ||
@@ -256,11 +271,11 @@ const channels = Array.from({ length: channelCount }, (_, index) => ({
       }
       link.dataset.previewState = "arming";
       armTimer = window.setTimeout(startPreview, previewDelay);
-    };
+    }
 
     link.addEventListener("pointerenter", armPreview);
     link.addEventListener("pointerleave", () => stopPreview());
-    preview.addEventListener("ended", () => stopPreview(true, true));
+    preview.addEventListener("ended", () => stopPreview(true, true, true));
     channelPreviewStops.push(() => stopPreview());
   });
 
