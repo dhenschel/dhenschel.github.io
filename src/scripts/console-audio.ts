@@ -117,7 +117,11 @@ const pickShuffleTrack = (
 
 let playbackMode: MusicDiscId = musicPreferences.defaults[getCurrentTheme()];
 let activeTrackId: MusicTrackId =
-  playbackMode === "shuffle" ? pickShuffleTrack() : playbackMode;
+  playbackMode === "shuffle"
+    ? pickShuffleTrack()
+    : playbackMode === "off"
+      ? musicTrackIds[0]
+      : playbackMode;
 let previousShuffleTrackId: MusicTrackId | null = null;
 
 const getActiveComposition = (): MusicComposition =>
@@ -584,7 +588,13 @@ const scheduleShuffleAdvance = () => {
 };
 
 const startMusic = (fadeInSeconds?: number) => {
-  if (!audioEnabled || launchInProgress || document.hidden || musicRunning) {
+  if (
+    playbackMode === "off" ||
+    !audioEnabled ||
+    launchInProgress ||
+    document.hidden ||
+    musicRunning
+  ) {
     return;
   }
 
@@ -671,6 +681,13 @@ const applyActiveTrack = (
 
 const setTrack = (discId: MusicDiscId) => {
   if (!isMusicDiscId(discId)) return;
+  if (discId === "off") {
+    playbackMode = "off";
+    previousShuffleTrackId = null;
+    clearShuffleAdvance();
+    stopMusic(420);
+    return;
+  }
   if (discId === "shuffle") {
     const nextTrackId = pickShuffleTrack(activeTrackId, previousShuffleTrackId);
     previousShuffleTrackId = activeTrackId;

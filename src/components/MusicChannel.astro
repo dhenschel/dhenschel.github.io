@@ -1,7 +1,7 @@
 ---
-import { musicTracks, shuffleDisc } from "../data/music";
+import { musicTracks, offDisc, shuffleDisc } from "../data/music";
 
-const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
+const musicLibraryDiscs = [shuffleDisc, offDisc, ...musicTracks];
 ---
 
 <section
@@ -47,11 +47,22 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
               data-music-disc
               data-track-id={track.id}
               data-shuffle-disc={track.id === "shuffle" ? "true" : undefined}
+              data-silent-disc={track.id === "off" ? "true" : undefined}
               data-carousel-position={index === 0 ? "active" : "visible"}
               data-carousel-distance={index}
-              aria-label={`${track.title} auswählen und anhören`}
-              data-i18n-aria="music.selectTrack"
-              data-i18n-params={JSON.stringify({ title: track.title })}
+              aria-label={
+                track.id === "off"
+                  ? "Musik ausschalten"
+                  : `${track.title} auswählen und anhören`
+              }
+              data-i18n-aria={
+                track.id === "off" ? "music.off.action" : "music.selectTrack"
+              }
+              data-i18n-params={
+                track.id === "off"
+                  ? undefined
+                  : JSON.stringify({ title: track.title })
+              }
               aria-pressed="false"
               tabindex={index === 0 ? "0" : "-1"}
               style={`--disc-color: ${track.color}; --disc-color-dark: ${track.colorDark}; --music-disc-index: ${index};`}
@@ -63,7 +74,9 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
                     data-i18n={
                       track.id === "shuffle"
                         ? "music.shuffle.label"
-                        : `music.track.${track.translationKey}.label`
+                        : track.id === "off"
+                          ? "music.off.label"
+                          : `music.track.${track.translationKey}.label`
                     }
                   >
                     {track.label}
@@ -82,6 +95,16 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
                           style={`--question-opacity: ${[0.92, 0.7, 0.5, 0.4, 0.5, 0.7][questionIndex]};`}
                         />
                       ))}
+                    </svg>
+                  )}
+                  {track.id === "off" && (
+                    <svg
+                      class="music-disc__mute-symbol"
+                      viewBox="0 0 100 100"
+                      aria-hidden="true"
+                    >
+                      <path d="M18 43h13l15-12v38L31 57H18Z" />
+                      <path d="m61 38 22 24m0-24L61 62" />
                     </svg>
                   )}
                   <i />
@@ -229,6 +252,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
     musicTrackIds,
     musicTracks,
     normalizeShufflePool,
+    offDisc,
     shuffleDisc,
     shufflePoolStorageKey,
     type ConsoleTheme,
@@ -237,7 +261,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
   } from "../data/music";
   import { t } from "../scripts/i18n";
 
-  const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
+  const musicLibraryDiscs = [shuffleDisc, offDisc, ...musicTracks];
 
   const musicDiscs = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-music-disc]"),
@@ -319,9 +343,9 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
   const getSelectedDisc = () => musicLibraryDiscs[selectedMusicIndex];
   const getDiscDescription = (index = selectedMusicIndex) => {
     const disc = musicLibraryDiscs[index];
-    return disc.id === "shuffle"
-      ? t("music.shuffle.description")
-      : t(`music.track.${disc.translationKey}.description`);
+    if (disc.id === "shuffle") return t("music.shuffle.description");
+    if (disc.id === "off") return t("music.off.description");
+    return t(`music.track.${disc.translationKey}.description`);
   };
 
   const getDiscRotation = (surface: HTMLElement) => {
@@ -362,11 +386,7 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
   const updateMusicState = () => {
     musicDiscs.forEach((disc) => {
       const discId = disc.dataset.trackId as MusicDiscId;
-      const isShuffle = discId === "shuffle";
-      const isActive =
-        musicState.playbackMode === "shuffle"
-          ? isShuffle
-          : discId === musicState.activeTrackId;
+      const isActive = discId === musicState.playbackMode;
       disc.dataset.activeTrack = String(isActive);
       disc.setAttribute("aria-pressed", String(isActive));
       if (!isActive) {
@@ -380,9 +400,11 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
       );
       if (status) {
         status.textContent = isActive
-          ? musicState.playing
-            ? t("music.playing")
-            : t("music.selected")
+          ? discId === "off"
+            ? t("music.off.active")
+            : musicState.playing
+              ? t("music.playing")
+              : t("music.selected")
           : "";
       }
       const dayBadge = disc.querySelector<HTMLElement>(
@@ -397,39 +419,46 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 
     const selectedDisc = getSelectedDisc();
     const selectedIsShuffle = selectedDisc.id === "shuffle";
+    const selectedIsOff = selectedDisc.id === "off";
     const selectedIsActive = selectedDisc.id === musicState.playbackMode;
     if (musicPlayLabel) {
       musicPlayLabel.textContent = selectedIsShuffle
         ? t(selectedIsActive ? "music.shuffle.again" : "music.shuffle.play")
-        : selectedIsActive && musicState.playing
-          ? t("music.playing")
-          : t("music.listen");
+        : selectedIsOff
+          ? t(selectedIsActive ? "music.off.activeShort" : "music.off.action")
+          : selectedIsActive && musicState.playing
+            ? t("music.playing")
+            : t("music.listen");
     }
     musicPlay?.setAttribute(
       "aria-label",
       selectedIsShuffle
         ? t("music.shuffle.playAria")
-        : selectedIsActive && musicState.playing
-          ? t("music.playingTrack", { title: selectedDisc.title })
-          : t("music.listenTrack", { title: selectedDisc.title }),
+        : selectedIsOff
+          ? t("music.off.action")
+          : selectedIsActive && musicState.playing
+            ? t("music.playingTrack", { title: selectedDisc.title })
+            : t("music.listenTrack", { title: selectedDisc.title }),
     );
     if (musicPlayingStatus) {
       const activeTrack = musicTracks.find(
         (track) => track.id === musicState.activeTrackId,
       );
-      musicPlayingStatus.textContent = selectedIsShuffle
-        ? selectedIsActive && activeTrack
-          ? t("music.shuffle.playing", { title: activeTrack.title })
-          : t("music.shuffle.hint")
-        : selectedIsActive
-          ? musicState.playing
-            ? t("music.playing")
-            : t("music.selectedBackground")
-          : t(
-              document.documentElement.dataset.inputMode === "gamepad"
-                ? "music.playHintGamepad"
-                : "music.playHint",
-            );
+      musicPlayingStatus.textContent = selectedIsOff
+        ? t(selectedIsActive ? "music.off.active" : "music.off.hint")
+        : selectedIsShuffle
+          ? selectedIsActive && activeTrack
+            ? t("music.shuffle.playing", { title: activeTrack.title })
+            : t("music.shuffle.hint")
+          : selectedIsActive
+            ? musicState.playing
+              ? t("music.playing")
+              : t("music.selectedBackground")
+            : t(
+                document.documentElement.dataset.inputMode === "gamepad"
+                  ? "music.playHintGamepad"
+                  : "music.playHint",
+              );
     }
 
     musicDefaultButtons.forEach((button) => {
@@ -452,13 +481,17 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
       const activeTrack = musicTracks.find(
         (track) => track.id === musicState.activeTrackId,
       );
-      headerMusicButton.title = activeTrack
-        ? t("header.openMusicTrackTitle", { title: activeTrack.title })
+      const activeTitle =
+        musicState.playbackMode === "off"
+          ? t("music.off.title")
+          : activeTrack?.title;
+      headerMusicButton.title = activeTitle
+        ? t("header.openMusicTrackTitle", { title: activeTitle })
         : t("header.openMusic");
       headerMusicButton.setAttribute(
         "aria-label",
-        activeTrack
-          ? t("header.openMusicTrack", { title: activeTrack.title })
+        activeTitle
+          ? t("header.openMusicTrack", { title: activeTitle })
           : t("header.openMusic"),
       );
     }
@@ -500,7 +533,9 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
       musicTitle.textContent =
         selectedDisc.id === "shuffle"
           ? t("music.shuffle.title")
-          : selectedDisc.title;
+          : selectedDisc.id === "off"
+            ? t("music.off.title")
+            : selectedDisc.title;
     }
     if (musicDescription) musicDescription.textContent = getDiscDescription();
     updateMusicState();
@@ -651,9 +686,11 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 
   musicDiscs.forEach((disc, index) => {
     const surface = disc.querySelector<HTMLElement>(".music-disc__surface");
+    const isSilentDisc = disc.dataset.silentDisc === "true";
 
     disc.addEventListener("pointerenter", () => {
       if (
+        isSilentDisc ||
         !surface ||
         disc.dataset.activeTrack !== "true" ||
         disc.dataset.carouselPosition !== "active"
@@ -667,6 +704,12 @@ const musicLibraryDiscs = [shuffleDisc, ...musicTracks];
 
     disc.addEventListener("pointerleave", () => {
       if (!surface) return;
+      if (isSilentDisc) {
+        surface.style.removeProperty("animation");
+        surface.style.removeProperty("--music-hover-angle");
+        surface.style.removeProperty("--music-resume-angle");
+        return;
+      }
       if (
         disc.dataset.activeTrack === "true" &&
         disc.dataset.carouselPosition === "active"

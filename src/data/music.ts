@@ -9,7 +9,7 @@ export const musicTrackIds = [
 ] as const;
 
 export type MusicTrackId = (typeof musicTrackIds)[number];
-export type MusicDiscId = "shuffle" | MusicTrackId;
+export type MusicDiscId = "off" | "shuffle" | MusicTrackId;
 export type ConsoleTheme = "light" | "dark";
 
 export type MusicTrack = {
@@ -34,6 +34,17 @@ export const shuffleDisc = {
   color: "#aeb6c1",
   colorDark: "#5d6875",
   label: "Zufall",
+};
+
+export const offDisc = {
+  id: "off" as const,
+  title: "Keine Musik",
+  shortTitle: "OFF",
+  description:
+    "Deaktiviert nur die Hintergrundmusik. Menü-Sounds und andere Soundeffekte bleiben aktiv.",
+  color: "#d5dde3",
+  colorDark: "#7c8994",
+  label: "Stille",
 };
 
 export const musicTracks: readonly MusicTrack[] = [
@@ -159,7 +170,7 @@ export const isMusicTrackId = (value: unknown): value is MusicTrackId =>
   (musicTrackIds as readonly string[]).includes(value);
 
 export const isMusicDiscId = (value: unknown): value is MusicDiscId =>
-  value === "shuffle" || isMusicTrackId(value);
+  value === "off" || value === "shuffle" || isMusicTrackId(value);
 
 export const isConsoleTheme = (value: unknown): value is ConsoleTheme =>
   value === "light" || value === "dark";

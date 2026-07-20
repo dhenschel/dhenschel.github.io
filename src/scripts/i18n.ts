@@ -109,6 +109,14 @@ const de: Record<string, string> = {
   "music.playingTrack": "{{title}} läuft gerade",
   "music.dayDefault": "Als Tag-Standard",
   "music.nightDefault": "Als Nacht-Standard",
+  "music.off.title": "Keine Musik",
+  "music.off.label": "Stille",
+  "music.off.description":
+    "Deaktiviert nur die Hintergrundmusik. Menü-Sounds und andere Soundeffekte bleiben aktiv.",
+  "music.off.action": "Musik ausschalten",
+  "music.off.activeShort": "Musik aus",
+  "music.off.active": "Hintergrundmusik ist ausgeschaltet",
+  "music.off.hint": "Wählt einen ruhigen Modus ohne Hintergrundmusik",
   "music.shuffle.title": "Shuffle",
   "music.shuffle.label": "Zufall",
   "music.shuffle.description":
@@ -331,6 +339,14 @@ const en: Record<string, string> = {
   "music.playingTrack": "{{title}} is playing",
   "music.dayDefault": "Set as day default",
   "music.nightDefault": "Set as night default",
+  "music.off.title": "No Music",
+  "music.off.label": "Silence",
+  "music.off.description":
+    "Turns off background music only. Menu sounds and other effects remain active.",
+  "music.off.action": "Turn music off",
+  "music.off.activeShort": "Music off",
+  "music.off.active": "Background music is turned off",
+  "music.off.hint": "Selects a quiet mode without background music",
   "music.shuffle.title": "Shuffle",
   "music.shuffle.label": "Random",
   "music.shuffle.description":
@@ -544,6 +560,14 @@ const fr: Record<string, string> = {
   "music.playingTrack": "{{title}} est en cours de lecture",
   "music.dayDefault": "Définir pour le jour",
   "music.nightDefault": "Définir pour la nuit",
+  "music.off.title": "Sans musique",
+  "music.off.label": "Silence",
+  "music.off.description":
+    "Coupe uniquement la musique de fond. Les sons du menu et les autres effets restent actifs.",
+  "music.off.action": "Couper la musique",
+  "music.off.activeShort": "Musique coupée",
+  "music.off.active": "La musique de fond est coupée",
+  "music.off.hint": "Sélectionne un mode calme sans musique de fond",
   "music.shuffle.title": "Aléatoire",
   "music.shuffle.label": "Hasard",
   "music.shuffle.description":
@@ -763,6 +787,14 @@ const es: Record<string, string> = {
   "music.playingTrack": "{{title}} se está reproduciendo",
   "music.dayDefault": "Usar de día",
   "music.nightDefault": "Usar de noche",
+  "music.off.title": "Sin música",
+  "music.off.label": "Silencio",
+  "music.off.description":
+    "Desactiva solo la música de fondo. Los sonidos del menú y los demás efectos siguen activos.",
+  "music.off.action": "Desactivar música",
+  "music.off.activeShort": "Música desactivada",
+  "music.off.active": "La música de fondo está desactivada",
+  "music.off.hint": "Selecciona un modo tranquilo sin música de fondo",
   "music.shuffle.title": "Aleatorio",
   "music.shuffle.label": "Azar",
   "music.shuffle.description":

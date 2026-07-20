@@ -20,7 +20,7 @@ type ConsoleMusicTrackId =
   | "metro-drift"
   | "soft-orbit"
   | "signal-garden";
-type ConsoleMusicDiscId = "shuffle" | ConsoleMusicTrackId;
+type ConsoleMusicDiscId = "off" | "shuffle" | ConsoleMusicTrackId;
 
 type ConsoleTheme = "light" | "dark";
 
