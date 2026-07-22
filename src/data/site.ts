@@ -9,7 +9,7 @@ export const siteMetadata = {
   themeColor: "#0b0d10",
   socialImage: "/social-card.png",
   socialImageAlt:
-    "D. Henschel – Software Developer. Digitale Produkte mit System und Charakter.",
+    "D. Henschel – Software Developer in einer spielkonsolenartigen Portfolio-Oberfläche.",
   socialImageWidth: 1200,
   socialImageHeight: 630,
 } as const;
