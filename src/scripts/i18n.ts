@@ -4,15 +4,15 @@ export type Language = (typeof supportedLanguages)[number];
 export type TranslationParams = Record<string, string | number>;
 
 const de: Record<string, string> = {
-  "page.home.title": "D. Henschel — Website-Menü",
+  "page.home.title": "D. Henschel | Software Developer & Web-Projekte",
   "page.home.description":
-    "Das persönliche Website-Menü von D. Henschel mit Projekten und kommenden Ideen.",
-  "page.imprint.title": "Impressum — D. Henschel",
-  "page.privacy.title": "Datenschutz — D. Henschel",
-  "page.notFound.title": "404 — Signal verloren",
-  "page.case.title": "dhenschel.de — Case Study",
+    "Das Portfolio von Daniel Henschel, Software Developer: interaktive Web-Projekte, Case Studies und Einblicke in Konzeption, Design und Entwicklung.",
+  "page.imprint.title": "Impressum | Daniel Henschel",
+  "page.privacy.title": "Datenschutz | Daniel Henschel",
+  "page.notFound.title": "Seite nicht gefunden | D. Henschel",
+  "page.case.title": "dhenschel.de Case Study | Astro, TypeScript & CSS",
   "page.case.description":
-    "Konzept und technische Entscheidungen hinter dem Portfolio-Hub von D. Henschel.",
+    "Case Study zum Portfolio dhenschel.de: Konzept, Console-Interface und technische Umsetzung als statische Website mit Astro, TypeScript und CSS.",
   "common.skipContent": "Zum Inhalt springen",
   "common.online": "Online",
   "input.current": "Aktive Eingabemethode",
@@ -236,14 +236,15 @@ const de: Record<string, string> = {
 
 const en: Record<string, string> = {
   ...de,
-  "page.home.title": "D. Henschel — Website Menu",
+  "page.home.title": "D. Henschel | Software Developer & Web Projects",
   "page.home.description":
-    "D. Henschel’s personal website menu featuring projects and upcoming ideas.",
-  "page.imprint.title": "Legal Notice — D. Henschel",
-  "page.privacy.title": "Privacy — D. Henschel",
-  "page.notFound.title": "404 — Signal Lost",
+    "Daniel Henschel’s software developer portfolio with interactive web projects, case studies, and insights into concept, design, and development.",
+  "page.imprint.title": "Legal Notice | Daniel Henschel",
+  "page.privacy.title": "Privacy | Daniel Henschel",
+  "page.notFound.title": "Page Not Found | D. Henschel",
+  "page.case.title": "dhenschel.de Case Study | Astro, TypeScript & CSS",
   "page.case.description":
-    "The concept and technical decisions behind D. Henschel’s portfolio hub.",
+    "Case study of dhenschel.de: concept, console interface, and implementation as a static website with Astro, TypeScript, and CSS.",
   "common.skipContent": "Skip to content",
   "common.online": "Online",
   "input.current": "Active input method",
@@ -464,12 +465,15 @@ const en: Record<string, string> = {
 
 const fr: Record<string, string> = {
   ...en,
-  "page.home.title": "D. Henschel — Menu des sites",
+  "page.home.title": "D. Henschel | Développeur logiciel et projets web",
   "page.home.description":
-    "Le menu personnel de D. Henschel avec ses projets et ses prochaines idées.",
-  "page.imprint.title": "Mentions légales — D. Henschel",
-  "page.privacy.title": "Confidentialité — D. Henschel",
-  "page.notFound.title": "404 — Signal perdu",
+    "Portfolio de Daniel Henschel, développeur logiciel : projets web interactifs, études de cas et aperçu de la conception, du design et du développement.",
+  "page.imprint.title": "Mentions légales | Daniel Henschel",
+  "page.privacy.title": "Confidentialité | Daniel Henschel",
+  "page.notFound.title": "Page introuvable | D. Henschel",
+  "page.case.title": "dhenschel.de | Étude de cas Astro, TypeScript et CSS",
+  "page.case.description":
+    "Étude de cas de dhenschel.de : concept, interface de console et réalisation d’un site statique avec Astro, TypeScript et CSS.",
   "common.skipContent": "Aller au contenu",
   "input.current": "Méthode de saisie active",
   "input.mouseKeyboard": "Souris et clavier",
@@ -690,12 +694,16 @@ const fr: Record<string, string> = {
 
 const es: Record<string, string> = {
   ...en,
-  "page.home.title": "D. Henschel — Menú de sitios",
+  "page.home.title": "D. Henschel | Desarrollador de software y proyectos web",
   "page.home.description":
-    "El menú personal de D. Henschel con sus proyectos y próximas ideas.",
-  "page.imprint.title": "Aviso legal — D. Henschel",
-  "page.privacy.title": "Privacidad — D. Henschel",
-  "page.notFound.title": "404 — Señal perdida",
+    "Portfolio de Daniel Henschel, desarrollador de software: proyectos web interactivos, casos de estudio y detalles sobre concepto, diseño y desarrollo.",
+  "page.imprint.title": "Aviso legal | Daniel Henschel",
+  "page.privacy.title": "Privacidad | Daniel Henschel",
+  "page.notFound.title": "Página no encontrada | D. Henschel",
+  "page.case.title":
+    "dhenschel.de | Caso de estudio con Astro, TypeScript y CSS",
+  "page.case.description":
+    "Caso de estudio de dhenschel.de: concepto, interfaz de consola e implementación como sitio estático con Astro, TypeScript y CSS.",
   "common.skipContent": "Ir al contenido",
   "input.current": "Método de entrada activo",
   "input.mouseKeyboard": "Ratón y teclado",

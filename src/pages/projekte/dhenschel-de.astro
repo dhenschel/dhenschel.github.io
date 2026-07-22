@@ -2,11 +2,42 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
+import { schemaIds, siteMetadata, siteProfile } from "../../data/site";
+
+const title = "dhenschel.de Case Study | Astro, TypeScript & CSS";
+const description =
+  "Case Study zum Portfolio dhenschel.de: Konzept, Console-Interface und technische Umsetzung als statische Website mit Astro, TypeScript und CSS.";
+const pageUrl = new URL("/projekte/dhenschel-de/", siteMetadata.url).href;
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${pageUrl}#webpage`,
+  url: pageUrl,
+  name: title,
+  description,
+  inLanguage: siteMetadata.language,
+  isPartOf: { "@id": schemaIds.website },
+  about: { "@id": schemaIds.website },
+  author: {
+    "@type": "Person",
+    "@id": schemaIds.person,
+    name: siteProfile.fullName,
+    url: siteMetadata.url,
+  },
+  primaryImageOfPage: {
+    "@type": "ImageObject",
+    url: new URL(siteMetadata.socialImage, siteMetadata.url).href,
+    width: siteMetadata.socialImageWidth,
+    height: siteMetadata.socialImageHeight,
+  },
+};
 ---
 
 <BaseLayout
-  title="dhenschel.de — Case Study"
-  description="Konzept und technische Entscheidungen hinter dem Portfolio-Hub von D. Henschel."
+  {title}
+  {description}
+  openGraphType="article"
+  structuredData={structuredData}
   titleKey="page.case.title"
   descriptionKey="page.case.description"
 >

@@ -1,34 +1,59 @@
 ---
 import "../styles/global.css";
+import { siteMetadata, siteProfile } from "../data/site";
+
+type OpenGraphType = "website" | "article" | "profile";
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
+  imageType?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  canonicalPath?: string;
+  openGraphType?: OpenGraphType;
   noindex?: boolean;
+  structuredData?: Record<string, unknown>;
   titleKey?: string;
   descriptionKey?: string;
   bodyClass?: string;
 }
 
 const {
-  title = "D. Henschel — Software Developer",
-  description = "Portfolio von D. Henschel: digitale Produkte mit System und Charakter.",
-  image = "/social-card.svg",
+  title = siteMetadata.defaultTitle,
+  description = siteMetadata.defaultDescription,
+  image = siteMetadata.socialImage,
+  imageAlt = siteMetadata.socialImageAlt,
+  imageType = "image/png",
+  imageWidth = siteMetadata.socialImageWidth,
+  imageHeight = siteMetadata.socialImageHeight,
+  canonicalPath = Astro.url.pathname,
+  openGraphType = "website",
   noindex = false,
+  structuredData,
   titleKey,
   descriptionKey,
   bodyClass,
 } = Astro.props;
 
-const baseUrl = Astro.site ?? Astro.url.origin;
-const canonicalUrl = new URL(Astro.url.pathname, baseUrl);
+const baseUrl = Astro.site ?? new URL(siteMetadata.url);
+const canonicalUrl = new URL(canonicalPath, baseUrl);
 const socialImageUrl = new URL(image, baseUrl);
+const robots = noindex
+  ? "noindex, follow"
+  : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+const serializedStructuredData = structuredData
+  ? JSON.stringify(structuredData).replace(/</g, "\\u003c")
+  : undefined;
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang={siteMetadata.language}>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline>
       (() => {
         const supported = ["de", "en", "fr", "es"];
@@ -48,29 +73,44 @@ const socialImageUrl = new URL(image, baseUrl);
         document.documentElement.dataset.language = language;
       })();
     </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0b0d10" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="canonical" href={canonicalUrl} />
+    <meta name="author" content={siteProfile.fullName} />
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content={siteMetadata.themeColor} />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="generator" content={Astro.generator} />
+    {!noindex && <link rel="canonical" href={canonicalUrl.href} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="de_DE" />
+    <meta property="og:type" content={openGraphType} />
+    <meta property="og:locale" content={siteMetadata.locale} />
+    <meta property="og:site_name" content={siteMetadata.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:url" content={canonicalUrl.href} />
+    <meta property="og:image" content={socialImageUrl.href} />
+    <meta property="og:image:secure_url" content={socialImageUrl.href} />
+    <meta property="og:image:type" content={imageType} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={socialImageUrl} />
+    <meta name="twitter:image" content={socialImageUrl.href} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
-    <title>{title}</title>
+    {
+      serializedStructuredData && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={serializedStructuredData}
+        />
+      )
+    }
   </head>
   <body
     class={bodyClass}

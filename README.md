@@ -33,7 +33,7 @@ server.
 **Open the deployed website:** [https://dhenschel.github.io/](https://dhenschel.github.io/)
 
 The configured canonical domain is
-[https://www.dhenschel.de/](https://www.dhenschel.de/). The GitHub Pages URL above
+[https://dhenschel.de/](https://dhenschel.de/). The GitHub Pages URL above
 is the direct deployment URL and can be used if custom-domain DNS is still
 propagating.
 

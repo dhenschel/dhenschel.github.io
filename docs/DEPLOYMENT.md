@@ -1,6 +1,6 @@
 # GitHub Pages und Custom Domain
 
-Zieladresse: `www.dhenschel.de`
+Zieladresse und kanonische Domain: `dhenschel.de`
 
 Aktive GitHub-Pages-Vorschau: `https://dhenschel.github.io/`
 
@@ -26,11 +26,12 @@ Workflow baut die Website und veröffentlicht ausschließlich das statische
 
 1. Domain im GitHub-Konto verifizieren, um eine Übernahme durch Dritte zu
    verhindern.
-2. In `Settings → Pages` des Repositorys `www.dhenschel.de` als Custom Domain
+2. In `Settings → Pages` des Repositorys `dhenschel.de` als Custom Domain
    eintragen.
-3. Bei STRATO `www` als `CNAME` direkt auf `dhenschel.github.io` zeigen lassen.
-4. Für die Apex-Domain `dhenschel.de` die von GitHub dokumentierten `A`-Records
-   setzen, damit GitHub zwischen Apex und `www` weiterleiten kann.
+3. Für die Apex-Domain `dhenschel.de` die von GitHub dokumentierten `A`-Records
+   setzen.
+4. `www` bei STRATO als `CNAME` direkt auf `dhenschel.github.io` zeigen lassen,
+   damit GitHub die Subdomain auf die kanonische Apex-Domain weiterleiten kann.
 5. Nach erfolgreicher DNS-Prüfung **Enforce HTTPS** aktivieren.
 6. Beide Varianten, HTTPS, Canonical URL und Weiterleitungen testen.
 
@@ -61,11 +62,11 @@ werden:
 
 Geprüft am 13. Juli 2026:
 
-| Record                   | Aktueller Wert | Zielwert                        |
-| ------------------------ | -------------- | ------------------------------- |
-| `dhenschel.de A`         | `217.160.0.59` | vier GitHub-Pages-IPv4-Adressen |
-| `www.dhenschel.de CNAME` | `dhenschel.de` | `dhenschel.github.io`           |
-| Nameserver               | `*.rzone.de`   | unverändert, STRATO             |
+| Record           | Aktueller Wert | Zielwert                        |
+| ---------------- | -------------- | ------------------------------- |
+| `dhenschel.de A` | `217.160.0.59` | vier GitHub-Pages-IPv4-Adressen |
+| `www CNAME`      | `dhenschel.de` | `dhenschel.github.io`           |
+| Nameserver       | `*.rzone.de`   | unverändert, STRATO             |
 
 Der aktuelle `A`-Record muss bei der Umstellung entfernt beziehungsweise durch
 die vier GitHub-Records ersetzt werden. Nach der DNS-Propagation wird die Custom
@@ -78,9 +79,11 @@ Domain im Repository gesetzt und anschließend **Enforce HTTPS** aktiviert.
 - erneute DNS-Prüfung und Aktivierung der Custom Domain;
 - HTTPS-Zertifikatsausstellung durch GitHub abwarten und HTTPS erzwingen.
 
-`www.dhenschel.de` ist als kanonische Darstellung festgelegt. Bei korrekt
-gesetzten Apex- und `www`-Records übernimmt GitHub die Weiterleitung von
-`dhenschel.de` auf `www.dhenschel.de`.
+`dhenschel.de` ist als kanonische Darstellung festgelegt und in GitHub Pages als
+Custom Domain hinterlegt. Die `www`-Variante darf nur als Weiterleitung auf die
+Apex-Domain dienen. Solange beim HTTPS-Aufruf der `www`-Variante kein gültiges
+Zertifikat ausgeliefert wird, wird sie weder als Canonical noch in Sitemap oder
+strukturierten Daten verwendet.
 
 ## Offizielle Dokumentation
 
