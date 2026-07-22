@@ -7,37 +7,55 @@ import MusicChannel from "../components/MusicChannel.astro";
 import ProjectHub from "../components/ProjectHub.astro";
 import StartupScreen from "../components/StartupScreen.astro";
 import { projects } from "../data/projects";
-import { siteProfile } from "../data/site";
+import {
+  personStructuredData,
+  schemaIds,
+  siteMetadata,
+  siteProfile,
+  websiteStructuredData,
+} from "../data/site";
 import "../styles/console.css";
 
-const websiteProjects = projects.filter((project) => project.url);
+const websiteProjects = projects.filter(
+  (project) => project.url && project.slug !== "github",
+);
+const pageUrl = new URL("/", siteMetadata.url).href;
 
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
+    personStructuredData,
+    websiteStructuredData,
     {
-      "@type": "Person",
-      "@id": "https://www.dhenschel.de/#person",
-      name: "D. Henschel",
-      url: "https://www.dhenschel.de",
-      sameAs: [siteProfile.github],
-      jobTitle: siteProfile.role,
-    },
-    {
-      "@type": "CollectionPage",
-      name: "D. Henschel — Website-Menü",
-      url: "https://www.dhenschel.de/",
-      about: { "@id": "https://www.dhenschel.de/#person" },
-      mainEntity: {
+      "@type": "ProfilePage",
+      "@id": `${pageUrl}#webpage`,
+      url: pageUrl,
+      name: siteMetadata.defaultTitle,
+      description: siteMetadata.defaultDescription,
+      inLanguage: siteMetadata.language,
+      isPartOf: { "@id": schemaIds.website },
+      about: { "@id": schemaIds.person },
+      mainEntity: { "@id": schemaIds.person },
+      primaryImageOfPage: {
+        "@type": "ImageObject",
+        url: new URL(siteMetadata.socialImage, siteMetadata.url).href,
+        width: siteMetadata.socialImageWidth,
+        height: siteMetadata.socialImageHeight,
+        caption: siteMetadata.socialImageAlt,
+      },
+      hasPart: {
         "@type": "ItemList",
+        name: "Web-Projekte von D. Henschel",
+        numberOfItems: websiteProjects.length,
         itemListElement: websiteProjects.map((project, index) => ({
           "@type": "ListItem",
           position: index + 1,
           item: {
-            "@type": "WebSite",
+            "@type": "CreativeWork",
             name: project.title,
             url: project.url,
-            creator: { "@id": "https://www.dhenschel.de/#person" },
+            description: project.description,
+            creator: { "@id": schemaIds.person },
           },
         })),
       },
@@ -47,8 +65,9 @@ const structuredData = {
 ---
 
 <BaseLayout
-  title="D. Henschel — Website-Menü"
-  description="Das persönliche Website-Menü von D. Henschel mit ClipCollection, CozySite, Restaurant Lava, BootBucht24 und kommenden Projekten."
+  title={siteMetadata.defaultTitle}
+  description={siteMetadata.defaultDescription}
+  structuredData={structuredData}
   titleKey="page.home.title"
   descriptionKey="page.home.description"
 >
@@ -77,12 +96,6 @@ const structuredData = {
             : "gallery";
     })();
   </script>
-
-  <script
-    is:inline
-    type="application/ld+json"
-    set:html={JSON.stringify(structuredData)}
-  />
 
   <StartupScreen />
 

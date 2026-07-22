@@ -15,7 +15,7 @@ interface Props {
 const { title, description, current } = Astro.props;
 ---
 
-<BaseLayout {title} {description} bodyClass="legal-console-body">
+<BaseLayout {title} {description} noindex bodyClass="legal-console-body">
   <script is:inline>
     (() => {
       const storageKey = "dh-console-theme";

@@ -1,7 +1,11 @@
 {
-  "name": "D. Henschel — Software Developer",
+  "id": "/",
+  "name": "D. Henschel | Software Developer & Web-Projekte",
   "short_name": "DH",
+  "description": "Portfolio von Software Developer Daniel Henschel mit interaktiven Web-Projekten und Case Studies.",
+  "lang": "de",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "landscape",
   "background_color": "#0b0d10",

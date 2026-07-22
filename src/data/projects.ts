@@ -105,7 +105,7 @@ export const projects: Project[] = [
     category: "Satirical Marketplace",
     description:
       "Ein humorvoller Fake-Marktplatz für gebrauchte Boote mit Suche, Filtern und Angeboten, die Besucher unerwartet auf Kurs bringen.",
-    url: "https://dhenschel.github.io/BootBucht24/",
+    url: "https://bootbucht24.cozysite.de/",
     image: "/projects/bootbucht24.jpg",
     year: "2026",
     status: "ONLINE",

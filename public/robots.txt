@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.dhenschel.de/sitemap-index.xml
+Sitemap: https://dhenschel.de/sitemap-index.xml
